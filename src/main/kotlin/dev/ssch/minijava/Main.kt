@@ -35,7 +35,8 @@ fun test(src: String, output: String) {
 
         override fun enterMinijava(ctx: MiniJavaParser.MinijavaContext?) {
             result.clear()
-            result.append("(module (func \$println (import \"imports\" \"println\") (param i32)) ")
+            result.append("(module (import \"imports\" \"println\" (func \$println (param i32))) ")
+//            result.append("(module (func \$println (import \"imports\" \"println\") (param i32)) ")
             result.append("(func (export \"main\") ")
         }
 
