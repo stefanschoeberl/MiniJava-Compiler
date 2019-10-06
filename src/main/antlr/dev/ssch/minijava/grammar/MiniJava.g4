@@ -6,8 +6,9 @@ package dev.ssch.minijava.grammar;
 
 minijava: statement*;
 
-statement: printstatement ';';
+statement: printlnstatement ';';
 
-printstatement: 'print' '(' INT ')';
+printlnstatement: 'println' '(' INT ')';
 
 INT: [0-9]+;
+WS: [ \t\r\n]+ -> skip;
