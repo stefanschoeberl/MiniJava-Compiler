@@ -35,18 +35,20 @@ fun test(src: String, output: String) {
 
         override fun enterMinijava(ctx: MiniJavaParser.MinijavaContext?) {
             result.clear()
-            result.append("(module (import \"imports\" \"println\" (func \$println (param i32))) ")
+            result.append("(module (import \"imports\" \"println\" (func (param i32))) ")
 //            result.append("(module (func \$println (import \"imports\" \"println\") (param i32)) ")
-            result.append("(func (export \"main\") ")
+            result.append("(func ")
         }
 
         override fun exitMinijava(ctx: MiniJavaParser.MinijavaContext?) {
-            result.append("))")
+            result.append(") ")
+            result.append("(export \"main\" (func 1)) ")
+            result.append(")")
             println(result)
         }
 
         override fun enterPrintlnstatement(ctx: MiniJavaParser.PrintlnstatementContext) {
-            result.append("i32.const ${ctx.INT().text} call \$println ")
+            result.append("i32.const ${ctx.INT().text} call 0 ")
         }
 
         fun compileAndRun() {
