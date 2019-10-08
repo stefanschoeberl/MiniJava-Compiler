@@ -59,6 +59,9 @@ class ModuleWriter {
 
         private fun writeFunction(function: Function, sb: StringBuilder) {
             sb.append("(func (type ${function.typeidx}) ")
+            function.locals.forEach {
+                sb.append("(local ${asText(it)}) ")
+            }
             function.body.instructions.forEach {
                 sb.append("${asText(it)} ")
             }
@@ -67,8 +70,10 @@ class ModuleWriter {
 
         private fun asText(instruction: Instruction): String {
             return when (instruction) {
-                is Instruction.I32_const -> "i32.const ${instruction.value}"
-                is Instruction.Call -> "call ${instruction.address}"
+                is Instruction.i32_const -> "i32.const ${instruction.value}"
+                is Instruction.call -> "call ${instruction.address}"
+                is Instruction.local_set -> "local.set ${instruction.address}"
+                is Instruction.local_get -> "local.get ${instruction.address}"
             }
         }
 

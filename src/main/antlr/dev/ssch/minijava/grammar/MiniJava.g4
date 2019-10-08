@@ -4,11 +4,17 @@ grammar MiniJava;
 package dev.ssch.minijava.grammar;
 }
 
-minijava: statement*;
+minijava: (statement ';')*;
 
-statement: printlnstatement ';';
+statement: 'int' IDENT            # vardecl
+         | IDENT '=' expr         # varassign
+         | 'println' '(' expr ')' # println
+         ;
 
-printlnstatement: 'println' '(' INT ')';
+expr: IDENT         # id
+    | INT           # int
+    ;
 
+IDENT: [_a-zA-Z][_a-zA-Z0-9]*;
 INT: [0-9]+;
 WS: [ \t\r\n]+ -> skip;
