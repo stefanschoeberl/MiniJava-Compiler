@@ -1,3 +1,7 @@
 package dev.ssch.minijava.ast
 
-class Function
+data class Function (
+    val typeidx: Int,
+    val locals: MutableList<ValueType>,
+    val body: Expr
+)

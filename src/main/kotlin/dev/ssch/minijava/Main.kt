@@ -1,5 +1,7 @@
 package dev.ssch.minijava
 
+import dev.ssch.minijava.ast.*
+import dev.ssch.minijava.ast.Function
 import dev.ssch.minijava.grammar.MiniJavaBaseListener
 import dev.ssch.minijava.grammar.MiniJavaLexer
 import dev.ssch.minijava.grammar.MiniJavaParser
@@ -7,7 +9,6 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.ParseTreeWalker
 import java.io.File
-import java.lang.StringBuilder
 import java.util.concurrent.TimeUnit
 
 fun main(args: Array<String>) {
@@ -31,28 +32,34 @@ fun test(src: String, output: String) {
 
         // https://developer.mozilla.org/en-US/docs/WebAssembly/Understanding_the_text_format
 
-        val result = StringBuilder()
+        lateinit var module: Module
+        lateinit var mainFunction: Function
+        var printlnAddr: Int = -1
 
         override fun enterMinijava(ctx: MiniJavaParser.MinijavaContext?) {
-            result.clear()
-            result.append("(module (import \"imports\" \"println\" (func (param i32))) ")
-//            result.append("(module (func \$println (import \"imports\" \"println\") (param i32)) ")
-            result.append("(func ")
-        }
+            module = Module()
 
-        override fun exitMinijava(ctx: MiniJavaParser.MinijavaContext?) {
-            result.append(") ")
-            result.append("(export \"main\" (func 1)) ")
-            result.append(")")
-            println(result)
+            val printlnType = module.declareType(FuncType(mutableListOf(ValueType.I32), mutableListOf()))
+            printlnAddr = module.importFunction(Import("imports", "println", ImportDesc.Func(printlnType)))
+
+            val mainType = module.declareType(FuncType(mutableListOf(), mutableListOf()))
+            mainFunction = Function(mainType, mutableListOf(), Expr(mutableListOf()))
+
+            val main = module.declareFunction(mainFunction)
+            module.exports.add(Export("main", ExportDesc.Func(main)))
         }
 
         override fun enterPrintlnstatement(ctx: MiniJavaParser.PrintlnstatementContext) {
-            result.append("i32.const ${ctx.INT().text} call 0 ")
+            mainFunction.body.instructions.apply {
+                add(Instruction.I32_const(ctx.INT().text.toInt()))
+                add(Instruction.Call(printlnAddr))
+            }
         }
 
         fun compileAndRun() {
-            File("compilation/$output.wat").writeText(result.toString())
+            val text = ModuleWriter.toSExpr(module)
+            println(text)
+            File("compilation/$output.wat").writeText(text)
 
             "wat2wasm compilation/$output.wat -o compilation/$output.wasm".runCommand(File(System.getProperty("user.dir")))
             "node run.js compilation/$output.wasm".runCommand(File(System.getProperty("user.dir")))
