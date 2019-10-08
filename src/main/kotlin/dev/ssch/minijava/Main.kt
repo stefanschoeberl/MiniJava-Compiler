@@ -74,6 +74,14 @@ fun main(args: Array<String>) {
         println(c);
         println((a + a + a) - b);
     """.trimIndent(), "test6")
+    test("""
+        int a = 1;
+        println(1);
+        int aa;
+        int b = 2;
+        int c = 3;
+        println(a + b + c);
+    """.trimIndent(), "test7")
 }
 
 fun test(src: String, output: String) {
@@ -111,10 +119,22 @@ fun test(src: String, output: String) {
             mainFunction.body.instructions.add(Instruction.call(printlnAddr))
         }
 
+        override fun exitVardeclassign(ctx: MiniJavaParser.VardeclassignContext) {
+            val name = ctx.IDENT().text
+            if (symbolTable.isDeclared(name)) {
+                println("$name is already declared") // TODO emit semantic error
+                return
+            }
+            symbolTable.declareVariable(name)
+            mainFunction.locals.add(ValueType.I32)
+
+            mainFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
+        }
+
         override fun enterVardecl(ctx: MiniJavaParser.VardeclContext) {
             val name = ctx.IDENT().text
             if (symbolTable.isDeclared(name)) {
-                println("$name is already declared")
+                println("$name is already declared") // TODO emit semantic error
                 return
             }
             symbolTable.declareVariable(name)
@@ -124,18 +144,16 @@ fun test(src: String, output: String) {
         override fun exitVarassign(ctx: MiniJavaParser.VarassignContext) {
             val name = ctx.IDENT().text
             if (!symbolTable.isDeclared(name)) {
-                println("$name is not declared")
+                println("$name is not declared") // TODO emit semantic error
                 return
             }
-            mainFunction.body.instructions.apply {
-                add(Instruction.local_set(symbolTable.addressOf(name)))
-            }
+            mainFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
         }
 
         override fun enterId(ctx: MiniJavaParser.IdContext) {
             val name = ctx.IDENT().text
             if (!symbolTable.isDeclared(name)) {
-                println("$name is not declared")
+                println("$name is not declared") // TODO emit semantic error
                 return
             }
             mainFunction.body.instructions.add(Instruction.local_get(symbolTable.addressOf(name)))

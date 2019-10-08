@@ -6,7 +6,8 @@ package dev.ssch.minijava.grammar;
 
 minijava: (statement ';')*;
 
-statement: 'int' IDENT            # Vardecl
+statement: 'int' IDENT '=' expr   # Vardeclassign
+         | 'int' IDENT            # Vardecl
          | IDENT '=' expr         # Varassign
          | 'println' '(' expr ')' # Println
          ;
