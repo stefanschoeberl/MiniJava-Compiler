@@ -74,6 +74,8 @@ class ModuleWriter {
                 is Instruction.call -> "call ${instruction.address}"
                 is Instruction.local_set -> "local.set ${instruction.address}"
                 is Instruction.local_get -> "local.get ${instruction.address}"
+                is Instruction.i32_add -> "i32.add"
+                is Instruction.i32_sub -> "i32.sub"
             }
         }
 

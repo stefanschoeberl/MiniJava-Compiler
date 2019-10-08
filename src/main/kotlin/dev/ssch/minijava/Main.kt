@@ -23,6 +23,10 @@ fun main(args: Array<String>) {
         int a;
         int A;
         int a1;
+        int _abc;
+    """.trimIndent(), "test3")
+    test("""
+        int a;
 
         println(2);
         a = 11;
@@ -35,7 +39,41 @@ fun main(args: Array<String>) {
         println(b);
         b = a;
         println(b);
-    """.trimIndent(), "test3")
+    """.trimIndent(), "test4")
+    test("""
+        int a;
+        int b;
+        a = 2;
+        b = 3;
+        int c;
+        c = a + b;
+        println(a);
+        println(b);
+        println(c);
+    """.trimIndent(), "test4")
+    test("""
+        int a;
+        int b;
+        a = 2;
+        b = 3;
+        int c;
+        c = b - a;
+        println(a);
+        println(b);
+        println(c);
+        c = a - b;
+        println(c);
+    """.trimIndent(), "test5")
+    test("""
+        int a;
+        int b;
+        int c;
+        a = 3;
+        b = 4;
+        c = (a + a + a) - b;
+        println(c);
+        println((a + a + a) - b);
+    """.trimIndent(), "test6")
 }
 
 fun test(src: String, output: String) {
@@ -107,18 +145,24 @@ fun test(src: String, output: String) {
             mainFunction.body.instructions.add(Instruction.i32_const(ctx.INT().text.toInt()))
         }
 
-        fun compileAndRun() {
-            val text = ModuleWriter.toSExpr(module)
-            println(text)
-            File("compilation/$output.wat").writeText(text)
-
-            "wat2wasm compilation/$output.wat -o compilation/$output.wasm".runCommand(File(System.getProperty("user.dir")))
-            "node run.js compilation/$output.wasm".runCommand(File(System.getProperty("user.dir")))
+        override fun exitAddSub(ctx: MiniJavaParser.AddSubContext) {
+            when (ctx.op.type) {
+                MiniJavaParser.PLUS -> mainFunction.body.instructions.add(Instruction.i32_add())
+                MiniJavaParser.MINUS -> mainFunction.body.instructions.add(Instruction.i32_sub())
+            }
         }
     }
+
     val walker = ParseTreeWalker()
     walker.walk(listener, tree)
-    listener.compileAndRun()
+
+    val text = ModuleWriter.toSExpr(listener.module)
+    println(text)
+    File("compilation/$output.wat").writeText(text)
+
+    "wat2wasm compilation/$output.wat -o compilation/$output.wasm".runCommand(File(System.getProperty("user.dir")))
+    "node run.js compilation/$output.wasm".runCommand(File(System.getProperty("user.dir")))
+
     println("-----")
 }
 

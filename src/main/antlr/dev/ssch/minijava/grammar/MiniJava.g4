@@ -6,14 +6,19 @@ package dev.ssch.minijava.grammar;
 
 minijava: (statement ';')*;
 
-statement: 'int' IDENT            # vardecl
-         | IDENT '=' expr         # varassign
-         | 'println' '(' expr ')' # println
+statement: 'int' IDENT            # Vardecl
+         | IDENT '=' expr         # Varassign
+         | 'println' '(' expr ')' # Println
          ;
 
-expr: IDENT         # id
-    | INT           # int
+expr: expr op=(PLUS|MINUS) expr # AddSub
+    | IDENT                     # Id
+    | INT                       # Int
+    | '(' expr ')'              # Parens
     ;
+
+PLUS: '+';
+MINUS: '-';
 
 IDENT: [_a-zA-Z][_a-zA-Z0-9]*;
 INT: [0-9]+;
