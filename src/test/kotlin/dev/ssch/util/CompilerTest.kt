@@ -1,4 +1,4 @@
-package dev.ssch.minijava.util
+package dev.ssch.util
 
 import dev.ssch.minijava.WebAssemblyAssembler
 import dev.ssch.minijava.Compiler

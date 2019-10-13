@@ -1,6 +1,6 @@
 package dev.ssch.minijava.expressions
 
-import dev.ssch.minijava.util.CompilerTest
+import dev.ssch.util.CompilerTest
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
