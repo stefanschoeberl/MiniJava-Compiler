@@ -12,14 +12,17 @@ statement: 'int' IDENT '=' expr   # Vardeclassign
          | 'println' '(' expr ')' # Println
          ;
 
-expr: expr op=(PLUS|MINUS) expr # AddSub
-    | IDENT                     # Id
-    | INT                       # Int
-    | '(' expr ')'              # Parens
+expr: expr op=(MUL|DIV) expr # MulDiv
+    | expr op=(ADD|SUB) expr # AddSub
+    | IDENT                  # Id
+    | INT                    # Int
+    | '(' expr ')'           # Parens
     ;
 
-PLUS: '+';
-MINUS: '-';
+ADD: '+';
+SUB: '-';
+MUL: '*';
+DIV: '/';
 
 IDENT: [_a-zA-Z][_a-zA-Z0-9]*;
 INT: [0-9]+;

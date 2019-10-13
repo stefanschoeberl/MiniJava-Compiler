@@ -79,8 +79,16 @@ class Listener : MiniJavaBaseListener() {
 
     override fun exitAddSub(ctx: MiniJavaParser.AddSubContext) {
         when (ctx.op.type) {
-            MiniJavaParser.PLUS -> mainFunction.body.instructions.add(Instruction.i32_add())
-            MiniJavaParser.MINUS -> mainFunction.body.instructions.add(Instruction.i32_sub())
+            MiniJavaParser.ADD -> mainFunction.body.instructions.add(Instruction.i32_add())
+            MiniJavaParser.SUB -> mainFunction.body.instructions.add(Instruction.i32_sub())
         }
     }
+
+    override fun exitMulDiv(ctx: MiniJavaParser.MulDivContext) {
+        when (ctx.op.type) {
+            MiniJavaParser.MUL -> mainFunction.body.instructions.add(Instruction.i32_mul())
+            MiniJavaParser.DIV -> mainFunction.body.instructions.add(Instruction.i32_div_s())
+        }
+    }
+
 }
