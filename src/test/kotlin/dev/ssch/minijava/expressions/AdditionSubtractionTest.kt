@@ -15,6 +15,14 @@ class AdditionSubtractionTest : CompilerTest() {
     }
 
     @Test
+    fun `add two negative values`() {
+        val output = """
+            println(-1 + -2);
+        """.run()
+        Assertions.assertThat(output.lines()).containsExactly("-3", "")
+    }
+
+    @Test
     fun `add two variables`() {
         val output = """
             int a = 1;
@@ -22,6 +30,16 @@ class AdditionSubtractionTest : CompilerTest() {
             println(a + b);
         """.run()
         Assertions.assertThat(output.lines()).containsExactly("3", "")
+    }
+
+    @Test
+    fun `add two negative variables`() {
+        val output = """
+            int a = 1;
+            int b = 2;
+            println(-a + -b);
+        """.run()
+        Assertions.assertThat(output.lines()).containsExactly("-3", "")
     }
 
     @Test

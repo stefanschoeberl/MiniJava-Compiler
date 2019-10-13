@@ -14,9 +14,9 @@ statement: 'int' IDENT '=' expr   # Vardeclassign
 
 expr: expr op=(MUL|DIV) expr # MulDiv
     | expr op=(ADD|SUB) expr # AddSub
-    | IDENT                  # Id
-    | INT                    # Int
-    | '(' expr ')'           # Parens
+    | '-'? IDENT             # Id
+    | '-'? INT               # Int
+    | '-'? '(' expr ')'      # Parens
     ;
 
 ADD: '+';

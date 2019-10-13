@@ -10,11 +10,15 @@ class MixedExpressionsTest : CompilerTest() {
     fun `arithmetic expressions`() {
         val output = """
             println((2 + 3) * 4);
+            println((2 + 3) * -4);
             println((2 + 3) * 4 / 9);
             println(1 - (2 + 3) * 4 + 5);
+            println(1 - (-2 + 3) * 4 + 5);
             println(30 / (1 - (2 + 3) * 4 + 5));
+            println(30 / (1 - (-2 + 3) * 4 + -5));
             println(30 / 1 - 2 + 3 * 4 + 5);
+            println(-30 / 1 - 2 + 3 * -4 + -5);
         """.run()
-        Assertions.assertThat(output.lines()).containsExactly("20", "2", "-14", "-2", "45", "")
+        Assertions.assertThat(output.lines()).containsExactly("20", "-20", "2", "-14", "2", "-2", "-3", "45", "-49", "")
     }
 }

@@ -70,11 +70,34 @@ class Listener : MiniJavaBaseListener() {
             println("$name is not declared") // TODO emit semantic error
             return
         }
+        if (ctx.SUB() != null) {
+            mainFunction.body.instructions.add(Instruction.i32_const(0))
+        }
         mainFunction.body.instructions.add(Instruction.local_get(symbolTable.addressOf(name)))
+        if (ctx.SUB() != null) {
+            mainFunction.body.instructions.add(Instruction.i32_sub())
+        }
     }
 
     override fun enterInt(ctx: MiniJavaParser.IntContext) {
-        mainFunction.body.instructions.add(Instruction.i32_const(ctx.INT().text.toInt()))
+        val value = if (ctx.SUB() != null) {
+            -ctx.INT().text.toInt()
+        } else {
+            ctx.INT().text.toInt()
+        }
+        mainFunction.body.instructions.add(Instruction.i32_const(value))
+    }
+
+    override fun enterParens(ctx: MiniJavaParser.ParensContext) {
+        if (ctx.SUB() != null) {
+            mainFunction.body.instructions.add(Instruction.i32_const(0))
+        }
+    }
+
+    override fun exitParens(ctx: MiniJavaParser.ParensContext) {
+        if (ctx.SUB() != null) {
+            mainFunction.body.instructions.add(Instruction.i32_sub())
+        }
     }
 
     override fun exitAddSub(ctx: MiniJavaParser.AddSubContext) {
