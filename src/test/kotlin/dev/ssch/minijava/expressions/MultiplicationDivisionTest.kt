@@ -10,7 +10,7 @@ class MultiplicationDivisionTest : CompilerTest() {
     fun `multiply two values`() {
         val output = """
             println(2 * 3);
-        """.run()
+        """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("6", "")
     }
 
@@ -18,7 +18,7 @@ class MultiplicationDivisionTest : CompilerTest() {
     fun `multiply two negative values`() {
         val output = """
             println(-2 * -3);
-        """.run()
+        """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("6", "")
     }
 
@@ -28,7 +28,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             int a = 2;
             int b = 3;
             println(a * b);
-        """.run()
+        """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("6", "")
     }
 
@@ -38,7 +38,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             int a = 2;
             int b = 3;
             println(-a * -b);
-        """.run()
+        """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("6", "")
     }
 
@@ -48,7 +48,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             println((2 * 3) * 4);
             println(2 * 3 * 4);
             println(2 * (3 * 4));
-        """.run()
+        """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("24", "24", "24", "")
     }
 
@@ -58,7 +58,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             println(1 / 2);
             println(8 / 3);
             println(6 / 3);
-        """.run()
+        """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("0", "2", "2", "")
     }
 
@@ -68,7 +68,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             println(-1 / 2);
             println(8 / -3);
             println(-6 / -3);
-        """.run()
+        """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("0", "-2", "2", "")
     }
 
@@ -83,7 +83,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             println(one / two);
             println(eight / three);
             println(six / three);
-        """.run()
+        """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("0", "2", "2", "")
     }
 
@@ -98,7 +98,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             println(-one / two);
             println(eight / -three);
             println(-six / -three);
-        """.run()
+        """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("0", "-2", "2", "")
     }
 
@@ -108,7 +108,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             println((8 / 3) / 2);
             println(8 / 3 / 2);
             println(8 / (3 / 2));
-        """.run()
+        """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("1", "1", "8", "")
     }
 }

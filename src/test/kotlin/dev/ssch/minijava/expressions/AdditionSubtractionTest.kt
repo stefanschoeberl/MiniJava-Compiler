@@ -10,7 +10,7 @@ class AdditionSubtractionTest : CompilerTest() {
     fun `add two values`() {
         val output = """
             println(1 + 2);
-        """.run()
+        """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("3", "")
     }
 
@@ -18,7 +18,7 @@ class AdditionSubtractionTest : CompilerTest() {
     fun `add two negative values`() {
         val output = """
             println(-1 + -2);
-        """.run()
+        """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("-3", "")
     }
 
@@ -28,7 +28,7 @@ class AdditionSubtractionTest : CompilerTest() {
             int a = 1;
             int b = 2;
             println(a + b);
-        """.run()
+        """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("3", "")
     }
 
@@ -38,7 +38,7 @@ class AdditionSubtractionTest : CompilerTest() {
             int a = 1;
             int b = 2;
             println(-a + -b);
-        """.run()
+        """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("-3", "")
     }
 
@@ -48,7 +48,7 @@ class AdditionSubtractionTest : CompilerTest() {
             println((1 + 2) + 3);
             println(1 + 2 + 3);
             println(1 + (2 + 3));
-        """.run()
+        """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("6", "6", "6", "")
     }
 
@@ -56,7 +56,7 @@ class AdditionSubtractionTest : CompilerTest() {
     fun `subtract two values`() {
         val output = """
             println(1 - 2);
-        """.run()
+        """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("-1", "")
     }
 
@@ -66,7 +66,7 @@ class AdditionSubtractionTest : CompilerTest() {
             int a = 1;
             int b = 2;
             println(a - b);
-        """.run()
+        """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("-1", "")
     }
 
@@ -76,7 +76,7 @@ class AdditionSubtractionTest : CompilerTest() {
             println((1 - 2) - 3);
             println(1 - 2 - 3);
             println(1 - (2 - 3));
-        """.run()
+        """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("-4", "-4", "2", "")
     }
 }

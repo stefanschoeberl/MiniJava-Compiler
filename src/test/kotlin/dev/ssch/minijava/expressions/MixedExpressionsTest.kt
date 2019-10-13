@@ -18,7 +18,7 @@ class MixedExpressionsTest : CompilerTest() {
             println(30 / (1 - (-2 + 3) * 4 + -5));
             println(30 / 1 - 2 + 3 * 4 + 5);
             println(-30 / 1 - 2 + 3 * -4 + -5);
-        """.run()
+        """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("20", "-20", "2", "-14", "2", "-2", "-3", "45", "-49", "")
     }
 }

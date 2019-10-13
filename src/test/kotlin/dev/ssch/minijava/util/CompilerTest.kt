@@ -12,7 +12,7 @@ abstract class CompilerTest {
     @TempDir
     lateinit var temporaryFolder: File
 
-    fun String.run(): String {
+    fun String.runInMainFunction(): String {
         val compiler = Compiler()
         val module = compiler.compile(this)
 
