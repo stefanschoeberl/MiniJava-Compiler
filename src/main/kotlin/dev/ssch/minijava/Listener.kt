@@ -39,7 +39,7 @@ class Listener : MiniJavaBaseListener() {
             println("$name is already declared") // TODO emit semantic error
             return
         }
-        symbolTable.declareVariable(name)
+        symbolTable.declareVariable(name, DataType.Integer)
         mainFunction.locals.add(ValueType.I32)
 
         mainFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
@@ -51,7 +51,7 @@ class Listener : MiniJavaBaseListener() {
             println("$name is already declared") // TODO emit semantic error
             return
         }
-        symbolTable.declareVariable(name)
+        symbolTable.declareVariable(name, DataType.Integer)
         mainFunction.locals.add(ValueType.I32)
     }
 

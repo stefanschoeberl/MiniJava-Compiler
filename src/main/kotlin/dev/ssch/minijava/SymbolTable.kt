@@ -2,16 +2,21 @@ package dev.ssch.minijava
 
 class SymbolTable {
 
-    private val symbols: MutableMap<String, Int> = mutableMapOf()
+    class SymbolInformation (
+        val address: Int,
+        val type: DataType
+    )
 
-    fun declareVariable(name: String): Int {
+    private val symbols: MutableMap<String, SymbolInformation> = mutableMapOf()
+
+    fun declareVariable(name: String, type: DataType): Int {
         val addr = symbols.size
-        symbols[name] = addr
+        symbols[name] = SymbolInformation(addr, type)
         return addr
     }
 
     fun isDeclared(name: String): Boolean = symbols.containsKey(name)
 
-
-    fun addressOf(name: String): Int = symbols[name]!!
+    fun addressOf(name: String): Int = symbols[name]!!.address
+    fun typeOf(name: String): DataType = symbols[name]!!.type
 }
