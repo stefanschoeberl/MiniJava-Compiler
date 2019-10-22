@@ -13,9 +13,15 @@ class BasicTest : CompilerTest() {
     }
 
     @Test
-    fun `println a value`() {
+    fun `println a numeric value`() {
         val output = "println(1);".runInMainFunction()
         assertThat(output.lines()).containsExactly("1", "")
+    }
+
+    @Test
+    fun `println a boolean value`() {
+        val output = "println(true);".runInMainFunction()
+        assertThat(output.lines()).containsExactly("true", "")
     }
 
     @Test
@@ -23,7 +29,9 @@ class BasicTest : CompilerTest() {
         val output = """
             println(1);
             println(2);
+            println(true);
+            println(false);
         """.runInMainFunction()
-        assertThat(output.lines()).containsExactly("1", "2", "")
+        assertThat(output.lines()).containsExactly("1", "2", "true", "false", "")
     }
 }
