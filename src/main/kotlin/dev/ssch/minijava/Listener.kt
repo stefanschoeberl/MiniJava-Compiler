@@ -133,7 +133,11 @@ class Listener : MiniJavaBaseListener() {
     }
 
     override fun exitEqNeq(ctx: MiniJavaParser.EqNeqContext) {
-        mainFunction.body.instructions.add(Instruction.i32_eq())
+        when (ctx.op.type) {
+            MiniJavaParser.EQ -> mainFunction.body.instructions.add(Instruction.i32_eq())
+            MiniJavaParser.NEQ -> mainFunction.body.instructions.add(Instruction.i32_ne())
+        }
+
         staticTypes.put(ctx, DataType.Boolean) // TODO check types of operands
     }
 

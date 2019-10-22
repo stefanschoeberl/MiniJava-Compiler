@@ -15,7 +15,7 @@ statement: type=IDENT name=IDENT '=' expr   # Vardeclassign
 
 expr: expr op=(MUL|DIV) expr # MulDiv
     | expr op=(ADD|SUB) expr # AddSub
-    | expr op=EQ expr        # EqNeq
+    | expr op=(EQ|NEQ) expr  # EqNeq
     | '-'? IDENT             # Id
     | '-'? INT               # Int
     | value=(TRUE|FALSE)     # Bool
@@ -23,7 +23,7 @@ expr: expr op=(MUL|DIV) expr # MulDiv
     ;
 
 EQ:  '==';
-//NEQ: '!=';
+NEQ: '!=';
 
 ADD: '+';
 SUB: '-';

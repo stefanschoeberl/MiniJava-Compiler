@@ -22,5 +22,6 @@ sealed class Instruction {
     class i32_mul : Instruction()
     class i32_div_s : Instruction()
     class i32_eq : Instruction()
+    class i32_ne : Instruction()
 }
 
