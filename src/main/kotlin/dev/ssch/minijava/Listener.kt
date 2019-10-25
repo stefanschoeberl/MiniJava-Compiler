@@ -126,12 +126,17 @@ class Listener : MiniJavaBaseListener() {
     }
 
     override fun exitEqNeq(ctx: MiniJavaParser.EqNeqContext) {
+        if (ctx.left.staticType == DataType.Integer && ctx.right.staticType != DataType.Integer ||
+            ctx.left.staticType == DataType.Boolean && ctx.right.staticType != DataType.Boolean) {
+            throw InvalidBinaryOperationException(ctx.left.staticType, ctx.right.staticType, ctx.op)
+        }
+
         when (ctx.op.type) {
             MiniJavaParser.EQ -> mainFunction.body.instructions.add(Instruction.i32_eq())
             MiniJavaParser.NEQ -> mainFunction.body.instructions.add(Instruction.i32_ne())
         }
 
-        ctx.staticType = DataType.Boolean // TODO check types of operands
+        ctx.staticType = DataType.Boolean
     }
 
     override fun exitAddSub(ctx: MiniJavaParser.AddSubContext) {

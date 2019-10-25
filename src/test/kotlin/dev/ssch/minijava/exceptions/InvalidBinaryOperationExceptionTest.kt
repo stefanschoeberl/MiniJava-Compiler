@@ -132,4 +132,128 @@ class InvalidBinaryOperationExceptionTest : CompilerTest() {
         """.runInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
+
+    // -----
+
+    @Test
+    fun `== two variables 1`() {
+        assertThatThrownBy {
+            """
+            boolean a = true;
+            int b = 123;
+            boolean c = a == b;
+        """.runInMainFunction()
+        }.isInstanceOf(InvalidBinaryOperationException::class.java)
+    }
+
+    @Test
+    fun `== two variables 2`() {
+        assertThatThrownBy {
+            """
+            boolean a = true;
+            int b = 123;
+            boolean c = b == a;
+        """.runInMainFunction()
+        }.isInstanceOf(InvalidBinaryOperationException::class.java)
+    }
+
+    @Test
+    fun `== two literals 1`() {
+        assertThatThrownBy {
+            """
+            boolean a = 123 == false;
+        """.runInMainFunction()
+        }.isInstanceOf(InvalidBinaryOperationException::class.java)
+    }
+
+    @Test
+    fun `== two literals 2`() {
+        assertThatThrownBy {
+            """
+            boolean a = false == 123;
+        """.runInMainFunction()
+        }.isInstanceOf(InvalidBinaryOperationException::class.java)
+    }
+
+    @Test
+    fun `== two complex expressions 1`() {
+        assertThatThrownBy {
+            """
+            boolean a = true;
+            boolean b = a == (2 * 4);
+        """.runInMainFunction()
+        }.isInstanceOf(InvalidBinaryOperationException::class.java)
+    }
+
+    @Test
+    fun `== two complex expressions 2`() {
+        assertThatThrownBy {
+            """
+            boolean a = true;
+            boolean b = (2 * 4) == a;
+        """.runInMainFunction()
+        }.isInstanceOf(InvalidBinaryOperationException::class.java)
+    }
+
+    // -----
+
+    @Test
+    fun `!= two variables 1`() {
+        assertThatThrownBy {
+            """
+            boolean a = true;
+            int b = 123;
+            boolean c = a != b;
+        """.runInMainFunction()
+        }.isInstanceOf(InvalidBinaryOperationException::class.java)
+    }
+
+    @Test
+    fun `!= two variables 2`() {
+        assertThatThrownBy {
+            """
+            boolean a = true;
+            int b = 123;
+            boolean c = b != a;
+        """.runInMainFunction()
+        }.isInstanceOf(InvalidBinaryOperationException::class.java)
+    }
+
+    @Test
+    fun `!= two literals 1`() {
+        assertThatThrownBy {
+            """
+            boolean a = 123 != false;
+        """.runInMainFunction()
+        }.isInstanceOf(InvalidBinaryOperationException::class.java)
+    }
+
+    @Test
+    fun `!= two literals 2`() {
+        assertThatThrownBy {
+            """
+            boolean a = false != 123;
+        """.runInMainFunction()
+        }.isInstanceOf(InvalidBinaryOperationException::class.java)
+    }
+
+    @Test
+    fun `!= two complex expressions 1`() {
+        assertThatThrownBy {
+            """
+            boolean a = true;
+            boolean b = a != (2 * 4);
+        """.runInMainFunction()
+        }.isInstanceOf(InvalidBinaryOperationException::class.java)
+    }
+
+    @Test
+    fun `!= two complex expressions 2`() {
+        assertThatThrownBy {
+            """
+            boolean a = true;
+            boolean b = (2 * 4) != a;
+        """.runInMainFunction()
+        }.isInstanceOf(InvalidBinaryOperationException::class.java)
+    }
 }
