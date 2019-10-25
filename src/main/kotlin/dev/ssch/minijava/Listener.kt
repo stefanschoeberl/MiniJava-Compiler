@@ -4,6 +4,7 @@ import dev.ssch.minijava.ast.*
 import dev.ssch.minijava.ast.Function
 import dev.ssch.minijava.grammar.MiniJavaBaseListener
 import dev.ssch.minijava.grammar.MiniJavaParser
+import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.ParseTreeProperty
 
 class Listener : MiniJavaBaseListener() {
@@ -17,6 +18,10 @@ class Listener : MiniJavaBaseListener() {
 
     lateinit var symbolTable: SymbolTable
     lateinit var staticTypes: ParseTreeProperty<DataType>
+
+    var ParseTree.staticType: DataType
+        get() = staticTypes.get(this)
+        set(type) = staticTypes.put(this, type)
 
     override fun enterMinijava(ctx: MiniJavaParser.MinijavaContext?) {
         module = Module()
@@ -35,7 +40,7 @@ class Listener : MiniJavaBaseListener() {
     }
 
     override fun exitPrintln(ctx: MiniJavaParser.PrintlnContext) {
-        val address = when (staticTypes.get(ctx.expr())) { // TODO remove nullability
+        val address = when (ctx.expr().staticType) { // TODO remove nullability
             DataType.Integer -> printlnIntAddr
             DataType.Boolean -> printlnBoolAddr
         }
@@ -52,7 +57,7 @@ class Listener : MiniJavaBaseListener() {
         symbolTable.declareVariable(name, type)
         mainFunction.locals.add(ValueType.I32)
 
-        if (type != staticTypes.get(ctx.expr())) {
+        if (type != ctx.expr().staticType) {
             println("cannot assign variable") // TODO emit semantic error
             return
         }
@@ -77,11 +82,22 @@ class Listener : MiniJavaBaseListener() {
             println("$name is not declared") // TODO emit semantic error
             return
         }
-        if (symbolTable.typeOf(name) != staticTypes.get(ctx.expr())) {
+        if (symbolTable.typeOf(name) != ctx.expr().staticType) {
             println("cannot assign variable") // TODO emit semantic error
             return
         }
         mainFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
+    }
+
+    override fun enterMinus(ctx: MiniJavaParser.MinusContext?) {
+        // TODO check types of operand
+        mainFunction.body.instructions.add(Instruction.i32_const(0))
+    }
+
+    override fun exitMinus(ctx: MiniJavaParser.MinusContext) {
+        // TODO check types of operand
+        mainFunction.body.instructions.add(Instruction.i32_sub())
+        ctx.staticType = ctx.expr().staticType
     }
 
     override fun enterId(ctx: MiniJavaParser.IdContext) {
@@ -90,24 +106,14 @@ class Listener : MiniJavaBaseListener() {
             println("$name is not declared") // TODO emit semantic error
             return
         }
-        if (ctx.SUB() != null) {
-            mainFunction.body.instructions.add(Instruction.i32_const(0))
-        }
         mainFunction.body.instructions.add(Instruction.local_get(symbolTable.addressOf(name)))
-        if (ctx.SUB() != null) {
-            mainFunction.body.instructions.add(Instruction.i32_sub())
-        }
-        staticTypes.put(ctx, symbolTable.typeOf(name))
+        ctx.staticType = symbolTable.typeOf(name)
     }
 
     override fun enterInt(ctx: MiniJavaParser.IntContext) {
-        val value = if (ctx.SUB() != null) {
-            -ctx.INT().text.toInt()
-        } else {
-            ctx.INT().text.toInt()
-        }
+        val value = ctx.INT().text.toInt()
         mainFunction.body.instructions.add(Instruction.i32_const(value))
-        staticTypes.put(ctx, DataType.Integer)
+        ctx.staticType = DataType.Integer
     }
 
     override fun enterBool(ctx: MiniJavaParser.BoolContext) {
@@ -116,20 +122,11 @@ class Listener : MiniJavaBaseListener() {
         } else {
             mainFunction.body.instructions.add(Instruction.i32_const(0))
         }
-        staticTypes.put(ctx, DataType.Boolean)
-    }
-
-    override fun enterParens(ctx: MiniJavaParser.ParensContext) {
-        if (ctx.SUB() != null) {
-            mainFunction.body.instructions.add(Instruction.i32_const(0))
-        }
+        ctx.staticType = DataType.Boolean
     }
 
     override fun exitParens(ctx: MiniJavaParser.ParensContext) {
-        if (ctx.SUB() != null) { // TODO check types of operands
-            mainFunction.body.instructions.add(Instruction.i32_sub())
-        }
-        staticTypes.put(ctx, staticTypes.get(ctx.expr()))
+        ctx.staticType = ctx.expr().staticType
     }
 
     override fun exitEqNeq(ctx: MiniJavaParser.EqNeqContext) {
@@ -138,7 +135,7 @@ class Listener : MiniJavaBaseListener() {
             MiniJavaParser.NEQ -> mainFunction.body.instructions.add(Instruction.i32_ne())
         }
 
-        staticTypes.put(ctx, DataType.Boolean) // TODO check types of operands
+        ctx.staticType = DataType.Boolean // TODO check types of operands
     }
 
     override fun exitAddSub(ctx: MiniJavaParser.AddSubContext) {
@@ -146,7 +143,7 @@ class Listener : MiniJavaBaseListener() {
             MiniJavaParser.ADD -> mainFunction.body.instructions.add(Instruction.i32_add())
             MiniJavaParser.SUB -> mainFunction.body.instructions.add(Instruction.i32_sub())
         }
-        staticTypes.put(ctx, DataType.Integer) // TODO check types of operands
+        ctx.staticType = DataType.Integer // TODO check types of operands
     }
 
     override fun exitMulDiv(ctx: MiniJavaParser.MulDivContext) {
@@ -154,7 +151,7 @@ class Listener : MiniJavaBaseListener() {
             MiniJavaParser.MUL -> mainFunction.body.instructions.add(Instruction.i32_mul())
             MiniJavaParser.DIV -> mainFunction.body.instructions.add(Instruction.i32_div_s())
         }
-        staticTypes.put(ctx, DataType.Integer) // TODO check types of operands
+        ctx.staticType = DataType.Integer // TODO check types of operands
     }
 
 }
