@@ -86,12 +86,13 @@ class Listener : MiniJavaBaseListener() {
     }
 
     override fun enterMinus(ctx: MiniJavaParser.MinusContext?) {
-        // TODO check types of operand
         mainFunction.body.instructions.add(Instruction.i32_const(0))
     }
 
     override fun exitMinus(ctx: MiniJavaParser.MinusContext) {
-        // TODO check types of operand
+        if (ctx.expr().staticType != DataType.Integer) {
+            throw InvalidUnaryOperationException(ctx.expr().staticType, ctx.SUB().symbol)
+        }
         mainFunction.body.instructions.add(Instruction.i32_sub())
         ctx.staticType = ctx.expr().staticType
     }
