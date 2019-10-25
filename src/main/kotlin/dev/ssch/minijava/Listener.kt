@@ -2,10 +2,7 @@ package dev.ssch.minijava
 
 import dev.ssch.minijava.ast.*
 import dev.ssch.minijava.ast.Function
-import dev.ssch.minijava.exception.IncompatibleAssignmentException
-import dev.ssch.minijava.exception.RedefinedVariableException
-import dev.ssch.minijava.exception.UndefinedVariableException
-import dev.ssch.minijava.exception.UnknownTypeException
+import dev.ssch.minijava.exception.*
 import dev.ssch.minijava.grammar.MiniJavaBaseListener
 import dev.ssch.minijava.grammar.MiniJavaParser
 import org.antlr.v4.runtime.tree.ParseTree
@@ -137,19 +134,27 @@ class Listener : MiniJavaBaseListener() {
     }
 
     override fun exitAddSub(ctx: MiniJavaParser.AddSubContext) {
+        if (ctx.left.staticType != DataType.Integer || ctx.right.staticType != DataType.Integer) {
+            throw InvalidBinaryOperationException(ctx.left.staticType, ctx.right.staticType, ctx.op)
+        }
+
         when (ctx.op.type) {
             MiniJavaParser.ADD -> mainFunction.body.instructions.add(Instruction.i32_add())
             MiniJavaParser.SUB -> mainFunction.body.instructions.add(Instruction.i32_sub())
         }
-        ctx.staticType = DataType.Integer // TODO check types of operands
+        ctx.staticType = DataType.Integer
     }
 
     override fun exitMulDiv(ctx: MiniJavaParser.MulDivContext) {
+        if (ctx.left.staticType != DataType.Integer || ctx.right.staticType != DataType.Integer) {
+            throw InvalidBinaryOperationException(ctx.left.staticType, ctx.right.staticType, ctx.op)
+        }
+
         when (ctx.op.type) {
             MiniJavaParser.MUL -> mainFunction.body.instructions.add(Instruction.i32_mul())
             MiniJavaParser.DIV -> mainFunction.body.instructions.add(Instruction.i32_div_s())
         }
-        ctx.staticType = DataType.Integer // TODO check types of operands
+        ctx.staticType = DataType.Integer
     }
 
 }

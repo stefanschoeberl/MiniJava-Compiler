@@ -13,14 +13,14 @@ statement: type=IDENT name=IDENT '=' expr   # Vardeclassign
          ;
 // https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html
 
-expr: '-' expr               # Minus
-    | expr op=(MUL|DIV) expr # MulDiv
-    | expr op=(ADD|SUB) expr # AddSub
-    | expr op=(EQ|NEQ) expr  # EqNeq
-    | IDENT                  # Id
-    | INT                    # Int
-    | value=(TRUE|FALSE)     # Bool
-    | '(' expr ')'           # Parens
+expr: '-' expr                          # Minus
+    | left=expr op=(MUL|DIV) right=expr # MulDiv
+    | left=expr op=(ADD|SUB) right=expr # AddSub
+    | left=expr op=(EQ|NEQ) right=expr  # EqNeq
+    | IDENT                             # Id
+    | INT                               # Int
+    | value=(TRUE|FALSE)                # Bool
+    | '(' expr ')'                      # Parens
     ;
 
 EQ:  '==';
