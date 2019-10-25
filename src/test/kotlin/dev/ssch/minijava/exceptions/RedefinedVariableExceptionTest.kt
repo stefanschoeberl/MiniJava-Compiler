@@ -20,7 +20,7 @@ class RedefinedVariableExceptionTest : CompilerTest() {
     @Test
     fun `redefine variable with different type`() {
         assertThatThrownBy {
-            """
+        """
             int a;
             boolean a;
         """.runInMainFunction()
@@ -30,7 +30,7 @@ class RedefinedVariableExceptionTest : CompilerTest() {
     @Test
     fun `redefine and assign variable`() {
         assertThatThrownBy {
-            """
+        """
             int a;
             int a = 1;
         """.runInMainFunction()
@@ -40,7 +40,7 @@ class RedefinedVariableExceptionTest : CompilerTest() {
     @Test
     fun `redefine and assign variable with different type`() {
         assertThatThrownBy {
-            """
+        """
             int a;
             boolean a = true;
         """.runInMainFunction()

@@ -28,7 +28,7 @@ class UndefinedVariableExceptionTest : CompilerTest() {
     @Test
     fun `assign undefined variable`() {
         assertThatThrownBy {
-            """
+        """
             a = 1;
         """.runInMainFunction()
         }.isInstanceOf(UndefinedVariableException::class.java)
@@ -37,7 +37,7 @@ class UndefinedVariableExceptionTest : CompilerTest() {
     @Test
     fun `assign defined to undefined variable`() {
         assertThatThrownBy {
-            """
+        """
             int b = 1;
             a = b;
         """.runInMainFunction()
