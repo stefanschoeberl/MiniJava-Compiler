@@ -2,6 +2,10 @@ package dev.ssch.minijava
 
 import dev.ssch.minijava.ast.*
 import dev.ssch.minijava.ast.Function
+import dev.ssch.minijava.exception.IncompatibleAssignmentException
+import dev.ssch.minijava.exception.RedefinedVariableException
+import dev.ssch.minijava.exception.UndefinedVariableException
+import dev.ssch.minijava.exception.UnknownTypeException
 import dev.ssch.minijava.grammar.MiniJavaBaseListener
 import dev.ssch.minijava.grammar.MiniJavaParser
 import org.antlr.v4.runtime.tree.ParseTree
@@ -40,7 +44,7 @@ class Listener : MiniJavaBaseListener() {
     }
 
     override fun exitPrintln(ctx: MiniJavaParser.PrintlnContext) {
-        val address = when (ctx.expr().staticType) { // TODO remove nullability
+        val address = when (ctx.expr().staticType) {
             DataType.Integer -> printlnIntAddr
             DataType.Boolean -> printlnBoolAddr
         }
@@ -49,17 +53,15 @@ class Listener : MiniJavaBaseListener() {
 
     override fun exitVardeclassign(ctx: MiniJavaParser.VardeclassignContext) {
         val name = ctx.name.text
-        val type = DataType.fromString(ctx.type.text)
+        val type = DataType.fromString(ctx.type.text) ?: throw UnknownTypeException(ctx.type.text, ctx.type)
         if (symbolTable.isDeclared(name)) {
-            println("$name is already declared") // TODO emit semantic error
-            return
+            throw RedefinedVariableException(name, ctx.name)
         }
         symbolTable.declareVariable(name, type)
         mainFunction.locals.add(ValueType.I32)
 
         if (type != ctx.expr().staticType) {
-            println("cannot assign variable") // TODO emit semantic error
-            return
+            throw IncompatibleAssignmentException(type, ctx.expr().staticType, ctx.name)
         }
 
         mainFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
@@ -67,10 +69,9 @@ class Listener : MiniJavaBaseListener() {
 
     override fun enterVardecl(ctx: MiniJavaParser.VardeclContext) {
         val name = ctx.name.text
-        val type = DataType.fromString(ctx.type.text)
+        val type = DataType.fromString(ctx.type.text) ?: throw UnknownTypeException(ctx.type.text, ctx.type)
         if (symbolTable.isDeclared(name)) {
-            println("$name is already declared") // TODO emit semantic error
-            return
+            throw RedefinedVariableException(name, ctx.name)
         }
         symbolTable.declareVariable(name, type)
         mainFunction.locals.add(ValueType.I32)
@@ -79,12 +80,10 @@ class Listener : MiniJavaBaseListener() {
     override fun exitVarassign(ctx: MiniJavaParser.VarassignContext) {
         val name = ctx.IDENT().text
         if (!symbolTable.isDeclared(name)) {
-            println("$name is not declared") // TODO emit semantic error
-            return
+            throw UndefinedVariableException(name, ctx.name)
         }
         if (symbolTable.typeOf(name) != ctx.expr().staticType) {
-            println("cannot assign variable") // TODO emit semantic error
-            return
+            throw IncompatibleAssignmentException(symbolTable.typeOf(name), ctx.expr().staticType, ctx.name)
         }
         mainFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
     }
@@ -103,8 +102,7 @@ class Listener : MiniJavaBaseListener() {
     override fun enterId(ctx: MiniJavaParser.IdContext) {
         val name = ctx.IDENT().text
         if (!symbolTable.isDeclared(name)) {
-            println("$name is not declared") // TODO emit semantic error
-            return
+            throw UndefinedVariableException(name, ctx.IDENT().symbol)
         }
         mainFunction.body.instructions.add(Instruction.local_get(symbolTable.addressOf(name)))
         ctx.staticType = symbolTable.typeOf(name)
