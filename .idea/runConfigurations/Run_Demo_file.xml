@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run Demo file" type="BashConfigurationType" factoryName="Bash">
+    <option name="INTERPRETER_OPTIONS" value="" />
+    <option name="INTERPRETER_PATH" value="/bin/bash" />
+    <option name="PROJECT_INTERPRETER" value="false" />
+    <option name="WORKING_DIRECTORY" value="" />
+    <option name="PARENT_ENVS" value="true" />
+    <option name="SCRIPT_NAME" value="run" />
+    <option name="PARAMETERS" value="demo.wasm" />
+    <module name="" />
+    <method v="2">
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="dev.ssch.minijava.MainKt" run_configuration_type="JetRunConfigurationType" />
+    </method>
+  </configuration>
+</component>
