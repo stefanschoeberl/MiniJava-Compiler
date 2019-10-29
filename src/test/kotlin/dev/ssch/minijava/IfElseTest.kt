@@ -125,4 +125,74 @@ class IfElseTest : CompilerTest() {
         """.runInMainFunction()
         assertThat(output.lines()).containsExactly("1", "2", "")
     }
+
+    @Test
+    fun `complex condition (true)`() {
+        val output = """
+            int a = 5;
+            int b = 5;
+            println(1);
+            if (a == b) {
+                println(123);
+            } else {
+                println(456);
+            }
+            println(2);
+        """.runInMainFunction()
+        assertThat(output.lines()).containsExactly("1", "123", "2", "")
+    }
+
+    @Test
+    fun `complex condition (false)`() {
+        val output = """
+            int a = 5;
+            int b = 6;
+            println(1);
+            if (a == b) {
+                println(123);
+            } else {
+                println(456);
+            }
+            println(2);
+        """.runInMainFunction()
+        assertThat(output.lines()).containsExactly("1", "456", "2", "")
+    }
+
+    @Test
+    fun `complex branches (true)`() {
+        val output = """
+            println(1);
+            if (true) {
+                int a = 123;
+                println(a);
+                println(a * 1000);
+            } else {
+                int b = 456;
+                println(b);
+                println(b * 1000);
+            }
+            println(2);
+        """.runInMainFunction()
+        assertThat(output.lines()).containsExactly("1", "123", "123000", "2", "")
+    }
+
+    @Test
+    fun `complex branches (false)`() {
+        val output = """
+            println(1);
+            if (false) {
+                int a = 123;
+                println(a);
+                println(a * 1000);
+            } else {
+                int b = 456;
+                println(b);
+                println(b * 1000);
+            }
+            println(2);
+        """.runInMainFunction()
+        assertThat(output.lines()).containsExactly("1", "456", "456000", "2", "")
+    }
+
+
 }
