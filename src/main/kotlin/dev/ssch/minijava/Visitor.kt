@@ -185,4 +185,33 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
     override fun visitBlock(ctx: MiniJavaParser.BlockContext) {
         visitChildren(ctx)
     }
+
+    override fun visitCompleteIfElse(ctx: MiniJavaParser.CompleteIfElseContext) {
+        visitIfElse(ctx.condition, ctx.thenbranch, ctx.elsebranch)
+    }
+
+    override fun visitIncompleteIf(ctx: MiniJavaParser.IncompleteIfContext) {
+        visitIfElse(ctx.condition, ctx.thenbranch)
+    }
+
+    override fun visitIncompleteIfElse(ctx: MiniJavaParser.IncompleteIfElseContext) {
+        visitIfElse(ctx.condition, ctx.thenbranch, ctx.thenbranch)
+    }
+
+    fun visitIfElse(condition: MiniJavaParser.ExprContext, thenbranch: ParseTree, elsebranch: ParseTree? = null) {
+        visit(condition)
+        mainFunction.body.instructions.add(Instruction._if())
+        visit(thenbranch)
+        mainFunction.body.instructions.add(Instruction._else())
+        if (elsebranch != null) {
+            visit(elsebranch)
+        }
+        mainFunction.body.instructions.add(Instruction.end())
+    }
+
+    override fun visitStatement(ctx: MiniJavaParser.StatementContext) {
+        visitChildren(ctx)
+    }
+
+
 }

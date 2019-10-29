@@ -79,6 +79,9 @@ class ModuleGenerator {
             is Instruction.i32_div_s -> "i32.div_s"
             is Instruction.i32_eq -> "i32.eq"
             is Instruction.i32_ne -> "i32.ne"
+            is Instruction._if -> "if"
+            is Instruction._else -> "else"
+            is Instruction.end -> "end"
         }
     }
 

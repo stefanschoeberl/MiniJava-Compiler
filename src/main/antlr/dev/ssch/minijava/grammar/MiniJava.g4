@@ -6,12 +6,22 @@ package dev.ssch.minijava.grammar;
 
 minijava: (statement)*;
 
-statement: '{' (statement)* '}'               # Block
-         | type=IDENT name=IDENT '=' expr ';' # Vardeclassign
-         | type=IDENT name=IDENT ';'          # Vardecl
-         | name=IDENT '=' expr ';'            # Varassign
-         | 'println' '(' expr ')' ';'         # Println
+statement: completeStatement
+         | incompleteIfStatement
          ;
+
+completeStatement: 'if' '(' condition=expr ')' thenbranch=completeStatement 'else' elsebranch=completeStatement # CompleteIfElse
+                 | '{' (statement)* '}'                                                                         # Block
+                 | type=IDENT name=IDENT '=' expr ';'                                                           # Vardeclassign
+                 | type=IDENT name=IDENT ';'                                                                    # Vardecl
+                 | name=IDENT '=' expr ';'                                                                      # Varassign
+                 | 'println' '(' expr ')' ';'                                                                   # Println
+                 ;
+
+incompleteIfStatement: 'if' '(' condition=expr ')' thenbranch=statement                                                 # IncompleteIf
+                     | 'if' '(' condition=expr ')' thenbranch=completeStatement 'else' elsebranch=incompleteIfStatement # IncompleteIfElse
+                     ;
+
 // https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html
 
 expr: '-' expr                          # Minus
