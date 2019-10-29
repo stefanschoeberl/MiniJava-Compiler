@@ -5,12 +5,12 @@ import dev.ssch.minijava.ast.Function
 import dev.ssch.minijava.exception.*
 import dev.ssch.minijava.grammar.MiniJavaBaseListener
 import dev.ssch.minijava.grammar.MiniJavaParser
+import dev.ssch.minijava.grammar.MiniJavaVisitor
+import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor
 import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.ParseTreeProperty
 
-class Listener : MiniJavaBaseListener() {
-
-    // https://developer.mozilla.org/en-US/docs/WebAssembly/Understanding_the_text_format
+class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
 
     lateinit var module: Module
     lateinit var mainFunction: Function
@@ -24,7 +24,7 @@ class Listener : MiniJavaBaseListener() {
         get() = staticTypes.get(this)
         set(type) = staticTypes.put(this, type)
 
-    override fun enterMinijava(ctx: MiniJavaParser.MinijavaContext?) {
+    override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext) {
         module = Module()
         symbolTable = SymbolTable()
         staticTypes = ParseTreeProperty()
@@ -38,9 +38,13 @@ class Listener : MiniJavaBaseListener() {
 
         val main = module.declareFunction(mainFunction)
         module.exports.add(Export("main", ExportDesc.Func(main)))
+
+        visitChildren(ctx)
     }
 
-    override fun exitPrintln(ctx: MiniJavaParser.PrintlnContext) {
+    override fun visitPrintln(ctx: MiniJavaParser.PrintlnContext) {
+        visit(ctx.expr())
+
         val address = when (ctx.expr().staticType) {
             DataType.Integer -> printlnIntAddr
             DataType.Boolean -> printlnBoolAddr
@@ -48,7 +52,9 @@ class Listener : MiniJavaBaseListener() {
         mainFunction.body.instructions.add(Instruction.call(address))
     }
 
-    override fun exitVardeclassign(ctx: MiniJavaParser.VardeclassignContext) {
+    override fun visitVardeclassign(ctx: MiniJavaParser.VardeclassignContext) {
+        visit(ctx.expr())
+
         val name = ctx.name.text
         val type = DataType.fromString(ctx.type.text) ?: throw UnknownTypeException(ctx.type.text, ctx.type)
         if (symbolTable.isDeclared(name)) {
@@ -64,7 +70,7 @@ class Listener : MiniJavaBaseListener() {
         mainFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
     }
 
-    override fun enterVardecl(ctx: MiniJavaParser.VardeclContext) {
+    override fun visitVardecl(ctx: MiniJavaParser.VardeclContext) {
         val name = ctx.name.text
         val type = DataType.fromString(ctx.type.text) ?: throw UnknownTypeException(ctx.type.text, ctx.type)
         if (symbolTable.isDeclared(name)) {
@@ -74,7 +80,9 @@ class Listener : MiniJavaBaseListener() {
         mainFunction.locals.add(ValueType.I32)
     }
 
-    override fun exitVarassign(ctx: MiniJavaParser.VarassignContext) {
+    override fun visitVarassign(ctx: MiniJavaParser.VarassignContext) {
+        visit(ctx.expr())
+
         val name = ctx.IDENT().text
         if (!symbolTable.isDeclared(name)) {
             throw UndefinedVariableException(name, ctx.name)
@@ -85,11 +93,11 @@ class Listener : MiniJavaBaseListener() {
         mainFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
     }
 
-    override fun enterMinus(ctx: MiniJavaParser.MinusContext?) {
+    override fun visitMinus(ctx: MiniJavaParser.MinusContext) {
         mainFunction.body.instructions.add(Instruction.i32_const(0))
-    }
 
-    override fun exitMinus(ctx: MiniJavaParser.MinusContext) {
+        visit(ctx.expr())
+
         if (ctx.expr().staticType != DataType.Integer) {
             throw InvalidUnaryOperationException(ctx.expr().staticType, ctx.SUB().symbol)
         }
@@ -97,7 +105,7 @@ class Listener : MiniJavaBaseListener() {
         ctx.staticType = ctx.expr().staticType
     }
 
-    override fun enterId(ctx: MiniJavaParser.IdContext) {
+    override fun visitId(ctx: MiniJavaParser.IdContext) {
         val name = ctx.IDENT().text
         if (!symbolTable.isDeclared(name)) {
             throw UndefinedVariableException(name, ctx.IDENT().symbol)
@@ -106,13 +114,13 @@ class Listener : MiniJavaBaseListener() {
         ctx.staticType = symbolTable.typeOf(name)
     }
 
-    override fun enterInt(ctx: MiniJavaParser.IntContext) {
+    override fun visitInt(ctx: MiniJavaParser.IntContext) {
         val value = ctx.INT().text.toInt()
         mainFunction.body.instructions.add(Instruction.i32_const(value))
         ctx.staticType = DataType.Integer
     }
 
-    override fun enterBool(ctx: MiniJavaParser.BoolContext) {
+    override fun visitBool(ctx: MiniJavaParser.BoolContext) {
         if (ctx.value.type == MiniJavaParser.TRUE) {
             mainFunction.body.instructions.add(Instruction.i32_const(1))
         } else {
@@ -121,11 +129,16 @@ class Listener : MiniJavaBaseListener() {
         ctx.staticType = DataType.Boolean
     }
 
-    override fun exitParens(ctx: MiniJavaParser.ParensContext) {
+    override fun visitParens(ctx: MiniJavaParser.ParensContext) {
+        visit(ctx.expr())
+
         ctx.staticType = ctx.expr().staticType
     }
 
-    override fun exitEqNeq(ctx: MiniJavaParser.EqNeqContext) {
+    override fun visitEqNeq(ctx: MiniJavaParser.EqNeqContext) {
+        visit(ctx.left)
+        visit(ctx.right)
+
         if (ctx.left.staticType == DataType.Integer && ctx.right.staticType != DataType.Integer ||
             ctx.left.staticType == DataType.Boolean && ctx.right.staticType != DataType.Boolean) {
             throw InvalidBinaryOperationException(ctx.left.staticType, ctx.right.staticType, ctx.op)
@@ -139,7 +152,10 @@ class Listener : MiniJavaBaseListener() {
         ctx.staticType = DataType.Boolean
     }
 
-    override fun exitAddSub(ctx: MiniJavaParser.AddSubContext) {
+    override fun visitAddSub(ctx: MiniJavaParser.AddSubContext) {
+        visit(ctx.left)
+        visit(ctx.right)
+
         if (ctx.left.staticType != DataType.Integer || ctx.right.staticType != DataType.Integer) {
             throw InvalidBinaryOperationException(ctx.left.staticType, ctx.right.staticType, ctx.op)
         }
@@ -151,7 +167,10 @@ class Listener : MiniJavaBaseListener() {
         ctx.staticType = DataType.Integer
     }
 
-    override fun exitMulDiv(ctx: MiniJavaParser.MulDivContext) {
+    override fun visitMulDiv(ctx: MiniJavaParser.MulDivContext) {
+        visit(ctx.left)
+        visit(ctx.right)
+
         if (ctx.left.staticType != DataType.Integer || ctx.right.staticType != DataType.Integer) {
             throw InvalidBinaryOperationException(ctx.left.staticType, ctx.right.staticType, ctx.op)
         }
@@ -163,4 +182,7 @@ class Listener : MiniJavaBaseListener() {
         ctx.staticType = DataType.Integer
     }
 
+    override fun visitBlock(ctx: MiniJavaParser.BlockContext) {
+        visitChildren(ctx)
+    }
 }

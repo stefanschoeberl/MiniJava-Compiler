@@ -6,7 +6,6 @@ import dev.ssch.minijava.grammar.MiniJavaParser
 import org.antlr.v4.runtime.BailErrorStrategy
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
-import org.antlr.v4.runtime.tree.ParseTreeWalker
 
 class Compiler {
 
@@ -18,12 +17,10 @@ class Compiler {
         parser.errorHandler = BailErrorStrategy()
         val tree = parser.minijava()
 
-        val listener = Listener()
+        val visitor = Visitor()
+        visitor.visit(tree)
 
-        val walker = ParseTreeWalker()
-        walker.walk(listener, tree)
-
-        return listener.module
+        return visitor.module
     }
 
 }
