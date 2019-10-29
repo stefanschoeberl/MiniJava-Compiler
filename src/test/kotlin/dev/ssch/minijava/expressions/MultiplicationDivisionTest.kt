@@ -1,5 +1,6 @@
 package dev.ssch.minijava.expressions
 
+import dev.ssch.minijava.exception.InvalidBinaryOperationException
 import dev.ssch.util.CompilerTest
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
@@ -110,5 +111,65 @@ class MultiplicationDivisionTest : CompilerTest() {
             println(8 / (3 / 2));
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("1", "1", "8", "")
+    }
+
+    @Test
+    fun `multiply two boolean variables`() {
+        Assertions.assertThatThrownBy {
+            """
+                boolean a = true;
+                boolean b = true;
+                int c = a * b;
+            """.runInMainFunction()
+        }.isInstanceOf(InvalidBinaryOperationException::class.java)
+    }
+
+    @Test
+    fun `multiply two boolean literals`() {
+        Assertions.assertThatThrownBy {
+            """
+                int a = true * false;
+            """.runInMainFunction()
+        }.isInstanceOf(InvalidBinaryOperationException::class.java)
+    }
+
+    @Test
+    fun `multiply two complex expressions`() {
+        Assertions.assertThatThrownBy {
+            """
+                boolean a = true;
+                int a = a * (2 * 4);
+            """.runInMainFunction()
+        }.isInstanceOf(InvalidBinaryOperationException::class.java)
+    }
+
+    @Test
+    fun `divide two boolean variables`() {
+        Assertions.assertThatThrownBy {
+            """
+                boolean a = true;
+                boolean b = true;
+                int c = a / b;
+            """.runInMainFunction()
+        }.isInstanceOf(InvalidBinaryOperationException::class.java)
+    }
+
+    @Test
+    fun `divide two boolean literals`() {
+        Assertions.assertThatThrownBy {
+            """
+                int a = true / false;
+            """.runInMainFunction()
+        }.isInstanceOf(InvalidBinaryOperationException::class.java)
+    }
+
+    @Test
+    fun `divide two complex expressions`() {
+        Assertions.assertThatThrownBy {
+            """
+                boolean a = true;
+                int a = a / (2 * 4);
+            """.runInMainFunction()
+        }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 }
