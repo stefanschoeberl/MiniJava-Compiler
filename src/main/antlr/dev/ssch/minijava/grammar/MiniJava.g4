@@ -4,12 +4,13 @@ grammar MiniJava;
 package dev.ssch.minijava.grammar;
 }
 
-minijava: (statement ';')*;
+minijava: (statement)*;
 
-statement: type=IDENT name=IDENT '=' expr   # Vardeclassign
-         | type=IDENT name=IDENT            # Vardecl
-         | name=IDENT '=' expr              # Varassign
-         | 'println' '(' expr ')'           # Println
+statement: '{' (statement)* '}'               # Block
+         | type=IDENT name=IDENT '=' expr ';' # Vardeclassign
+         | type=IDENT name=IDENT ';'          # Vardecl
+         | name=IDENT '=' expr ';'            # Varassign
+         | 'println' '(' expr ')' ';'         # Println
          ;
 // https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html
 
