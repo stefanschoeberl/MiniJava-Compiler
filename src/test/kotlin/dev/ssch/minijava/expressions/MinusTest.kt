@@ -1,16 +1,25 @@
-package dev.ssch.minijava.exceptions
+package dev.ssch.minijava.expressions
 
 import dev.ssch.minijava.exception.InvalidUnaryOperationException
 import dev.ssch.util.CompilerTest
-import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
-class InvalidUnaryOperationExceptionTest : CompilerTest() {
+class MinusTest : CompilerTest() {
+
+    @Test
+    fun `minus expressions`() {
+        val output = """
+            println(-1);
+            println(-(1+2));
+        """.runInMainFunction()
+        Assertions.assertThat(output.lines()).containsExactly("-1", "-3", "")
+    }
 
     @Test
     fun `minus variable`() {
-        assertThatThrownBy {
-        """
+        Assertions.assertThatThrownBy {
+            """
             boolean a = true;
             int c = -a;
         """.runInMainFunction()
@@ -19,8 +28,8 @@ class InvalidUnaryOperationExceptionTest : CompilerTest() {
 
     @Test
     fun `minus literal`() {
-        assertThatThrownBy {
-        """
+        Assertions.assertThatThrownBy {
+            """
             int a = -true;
         """.runInMainFunction()
         }.isInstanceOf(InvalidUnaryOperationException::class.java)
@@ -28,8 +37,8 @@ class InvalidUnaryOperationExceptionTest : CompilerTest() {
 
     @Test
     fun `minus complex expression`() {
-        assertThatThrownBy {
-        """
+        Assertions.assertThatThrownBy {
+            """
             boolean a = true;
             int a = -(a);
         """.runInMainFunction()
