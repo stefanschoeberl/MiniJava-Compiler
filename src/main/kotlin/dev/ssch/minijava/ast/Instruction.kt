@@ -19,12 +19,21 @@ sealed class Instruction {
         val address: Int
     ) : Instruction()
 
+    class br (
+        val label: Int
+    ) : Instruction()
+
+    class br_if (
+        val label: Int
+    ) : Instruction()
+
     class i32_add : Instruction()
     class i32_sub : Instruction()
     class i32_mul : Instruction()
     class i32_div_s : Instruction()
 
     class i32_eq : Instruction()
+    class i32_eqz : Instruction()
     class i32_ne : Instruction()
 
     class i32_and : Instruction()
@@ -33,5 +42,8 @@ sealed class Instruction {
     class _if : Instruction()
     class _else: Instruction()
     class end: Instruction()
+
+    class block: Instruction()
+    class loop: Instruction()
 }
 

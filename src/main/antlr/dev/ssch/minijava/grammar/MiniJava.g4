@@ -11,6 +11,7 @@ statement: completeStatement
          ;
 
 completeStatement: 'if' '(' condition=expr ')' thenbranch=completeStatement 'else' elsebranch=completeStatement # CompleteIfElse
+                 | 'while' '(' condition=expr ')' body=statement                                                # WhileLoop
                  | '{' (statement)* '}'                                                                         # Block
                  | type=IDENT name=IDENT '=' expr ';'                                                           # Vardeclassign
                  | type=IDENT name=IDENT ';'                                                                    # Vardecl

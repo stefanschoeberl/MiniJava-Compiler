@@ -84,6 +84,11 @@ class ModuleGenerator {
             is Instruction.end -> "end"
             is Instruction.i32_and -> "i32.and"
             is Instruction.i32_or -> "i32.or"
+            is Instruction.br -> "br ${instruction.label}"
+            is Instruction.br_if -> "br_if ${instruction.label}"
+            is Instruction.i32_eqz -> "i32.eqz"
+            is Instruction.block -> "block"
+            is Instruction.loop -> "loop"
         }
     }
 

@@ -3,7 +3,6 @@ package dev.ssch.minijava
 import dev.ssch.minijava.ast.*
 import dev.ssch.minijava.ast.Function
 import dev.ssch.minijava.exception.*
-import dev.ssch.minijava.grammar.MiniJavaBaseListener
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.grammar.MiniJavaVisitor
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor
@@ -224,7 +223,7 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
     }
 
     fun visitIfElse(condition: MiniJavaParser.ExprContext, thenbranch: ParseTree, elsebranch: ParseTree? = null) {
-        visit(condition)
+        visit(condition) // TODO: Check condition datatype
         mainFunction.body.instructions.add(Instruction._if())
         visit(thenbranch)
         if (elsebranch != null) {
@@ -238,5 +237,24 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
         visitChildren(ctx)
     }
 
+    override fun visitWhileLoop(ctx: MiniJavaParser.WhileLoopContext) {
+        with(mainFunction.body.instructions) {
+            add(Instruction.block())
+            add(Instruction.loop())
 
+            visit(ctx.condition)
+            if (ctx.condition.staticType != DataType.Boolean) {
+                throw IncompatibleTypeException(DataType.Boolean, ctx.condition.staticType, ctx.getStart())
+            }
+            add(Instruction.i32_eqz())
+            add(Instruction.br_if(1))
+
+            visit(ctx.statement())
+
+            add(Instruction.br(0))
+
+            add(Instruction.end())
+            add(Instruction.end())
+        }
+    }
 }
