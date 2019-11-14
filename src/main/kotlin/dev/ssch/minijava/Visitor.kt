@@ -223,7 +223,10 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
     }
 
     fun visitIfElse(condition: MiniJavaParser.ExprContext, thenbranch: ParseTree, elsebranch: ParseTree? = null) {
-        visit(condition) // TODO: Check condition datatype
+        visit(condition)
+        if (condition.staticType != DataType.Boolean) {
+            throw IncompatibleTypeException(DataType.Boolean, condition.staticType, condition.getStart())
+        }
         mainFunction.body.instructions.add(Instruction._if())
         visit(thenbranch)
         if (elsebranch != null) {
@@ -244,7 +247,7 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
 
             visit(ctx.condition)
             if (ctx.condition.staticType != DataType.Boolean) {
-                throw IncompatibleTypeException(DataType.Boolean, ctx.condition.staticType, ctx.getStart())
+                throw IncompatibleTypeException(DataType.Boolean, ctx.condition.staticType, ctx.condition.getStart())
             }
             add(Instruction.i32_eqz())
             add(Instruction.br_if(1))

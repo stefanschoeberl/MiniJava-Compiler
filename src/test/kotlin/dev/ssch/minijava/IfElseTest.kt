@@ -1,6 +1,8 @@
 package dev.ssch.minijava
 
+import dev.ssch.minijava.exception.IncompatibleTypeException
 import dev.ssch.util.CompilerTest
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -194,5 +196,16 @@ class IfElseTest : CompilerTest() {
         assertThat(output.lines()).containsExactly("1", "456", "456000", "2", "")
     }
 
-
+    @Test
+    fun `non boolean condition`() {
+        Assertions.assertThatThrownBy {
+            """
+                if (1 + 2) {
+                    println(123);
+                } else {
+                    println(456);
+                }
+            """.runInMainFunction()
+        }.isInstanceOf(IncompatibleTypeException::class.java)
+    }
 }
