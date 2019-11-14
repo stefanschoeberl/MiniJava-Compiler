@@ -202,8 +202,8 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
         visit(condition)
         mainFunction.body.instructions.add(Instruction._if())
         visit(thenbranch)
-        mainFunction.body.instructions.add(Instruction._else())
         if (elsebranch != null) {
+            mainFunction.body.instructions.add(Instruction._else())
             visit(elsebranch)
         }
         mainFunction.body.instructions.add(Instruction.end())
