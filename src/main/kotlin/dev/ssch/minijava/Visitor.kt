@@ -135,6 +135,31 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
         ctx.staticType = ctx.expr().staticType
     }
 
+    override fun visitOr(ctx: MiniJavaParser.OrContext) {
+        visit(ctx.left)
+        visit(ctx.right)
+
+        if (ctx.left.staticType != DataType.Boolean || ctx.right.staticType != DataType.Boolean) {
+            throw InvalidBinaryOperationException(ctx.left.staticType, ctx.right.staticType, ctx.op)
+        }
+
+        mainFunction.body.instructions.add(Instruction.i32_or())
+        ctx.staticType = DataType.Boolean
+    }
+
+    override fun visitAnd(ctx: MiniJavaParser.AndContext) {
+        visit(ctx.left)
+        visit(ctx.right)
+
+        if (ctx.left.staticType != DataType.Boolean || ctx.right.staticType != DataType.Boolean) {
+            throw InvalidBinaryOperationException(ctx.left.staticType, ctx.right.staticType, ctx.op)
+        }
+
+        mainFunction.body.instructions.add(Instruction.i32_and())
+
+        ctx.staticType = DataType.Boolean
+    }
+
     override fun visitEqNeq(ctx: MiniJavaParser.EqNeqContext) {
         visit(ctx.left)
         visit(ctx.right)

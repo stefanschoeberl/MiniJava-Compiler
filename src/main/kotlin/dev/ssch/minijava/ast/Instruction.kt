@@ -23,8 +23,13 @@ sealed class Instruction {
     class i32_sub : Instruction()
     class i32_mul : Instruction()
     class i32_div_s : Instruction()
+
     class i32_eq : Instruction()
     class i32_ne : Instruction()
+
+    class i32_and : Instruction()
+    class i32_or : Instruction()
+
     class _if : Instruction()
     class _else: Instruction()
     class end: Instruction()

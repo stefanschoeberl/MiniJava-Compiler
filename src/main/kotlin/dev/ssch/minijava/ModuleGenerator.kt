@@ -82,6 +82,8 @@ class ModuleGenerator {
             is Instruction._if -> "if"
             is Instruction._else -> "else"
             is Instruction.end -> "end"
+            is Instruction.i32_and -> "i32.and"
+            is Instruction.i32_or -> "i32.or"
         }
     }
 

@@ -28,6 +28,8 @@ expr: '-' expr                          # Minus
     | left=expr op=(MUL|DIV) right=expr # MulDiv
     | left=expr op=(ADD|SUB) right=expr # AddSub
     | left=expr op=(EQ|NEQ) right=expr  # EqNeq
+    | left=expr op=AND right=expr       # And
+    | left=expr op=OR right=expr        # Or
     | IDENT                             # Id
     | INT                               # Int
     | value=(TRUE|FALSE)                # Bool
@@ -36,6 +38,8 @@ expr: '-' expr                          # Minus
 
 EQ:  '==';
 NEQ: '!=';
+AND: '&&';
+OR: '||';
 
 ADD: '+';
 SUB: '-';
