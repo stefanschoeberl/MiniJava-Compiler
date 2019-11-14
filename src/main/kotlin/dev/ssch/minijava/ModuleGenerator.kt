@@ -89,6 +89,10 @@ class ModuleGenerator {
             is Instruction.i32_eqz -> "i32.eqz"
             is Instruction.block -> "block"
             is Instruction.loop -> "loop"
+            is Instruction.i32_lt_s -> "i32.lt_s"
+            is Instruction.i32_le_s -> "i32.le_s"
+            is Instruction.i32_gt_s -> "i32.gt_s"
+            is Instruction.i32_ge_s -> "i32.ge_s"
         }
     }
 

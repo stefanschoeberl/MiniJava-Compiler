@@ -1,7 +1,5 @@
 package dev.ssch.minijava.ast
 
-import jdk.internal.org.objectweb.asm.commons.InstructionAdapter
-
 sealed class Instruction {
     class i32_const (
         val value: Int
@@ -33,8 +31,14 @@ sealed class Instruction {
     class i32_div_s : Instruction()
 
     class i32_eq : Instruction()
-    class i32_eqz : Instruction()
     class i32_ne : Instruction()
+
+    class i32_lt_s : Instruction()
+    class i32_le_s : Instruction()
+    class i32_gt_s : Instruction()
+    class i32_ge_s : Instruction()
+
+    class i32_eqz : Instruction()
 
     class i32_and : Instruction()
     class i32_or : Instruction()

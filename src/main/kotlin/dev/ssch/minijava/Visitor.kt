@@ -176,6 +176,25 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
         ctx.staticType = DataType.Boolean
     }
 
+    override fun visitRelational(ctx: MiniJavaParser.RelationalContext) {
+        visit(ctx.left)
+        visit(ctx.right)
+
+        if (ctx.left.staticType == DataType.Integer && ctx.right.staticType != DataType.Integer ||
+            ctx.left.staticType == DataType.Boolean && ctx.right.staticType != DataType.Boolean) {
+            throw InvalidBinaryOperationException(ctx.left.staticType, ctx.right.staticType, ctx.op)
+        }
+
+        when (ctx.op.type) {
+            MiniJavaParser.LT -> mainFunction.body.instructions.add(Instruction.i32_lt_s())
+            MiniJavaParser.LE -> mainFunction.body.instructions.add(Instruction.i32_le_s())
+            MiniJavaParser.GT -> mainFunction.body.instructions.add(Instruction.i32_gt_s())
+            MiniJavaParser.GE -> mainFunction.body.instructions.add(Instruction.i32_ge_s())
+        }
+
+        ctx.staticType = DataType.Boolean
+    }
+
     override fun visitAddSub(ctx: MiniJavaParser.AddSubContext) {
         visit(ctx.left)
         visit(ctx.right)

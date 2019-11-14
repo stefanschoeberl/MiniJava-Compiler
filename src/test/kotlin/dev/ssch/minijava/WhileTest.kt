@@ -59,7 +59,7 @@ class WhileTest : CompilerTest() {
     }
 
     @Test
-    fun `while with if`() {
+    fun `while with if 1`() {
         val output = """
             int i = 0;
             while (i != 10) {
@@ -71,6 +71,21 @@ class WhileTest : CompilerTest() {
             println(-1);
         """.runInMainFunction()
         assertThat(output.lines()).containsExactly("1", "3", "5", "-1", "")
+    }
+
+    @Test
+    fun `while with if 2`() {
+        val output = """
+            int i = 0;
+            while (i < 10) {
+                if (i >= 2 && i < 5) {
+                    println(i);
+                }
+                i = i + 1;
+            }
+            println(-1);
+        """.runInMainFunction()
+        assertThat(output.lines()).containsExactly("2", "3", "4", "-1", "")
     }
 
     @Test

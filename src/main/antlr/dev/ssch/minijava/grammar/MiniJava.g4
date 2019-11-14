@@ -25,20 +25,25 @@ incompleteIfStatement: 'if' '(' condition=expr ')' thenbranch=statement         
 
 // https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html
 
-expr: '-' expr                          # Minus
-    | left=expr op=(MUL|DIV) right=expr # MulDiv
-    | left=expr op=(ADD|SUB) right=expr # AddSub
-    | left=expr op=(EQ|NEQ) right=expr  # EqNeq
-    | left=expr op=AND right=expr       # And
-    | left=expr op=OR right=expr        # Or
-    | IDENT                             # Id
-    | INT                               # Int
-    | value=(TRUE|FALSE)                # Bool
-    | '(' expr ')'                      # Parens
+expr: '-' expr                              # Minus
+    | left=expr op=(MUL|DIV) right=expr     # MulDiv
+    | left=expr op=(ADD|SUB) right=expr     # AddSub
+    | left=expr op=(LT|LE|GT|GE) right=expr # Relational
+    | left=expr op=(EQ|NEQ) right=expr      # EqNeq
+    | left=expr op=AND right=expr           # And
+    | left=expr op=OR right=expr            # Or
+    | IDENT                                 # Id
+    | INT                                   # Int
+    | value=(TRUE|FALSE)                    # Bool
+    | '(' expr ')'                          # Parens
     ;
 
 EQ:  '==';
 NEQ: '!=';
+LT: '<';
+LE: '<=';
+GT: '>';
+GE: '>=';
 AND: '&&';
 OR: '||';
 
