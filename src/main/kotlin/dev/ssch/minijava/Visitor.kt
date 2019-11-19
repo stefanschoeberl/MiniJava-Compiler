@@ -75,8 +75,10 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
         if (symbolTable.isDeclared(name)) {
             throw RedefinedVariableException(name, ctx.name)
         }
-        symbolTable.declareVariable(name, type)
+        val address = symbolTable.declareVariable(name, type)
         mainFunction.locals.add(ValueType.I32)
+        mainFunction.body.instructions.add(Instruction.i32_const(0))
+        mainFunction.body.instructions.add(Instruction.local_set(address))
     }
 
     override fun visitVarassign(ctx: MiniJavaParser.VarassignContext) {
