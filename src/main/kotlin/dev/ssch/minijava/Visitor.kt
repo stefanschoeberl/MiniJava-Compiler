@@ -39,6 +39,14 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
         module.exports.add(Export("main", ExportDesc.Func(main)))
 
         visitChildren(ctx)
+
+        symbolTable.allLocalVariables.forEach {
+            when (it) {
+                DataType.Integer -> mainFunction.locals.add(ValueType.I32)
+                DataType.Boolean -> mainFunction.locals.add(ValueType.I32)
+            }
+        }
+
     }
 
     override fun visitPrintln(ctx: MiniJavaParser.PrintlnContext) {
@@ -60,7 +68,6 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
             throw RedefinedVariableException(name, ctx.name)
         }
         symbolTable.declareVariable(name, type)
-        mainFunction.locals.add(ValueType.I32)
 
         if (type != ctx.expr().staticType) {
             throw IncompatibleAssignmentException(type, ctx.expr().staticType, ctx.name)
@@ -76,7 +83,6 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
             throw RedefinedVariableException(name, ctx.name)
         }
         val address = symbolTable.declareVariable(name, type)
-        mainFunction.locals.add(ValueType.I32)
         mainFunction.body.instructions.add(Instruction.i32_const(0))
         mainFunction.body.instructions.add(Instruction.local_set(address))
     }
@@ -228,7 +234,9 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
     }
 
     override fun visitBlock(ctx: MiniJavaParser.BlockContext) {
+        symbolTable.pushScope()
         visitChildren(ctx)
+        symbolTable.popScope()
     }
 
     override fun visitCompleteIfElse(ctx: MiniJavaParser.CompleteIfElseContext) {

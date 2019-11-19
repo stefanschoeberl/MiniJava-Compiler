@@ -19,3 +19,11 @@ fun List<String>.runCommand(workingDir: File): String {
 
     return process.inputStream.bufferedReader().readText()
 }
+
+fun <T> MutableList<T>.removeFirstOrNull(): T? {
+    if (this.isEmpty()) {
+        return null
+    } else {
+        return this.removeAt(0)
+    }
+}
