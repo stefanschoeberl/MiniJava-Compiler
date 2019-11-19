@@ -100,7 +100,7 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
         mainFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
     }
 
-    override fun visitMinus(ctx: MiniJavaParser.MinusContext) {
+    override fun visitMinusExpr(ctx: MiniJavaParser.MinusExprContext) {
         mainFunction.body.instructions.add(Instruction.i32_const(0))
 
         visit(ctx.expr())
@@ -112,7 +112,7 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
         ctx.staticType = ctx.expr().staticType
     }
 
-    override fun visitId(ctx: MiniJavaParser.IdContext) {
+    override fun visitIdExpr(ctx: MiniJavaParser.IdExprContext) {
         val name = ctx.IDENT().text
         if (!symbolTable.isDeclared(name)) {
             throw UndefinedVariableException(name, ctx.IDENT().symbol)
@@ -121,13 +121,13 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
         ctx.staticType = symbolTable.typeOf(name)
     }
 
-    override fun visitInt(ctx: MiniJavaParser.IntContext) {
+    override fun visitIntExpr(ctx: MiniJavaParser.IntExprContext) {
         val value = ctx.INT().text.toInt()
         mainFunction.body.instructions.add(Instruction.i32_const(value))
         ctx.staticType = DataType.Integer
     }
 
-    override fun visitBool(ctx: MiniJavaParser.BoolContext) {
+    override fun visitBoolExpr(ctx: MiniJavaParser.BoolExprContext) {
         if (ctx.value.type == MiniJavaParser.TRUE) {
             mainFunction.body.instructions.add(Instruction.i32_const(1))
         } else {
@@ -136,13 +136,13 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
         ctx.staticType = DataType.Boolean
     }
 
-    override fun visitParens(ctx: MiniJavaParser.ParensContext) {
+    override fun visitParensExpr(ctx: MiniJavaParser.ParensExprContext) {
         visit(ctx.expr())
 
         ctx.staticType = ctx.expr().staticType
     }
 
-    override fun visitOr(ctx: MiniJavaParser.OrContext) {
+    override fun visitOrExpr(ctx: MiniJavaParser.OrExprContext) {
         visit(ctx.left)
         visit(ctx.right)
 
@@ -154,7 +154,7 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
         ctx.staticType = DataType.Boolean
     }
 
-    override fun visitAnd(ctx: MiniJavaParser.AndContext) {
+    override fun visitAndExpr(ctx: MiniJavaParser.AndExprContext) {
         visit(ctx.left)
         visit(ctx.right)
 
@@ -167,7 +167,7 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
         ctx.staticType = DataType.Boolean
     }
 
-    override fun visitEqNeq(ctx: MiniJavaParser.EqNeqContext) {
+    override fun visitEqNeqExpr(ctx: MiniJavaParser.EqNeqExprContext) {
         visit(ctx.left)
         visit(ctx.right)
 
@@ -184,7 +184,7 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
         ctx.staticType = DataType.Boolean
     }
 
-    override fun visitRelational(ctx: MiniJavaParser.RelationalContext) {
+    override fun visitRelationalExpr(ctx: MiniJavaParser.RelationalExprContext) {
         visit(ctx.left)
         visit(ctx.right)
 
@@ -203,7 +203,7 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
         ctx.staticType = DataType.Boolean
     }
 
-    override fun visitAddSub(ctx: MiniJavaParser.AddSubContext) {
+    override fun visitAddSubExpr(ctx: MiniJavaParser.AddSubExprContext) {
         visit(ctx.left)
         visit(ctx.right)
 
@@ -218,7 +218,7 @@ class Visitor : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
         ctx.staticType = DataType.Integer
     }
 
-    override fun visitMulDiv(ctx: MiniJavaParser.MulDivContext) {
+    override fun visitMulDivExpr(ctx: MiniJavaParser.MulDivExprContext) {
         visit(ctx.left)
         visit(ctx.right)
 
