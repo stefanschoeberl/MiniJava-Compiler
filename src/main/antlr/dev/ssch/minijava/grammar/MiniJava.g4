@@ -4,7 +4,9 @@ grammar MiniJava;
 package dev.ssch.minijava.grammar;
 }
 
-minijava: (statement)*;
+minijava: (method)*;
+
+method: (publicmodifier='public')? returntype=IDENT name=IDENT '(' ')' '{' (statements+=statement)* '}';
 
 statement: completeStatement
          | incompleteIfStatement
@@ -16,7 +18,7 @@ completeStatement: 'if' '(' condition=expr ')' thenbranch=completeStatement 'els
                  | type=IDENT name=IDENT '=' expr ';'                                                           # Vardeclassign
                  | type=IDENT name=IDENT ';'                                                                    # Vardecl
                  | name=IDENT '=' expr ';'                                                                      # Varassign
-                 | 'println' '(' expr ')' ';'                                                                   # Println
+                 | name=IDENT '(' (parameters+=expr)* ')' ';'                                                                 # Call
                  ;
 
 incompleteIfStatement: 'if' '(' condition=expr ')' thenbranch=statement                                                 # IncompleteIf

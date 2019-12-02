@@ -13,8 +13,12 @@ abstract class CompilerTest {
     lateinit var temporaryFolder: File
 
     fun String.runInMainFunction(): String {
+        return "public void main() { $this }".compileAndRunMainFunction()
+    }
+
+    fun String.compileAndRunMainFunction(): String {
         val compiler = Compiler()
-        val module = compiler.compile(this)
+        val module = compiler.compile(this )
 
         val moduleGenerator = ModuleGenerator()
         val watText = moduleGenerator.toSExpr(module)

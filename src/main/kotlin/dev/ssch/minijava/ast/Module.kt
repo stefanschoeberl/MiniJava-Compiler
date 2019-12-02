@@ -22,8 +22,6 @@ data class Module (
     }
 
     fun importFunction(import: Import): Int {
-        // TODO: check, if no module function has been defined yet
-
         imports.add(import)
         return imports.size - 1
     }

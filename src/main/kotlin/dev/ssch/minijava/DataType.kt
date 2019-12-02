@@ -7,10 +7,17 @@ enum class DataType {
     companion object {
         fun fromString(s: String): DataType? {
             return when (s) {
-                "int" -> DataType.Integer
-                "boolean" -> DataType.Boolean
+                "int" -> Integer
+                "boolean" -> Boolean
                 else -> null
             }
+        }
+    }
+
+    override fun toString(): String {
+        return when(this) {
+            Integer -> "int"
+            Boolean -> "boolean"
         }
     }
 }

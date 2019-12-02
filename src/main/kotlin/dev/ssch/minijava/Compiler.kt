@@ -17,10 +17,13 @@ class Compiler {
         parser.errorHandler = BailErrorStrategy()
         val tree = parser.minijava()
 
-        val visitor = Visitor()
-        visitor.visit(tree)
+        val declarationPhase = DeclarationPhase()
+        declarationPhase.visit(tree)
 
-        return visitor.module
+        val codeGenerationPhase = CodeGenerationPhase(declarationPhase.methodSymbolTable)
+        codeGenerationPhase.visit(tree)
+
+        return codeGenerationPhase.module
     }
 
 }

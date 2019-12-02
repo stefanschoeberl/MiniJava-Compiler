@@ -1,5 +1,6 @@
 package dev.ssch.minijava
 
+import dev.ssch.minijava.ast.ValueType
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -26,4 +27,15 @@ fun <T> MutableList<T>.removeFirstOrNull(): T? {
     } else {
         return this.removeAt(0)
     }
+}
+
+fun DataType.toWebAssemblyType(): ValueType {
+    return when (this) {
+        DataType.Integer -> ValueType.I32
+        DataType.Boolean -> ValueType.I32
+    }
+}
+
+fun MethodSymbolTable.MethodSignature.externalName(): String {
+    return this.name + this.parameterTypes.map { "#$it" }.joinToString()
 }

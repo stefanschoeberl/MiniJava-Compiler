@@ -8,8 +8,8 @@ const readFile = promisify(fs.readFile);
 async function runFile(file) {
     const imports = {
         imports: {
-            println_int: arg => console.log(arg),
-            println_bool: arg => console.log(arg === 0 ? 'false' : 'true')
+            "println#int": arg => console.log(arg),
+            "println#boolean": arg => console.log(arg === 0 ? 'false' : 'true')
         }
     };
     const bytes = await readFile(file);
