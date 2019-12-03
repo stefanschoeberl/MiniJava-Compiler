@@ -6,7 +6,11 @@ package dev.ssch.minijava.grammar;
 
 minijava: (method)*;
 
-method: (publicmodifier='public')? returntype=IDENT name=IDENT '(' ')' '{' (statements+=statement)* '}';
+method: (publicmodifier='public')? returntype=IDENT name=IDENT
+        '(' (parameters+=formalParameter (',' parameters+=formalParameter)*)? ')'
+        '{' (statements+=statement)* '}';
+
+formalParameter: type=IDENT name=IDENT;
 
 statement: completeStatement
          | incompleteIfStatement
@@ -18,7 +22,7 @@ completeStatement: 'if' '(' condition=expr ')' thenbranch=completeStatement 'els
                  | type=IDENT name=IDENT '=' expr ';'                                                           # Vardeclassign
                  | type=IDENT name=IDENT ';'                                                                    # Vardecl
                  | name=IDENT '=' expr ';'                                                                      # Varassign
-                 | name=IDENT '(' (parameters+=expr)* ')' ';'                                                                 # Call
+                 | name=IDENT '(' (parameters+=expr (',' parameters+=expr)*)? ')' ';'                           # Call
                  ;
 
 incompleteIfStatement: 'if' '(' condition=expr ')' thenbranch=statement                                                 # IncompleteIf

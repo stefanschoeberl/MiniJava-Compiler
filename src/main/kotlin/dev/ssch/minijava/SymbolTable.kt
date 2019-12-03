@@ -10,23 +10,35 @@ class SymbolTable {
     private val scopes = mutableListOf(mutableSetOf<String>())
     private val symbols = mutableMapOf<String, SymbolInformation>()
 
+    private var parameterCount = 0
     private val localVariables = mutableListOf<DataType>()
     private val unusedVariables = mutableMapOf<DataType, MutableList<Int>>()
 
-    private fun allocateNewAddressFor(type: DataType): Int {
-        val address = localVariables.size
+    private fun allocateNewAddressForParameter(): Int {
+        return parameterCount++
+    }
+
+    private fun allocateNewAddressForLocal(type: DataType): Int {
+        val address = localVariables.size + parameterCount
         localVariables.add(type)
         return address
     }
 
-    private fun getFreeAddressFor(type: DataType): Int {
-        val pool = unusedVariables[type] ?: return allocateNewAddressFor(type)
-        val address = pool.removeFirstOrNull() ?: return allocateNewAddressFor(type)
+    private fun getFreeAddressForLocal(type: DataType): Int {
+        val pool = unusedVariables[type] ?: return allocateNewAddressForLocal(type)
+        val address = pool.removeFirstOrNull() ?: return allocateNewAddressForLocal(type)
         return address
     }
 
     fun declareVariable(name: String, type: DataType): Int {
-        val addr = getFreeAddressFor(type)
+        val addr = getFreeAddressForLocal(type)
+        symbols[name] = SymbolInformation(addr, type)
+        scopes.first().add(name)
+        return addr
+    }
+
+    fun declareParameter(name: String, type: DataType): Int {
+        val addr = allocateNewAddressForParameter()
         symbols[name] = SymbolInformation(addr, type)
         scopes.first().add(name)
         return addr

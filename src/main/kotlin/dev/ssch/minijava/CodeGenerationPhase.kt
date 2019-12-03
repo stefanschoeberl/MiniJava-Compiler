@@ -3,13 +3,12 @@ package dev.ssch.minijava
 import dev.ssch.minijava.ast.*
 import dev.ssch.minijava.ast.Function
 import dev.ssch.minijava.exception.*
+import dev.ssch.minijava.grammar.MiniJavaBaseVisitor
 import dev.ssch.minijava.grammar.MiniJavaParser
-import dev.ssch.minijava.grammar.MiniJavaVisitor
-import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor
 import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.ParseTreeProperty
 
-class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : AbstractParseTreeVisitor<Unit>(), MiniJavaVisitor<Unit> {
+class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : MiniJavaBaseVisitor<Unit>() {
 
     lateinit var module: Module
     private lateinit var currentFunction: Function
@@ -58,7 +57,13 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Ab
         // reset scope
         symbolTable = SymbolTable()
 
-        currentFunction = functions[MethodSymbolTable.MethodSignature(ctx.name.text, mutableListOf())]!!
+        val parameters = ctx.parameters.map { Pair(it.name.text, DataType.fromString(it.type.text)!!) }
+        val parameterTypes = parameters.map { it.second }
+        currentFunction = functions[MethodSymbolTable.MethodSignature(ctx.name.text, parameterTypes)]!!
+
+        parameters.forEach {
+            symbolTable.declareParameter(it.first, it.second)
+        }
 
         ctx.statements.forEach {
             visit(it)
@@ -291,10 +296,6 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Ab
             visit(elsebranch)
         }
         currentFunction.body.instructions.add(Instruction.end())
-    }
-
-    override fun visitStatement(ctx: MiniJavaParser.StatementContext) {
-        visitChildren(ctx)
     }
 
     override fun visitWhileLoop(ctx: MiniJavaParser.WhileLoopContext) {

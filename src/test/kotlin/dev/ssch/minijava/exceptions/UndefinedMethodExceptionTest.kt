@@ -15,4 +15,16 @@ class UndefinedMethodExceptionTest : CompilerTest() {
         """.runInMainFunction()
         }.isInstanceOf(UndefinedMethodException::class.java)
     }
+
+    @Test
+    fun `wrong parameter types`() {
+        assertThatThrownBy {
+        """
+            void a(int b) {}
+            public void main() {
+                a(true);
+            }
+        """.compileAndRunMainFunction()
+        }.isInstanceOf(UndefinedMethodException::class.java)
+    }
 }

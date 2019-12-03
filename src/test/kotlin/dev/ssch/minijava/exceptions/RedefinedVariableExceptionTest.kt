@@ -46,4 +46,15 @@ class RedefinedVariableExceptionTest : CompilerTest() {
         """.runInMainFunction()
         }.isInstanceOf(RedefinedVariableException::class.java)
     }
+
+    @Test
+    fun `redefine variable with same name as local variable`() {
+        assertThatThrownBy {
+        """
+            void a(int x) {
+                int x = 123;
+            }
+        """.compileAndRunMainFunction()
+        }.isInstanceOf(RedefinedVariableException::class.java)
+    }
 }

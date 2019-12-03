@@ -21,7 +21,9 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
             else -> DataType.fromString(ctx.returntype.text) ?: throw UnknownTypeException(ctx.returntype.text, ctx.returntype)
         }
         val name = ctx.name.text
-        val parameters = listOf<DataType>()
+        val parameters = ctx.parameters.map {
+            DataType.fromString(it.type.text) ?: throw UnknownTypeException(it.type.text, it.type)
+        }
         if (methodSymbolTable.isDeclared(name, parameters)) {
             throw RedefinedMethodException(name, ctx.name)
         }
