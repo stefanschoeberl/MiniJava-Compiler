@@ -343,7 +343,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
             add(Instruction.i32_eqz())
             add(Instruction.br_if(1))
 
-            visit(ctx.statement())
+            visit(ctx.body)
 
             add(Instruction.br(0))
 

@@ -15,7 +15,7 @@ class VariableTest : CompilerTest() {
     }
 
     @Test
-    fun `declare a variable and initilize it with a value`() {
+    fun `declare a variable and initialize it with a value`() {
         val output = """
             int a = 123;
             println(a);
@@ -24,7 +24,7 @@ class VariableTest : CompilerTest() {
     }
 
     @Test
-    fun `declare a variable and initilize it with another variable`() {
+    fun `declare a variable and initialize it with another variable`() {
         val output = """
             int a = 123;
             int b = a;
