@@ -6,9 +6,9 @@ package dev.ssch.minijava.grammar;
 
 minijava: (method)*;
 
-method: (publicmodifier='public')? returntype=IDENT name=IDENT
+method: (publicmodifier+='public' | nativemodifier+='native')* returntype=IDENT name=IDENT
         '(' (parameters+=formalParameter (',' parameters+=formalParameter)*)? ')'
-        '{' (statements+=statement)* '}';
+        (block='{' (statements+=statement)* '}' | semicolon=';');
 
 formalParameter: type=IDENT name=IDENT;
 

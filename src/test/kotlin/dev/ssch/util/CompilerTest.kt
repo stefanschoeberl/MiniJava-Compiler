@@ -12,13 +12,20 @@ abstract class CompilerTest {
     @TempDir
     lateinit var temporaryFolder: File
 
-    fun String.runInMainFunction(): String {
-        return "public void main() { $this }".compileAndRunMainFunction()
+    fun useStandardLibary(use: Boolean): String {
+        return if (use) """
+            native void println(int a);
+            native void println(boolean a);
+        """ else ""
     }
 
-    fun String.compileAndRunMainFunction(): String {
+    fun String.runInMainFunction(withStandardLibrary: Boolean = true): String {
+        return "public void main() { $this }".compileAndRunMainFunction(withStandardLibrary)
+    }
+
+    fun String.compileAndRunMainFunction(withStandardLibrary: Boolean = true): String {
         val compiler = Compiler()
-        val module = compiler.compile(this )
+        val module = compiler.compile("${useStandardLibary(withStandardLibrary)} $this" )
 
         val moduleGenerator = ModuleGenerator()
         val watText = moduleGenerator.toSExpr(module)

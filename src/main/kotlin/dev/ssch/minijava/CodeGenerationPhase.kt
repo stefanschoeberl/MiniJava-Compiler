@@ -54,6 +54,10 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
     }
 
     override fun visitMethod(ctx: MiniJavaParser.MethodContext) {
+        if (ctx.nativemodifier.isNotEmpty()) {
+            return
+        }
+
         // reset scope
         symbolTable = SymbolTable()
 
