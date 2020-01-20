@@ -93,6 +93,9 @@ class ModuleGenerator {
             is Instruction.i32_le_s -> "i32.le_s"
             is Instruction.i32_gt_s -> "i32.gt_s"
             is Instruction.i32_ge_s -> "i32.ge_s"
+            is Instruction._return -> "return"
+            is Instruction.drop -> "drop"
+            is Instruction.unreachable -> "unreachable"
         }
     }
 

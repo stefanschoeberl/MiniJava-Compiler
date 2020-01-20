@@ -49,5 +49,8 @@ sealed class Instruction {
 
     class block: Instruction()
     class loop: Instruction()
+    class drop: Instruction()
+    class _return: Instruction()
+    class unreachable: Instruction()
 }
 

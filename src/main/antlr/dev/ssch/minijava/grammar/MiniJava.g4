@@ -22,7 +22,8 @@ completeStatement: 'if' '(' condition=expr ')' thenbranch=completeStatement 'els
                  | type=IDENT name=IDENT '=' expr ';'                                                           # Vardeclassign
                  | type=IDENT name=IDENT ';'                                                                    # Vardecl
                  | name=IDENT '=' expr ';'                                                                      # Varassign
-                 | name=IDENT '(' (parameters+=expr (',' parameters+=expr)*)? ')' ';'                           # Call
+                 | callExpression ';'                                                                           # Call
+                 | 'return' value=expr ';'                                                                      # Return
                  ;
 
 incompleteIfStatement: 'if' '(' condition=expr ')' thenbranch=statement                                                 # IncompleteIf
@@ -31,18 +32,22 @@ incompleteIfStatement: 'if' '(' condition=expr ')' thenbranch=statement         
 
 // https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html
 
-expr: '-' expr                              # MinusExpr
-    | left=expr op=(MUL|DIV) right=expr     # MulDivExpr
-    | left=expr op=(ADD|SUB) right=expr     # AddSubExpr
-    | left=expr op=(LT|LE|GT|GE) right=expr # RelationalExpr
-    | left=expr op=(EQ|NEQ) right=expr      # EqNeqExpr
-    | left=expr op=AND right=expr           # AndExpr
-    | left=expr op=OR right=expr            # OrExpr
-    | IDENT                                 # IdExpr
-    | INT                                   # IntExpr
-    | value=(TRUE|FALSE)                    # BoolExpr
-    | '(' expr ')'                          # ParensExpr
+expr: '-' expr                                                           # MinusExpr
+    | left=expr op=(MUL|DIV) right=expr                                  # MulDivExpr
+    | left=expr op=(ADD|SUB) right=expr                                  # AddSubExpr
+    | left=expr op=(LT|LE|GT|GE) right=expr                              # RelationalExpr
+    | left=expr op=(EQ|NEQ) right=expr                                   # EqNeqExpr
+    | left=expr op=AND right=expr                                        # AndExpr
+    | left=expr op=OR right=expr                                         # OrExpr
+    | IDENT                                                              # IdExpr
+    | INT                                                                # IntExpr
+    | value=(TRUE|FALSE)                                                 # BoolExpr
+    | callExpression                                                     # CallExpr
+    | '(' expr ')'                                                       # ParensExpr
     ;
+
+callExpression:
+    name=IDENT '(' (parameters+=expr (',' parameters+=expr)*)? ')';
 
 EQ:  '==';
 NEQ: '!=';

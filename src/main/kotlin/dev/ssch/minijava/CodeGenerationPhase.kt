@@ -18,7 +18,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
 
     private lateinit var functions: MutableMap<MethodSymbolTable.MethodSignature, Function>
 
-    private var ParseTree.staticType: DataType
+    private var ParseTree.staticType: DataType?
         get() = staticTypes.get(this)
         set(type) = staticTypes.put(this, type)
 
@@ -73,29 +73,17 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
             visit(it)
         }
 
+        // "workaround" idea from https://github.com/WebAssembly/wabt/issues/1075
+        if (methodSymbolTable.returnTypeOf(ctx.name.text, parameters.map { it.second }) != null) {
+            currentFunction.body.instructions.add(Instruction.unreachable())
+        }
+
         symbolTable.allLocalVariables.forEach {
             when (it) {
                 DataType.Integer -> currentFunction.locals.add(ValueType.I32)
                 DataType.Boolean -> currentFunction.locals.add(ValueType.I32)
             }
         }
-    }
-
-    override fun visitCall(ctx: MiniJavaParser.CallContext) {
-        ctx.parameters.forEach {
-            visit(it)
-        }
-
-        val name = ctx.name.text
-        val parameters = ctx.parameters.map { it.staticType }
-
-        if (!methodSymbolTable.isDeclared(name, parameters)) {
-            throw UndefinedMethodException(name, ctx.name)
-        }
-
-        val address = methodSymbolTable.addressOf(name, parameters)
-
-        currentFunction.body.instructions.add(Instruction.call(address))
     }
 
     override fun visitVardeclassign(ctx: MiniJavaParser.VardeclassignContext) {
@@ -137,6 +125,41 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         currentFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
     }
 
+    override fun visitCall(ctx: MiniJavaParser.CallContext) {
+        visit(ctx.callExpression())
+
+        if (ctx.callExpression().staticType != null) {
+            currentFunction.body.instructions.add(Instruction.drop())
+        }
+    }
+
+    override fun visitReturn(ctx: MiniJavaParser.ReturnContext) {
+        visit(ctx.value)
+
+        currentFunction.body.instructions.add(Instruction._return())
+    }
+
+    override fun visitCallExpression(ctx: MiniJavaParser.CallExpressionContext) {
+        ctx.parameters.forEach {
+            visit(it)
+        }
+
+        val name = ctx.name.text
+        val parameters = ctx.parameters.map {
+            it.staticType ?: throw VoidParameterException(it.start)
+        }
+
+        if (!methodSymbolTable.isDeclared(name, parameters)) {
+            throw UndefinedMethodException(name, ctx.name)
+        }
+
+        val address = methodSymbolTable.addressOf(name, parameters)
+
+        currentFunction.body.instructions.add(Instruction.call(address))
+
+        ctx.staticType = methodSymbolTable.returnTypeOf(name, parameters)
+    }
+
     override fun visitMinusExpr(ctx: MiniJavaParser.MinusExprContext) {
         currentFunction.body.instructions.add(Instruction.i32_const(0))
 
@@ -147,6 +170,12 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         }
         currentFunction.body.instructions.add(Instruction.i32_sub())
         ctx.staticType = ctx.expr().staticType
+    }
+
+    override fun visitCallExpr(ctx: MiniJavaParser.CallExprContext) {
+        visit(ctx.callExpression())
+
+        ctx.staticType = ctx.callExpression().staticType
     }
 
     override fun visitIdExpr(ctx: MiniJavaParser.IdExprContext) {

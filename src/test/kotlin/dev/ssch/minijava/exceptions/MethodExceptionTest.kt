@@ -3,6 +3,7 @@ package dev.ssch.minijava.exceptions
 import dev.ssch.minijava.exception.InvalidMethodBodyException
 import dev.ssch.minijava.exception.InvalidModifierException
 import dev.ssch.minijava.exception.MissingMethodBodyException
+import dev.ssch.minijava.exception.VoidParameterException
 import dev.ssch.util.CompilerTest
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -57,10 +58,25 @@ class MethodExceptionTest : CompilerTest() {
     @Test
     fun `normal method without body`() {
         assertThatThrownBy {
-            """
+        """
             public void a();
         """.compileAndRunMainFunction(false)
         }.isInstanceOf(MissingMethodBodyException::class.java)
+    }
+
+    @Test
+    fun `void parameter`() {
+        assertThatThrownBy {
+            """
+            public void a() { }
+            
+            public void b(int a) {}
+            
+            public void c() {
+                b(a());
+            }
+        """.compileAndRunMainFunction(false)
+        }.isInstanceOf(VoidParameterException::class.java)
     }
 
 

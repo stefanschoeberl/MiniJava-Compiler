@@ -152,4 +152,87 @@ class MethodsTest : CompilerTest() {
         assertThat(output.lines()).containsExactly("9", "-5", "")
     }
 
+    @Test
+    fun `return a single value`() {
+        val output = """
+            public void main() {
+                int a = increment(10);
+                println(a);
+            }
+            
+            int increment(int x) {
+                return x + 1;
+            }
+            """.compileAndRunMainFunction()
+        assertThat(output.lines()).containsExactly("11", "")
+    }
+
+    @Test
+    fun `nested calls`() {
+        val output = """
+            public void main() {
+                println(increment(increment(increment(1))));
+            }
+            
+            int increment(int x) {
+                return x + 1;
+            }
+            """.compileAndRunMainFunction()
+        assertThat(output.lines()).containsExactly("4", "")
+    }
+
+    @Test
+    fun `don't use return value`() {
+        val output = """
+            public void main() { 
+                increment(5);
+                println(increment(10));
+            }
+            
+            int increment(int x) {
+                return x + 1;
+            }
+            """.compileAndRunMainFunction()
+        assertThat(output.lines()).containsExactly("11", "")
+    }
+
+    @Test
+    fun `simple recursion`() {
+        val output = """
+            public void main() { 
+                println(duplicate(1, 5));
+            }
+            
+            int duplicate(int a, int n) {
+                if (n == 0) {
+                    return a;
+                } else {
+                    return 2 * duplicate(a, n - 1);
+                }
+            }
+            """.compileAndRunMainFunction()
+        assertThat(output.lines()).containsExactly("32", "")
+    }
+
+    @Test
+    fun `fibonacci recursion`() {
+        val output = """
+            public void main() {
+                int i = 0;
+                while (i < 10) {
+                    println(fib(i));
+                    i = i + 1;
+                }
+            }
+            
+            int fib(int n) {
+                if (n == 0 || n == 1) {
+                    return n;
+                } else {
+                    return fib(n - 1) + fib(n - 2);
+                }
+            }
+            """.compileAndRunMainFunction()
+        assertThat(output.lines()).containsExactly("0", "1", "1", "2", "3", "5", "8", "13", "21", "34", "")
+    }
 }
