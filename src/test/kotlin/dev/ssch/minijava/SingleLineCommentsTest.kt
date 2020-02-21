@@ -8,14 +8,14 @@ class SingleLineCommentsTest : CompilerTest() {
 
     @Test
     fun `empty line`() {
-        val output = "//".runInMainFunction()
-        assertThat(output).hasLineCount(0)
+        val output = "//\nprintln(123);".runInMainFunction()
+        assertThat(output.lines()).containsExactly("123", "")
     }
 
     @Test
     fun `single line`() {
-        val output = "// this is a comment".runInMainFunction()
-        assertThat(output).hasLineCount(0)
+        val output = "// this is a comment\nprintln(123);".runInMainFunction()
+        assertThat(output.lines()).containsExactly("123", "")
     }
 
     @Test
@@ -24,8 +24,9 @@ class SingleLineCommentsTest : CompilerTest() {
             // line 1
             // line 2
             // line 3
+            println(123);
         """.runInMainFunction()
-        assertThat(output).hasLineCount(0)
+        assertThat(output.lines()).containsExactly("123", "")
     }
 
     @Test
@@ -34,8 +35,9 @@ class SingleLineCommentsTest : CompilerTest() {
             //
             //
             //
+            println(123);
         """.runInMainFunction()
-        assertThat(output).hasLineCount(0)
+        assertThat(output.lines()).containsExactly("123", "")
     }
 
     @Test
@@ -54,19 +56,19 @@ class SingleLineCommentsTest : CompilerTest() {
 
     @Test
     fun `edge cases 1`() {
-        val output = "///".runInMainFunction()
-        assertThat(output).hasLineCount(0)
+        val output = "///\nprintln(123);".runInMainFunction()
+        assertThat(output.lines()).containsExactly("123", "")
     }
     @Test
     fun `edge cases 2`() {
-        val output = "////".runInMainFunction()
-        assertThat(output).hasLineCount(0)
+        val output = "////\nprintln(123);".runInMainFunction()
+        assertThat(output.lines()).containsExactly("123", "")
     }
 
     @Test
     fun `edge cases 3`() {
-        val output = "// abc // abc".runInMainFunction()
-        assertThat(output).hasLineCount(0)
+        val output = "// abc // abc\nprintln(123);".runInMainFunction()
+        assertThat(output.lines()).containsExactly("123", "")
     }
 
     @Test
@@ -75,8 +77,9 @@ class SingleLineCommentsTest : CompilerTest() {
             // //
             ////
             ///////
+            println(123);
         """.runInMainFunction()
-        assertThat(output).hasLineCount(0)
+        assertThat(output.lines()).containsExactly("123", "")
     }
 
 }

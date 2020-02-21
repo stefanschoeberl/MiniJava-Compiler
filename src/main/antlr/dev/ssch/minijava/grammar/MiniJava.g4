@@ -68,5 +68,5 @@ FALSE: 'false';
 IDENT: [_a-zA-Z][_a-zA-Z0-9]*;
 INT: [0-9]+;
 WS: [ \t\r\n]+ -> skip;
-SINGLE_LINE_COMMENT: '//' ~[\r\n]* [\r\n]+ -> skip;
+SINGLE_LINE_COMMENT: '//' .*? [\r\n]+ -> skip;
 MULTI_LINE_COMMENT: '/*' .*? '*/' -> skip;
