@@ -4,7 +4,7 @@ import dev.ssch.util.CompilerTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class CommentsTest : CompilerTest() {
+class SingleLineCommentsTest : CompilerTest() {
 
     @Test
     fun `empty line`() {
@@ -50,6 +50,33 @@ class CommentsTest : CompilerTest() {
             }
         """.compileAndRunMainFunction()
         assertThat(output.lines()).containsExactly("123", "")
+    }
+
+    @Test
+    fun `edge cases 1`() {
+        val output = "///".runInMainFunction()
+        assertThat(output).hasLineCount(0)
+    }
+    @Test
+    fun `edge cases 2`() {
+        val output = "////".runInMainFunction()
+        assertThat(output).hasLineCount(0)
+    }
+
+    @Test
+    fun `edge cases 3`() {
+        val output = "// abc // abc".runInMainFunction()
+        assertThat(output).hasLineCount(0)
+    }
+
+    @Test
+    fun `edge cases 4`() {
+        val output = """
+            // //
+            ////
+            ///////
+        """.runInMainFunction()
+        assertThat(output).hasLineCount(0)
     }
 
 }
