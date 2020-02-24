@@ -58,5 +58,6 @@ sealed class Instruction {
     class unreachable: Instruction()
 
     class f32_convert_i32_s : Instruction()
+    class i32_trunc_f32_s : Instruction()
 }
 

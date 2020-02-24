@@ -57,6 +57,10 @@ abstract class CompilerTest {
         Assertions.assertThat(actual.toInt()).isEqualTo(value)
     }
 
+    fun v(value: Boolean): (String) -> Unit = { actual ->
+        Assertions.assertThat(actual.toBoolean()).isEqualTo(value)
+    }
+
     fun v(value: Float, precision: Float): (String) -> Unit = { actual ->
         Assertions.assertThat(actual.toFloat()).isEqualTo(value, within(precision))
     }

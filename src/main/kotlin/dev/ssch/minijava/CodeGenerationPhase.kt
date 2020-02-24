@@ -177,6 +177,19 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         ctx.staticType = ctx.expr().staticType
     }
 
+    override fun visitCastExpr(ctx: MiniJavaParser.CastExprContext) {
+        val type = DataType.fromString(ctx.type.text) ?: throw UnknownTypeException(ctx.type.text, ctx.type)
+
+        visit(ctx.expr())
+
+        val castCode = ctx.expr().staticType?.castTypeTo(type)
+            ?: throw InconvertibleTypeException(ctx.expr().staticType, type, ctx.start)
+
+        currentFunction.body.instructions.addAll(castCode)
+
+        ctx.staticType = type
+    }
+
     override fun visitCallExpr(ctx: MiniJavaParser.CallExprContext) {
         visit(ctx.callExpression())
 

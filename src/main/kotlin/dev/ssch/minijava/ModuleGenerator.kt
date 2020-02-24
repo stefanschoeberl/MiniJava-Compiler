@@ -98,6 +98,7 @@ class ModuleGenerator {
             is Instruction.drop -> "drop"
             is Instruction.unreachable -> "unreachable"
             is Instruction.f32_convert_i32_s -> "f32.convert_i32_s"
+            is Instruction.i32_trunc_f32_s -> "i32.trunc_f32_s"
         }
     }
 

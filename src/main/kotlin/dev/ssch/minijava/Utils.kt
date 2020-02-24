@@ -42,11 +42,24 @@ val dataTypeWideningConversions = hashMapOf(
     Pair(Pair(DataType.Integer, DataType.Float), listOf(Instruction.f32_convert_i32_s()))
 )
 
+val dataTypeCastingConversions = hashMapOf(
+    Pair(Pair(DataType.Integer, DataType.Float), listOf(Instruction.f32_convert_i32_s())),
+    Pair(Pair(DataType.Float, DataType.Integer), listOf(Instruction.i32_trunc_f32_s()))
+)
+
 fun DataType.assignTypeTo(other: DataType): List<Instruction>? {
     if (this == other) {
         return listOf()
     } else {
         return dataTypeWideningConversions[Pair(this, other)]
+    }
+}
+
+fun DataType.castTypeTo(other: DataType): List<Instruction>? {
+    if (this == other) {
+        return listOf()
+    } else {
+        return dataTypeCastingConversions[Pair(this, other)]
     }
 }
 

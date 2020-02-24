@@ -33,6 +33,7 @@ incompleteIfStatement: 'if' '(' condition=expr ')' thenbranch=statement         
 // https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html
 
 expr: '-' expr                                                           # MinusExpr
+    | '(' type=IDENT ')' expr                                                 # CastExpr
     | left=expr op=(MUL|DIV) right=expr                                  # MulDivExpr
     | left=expr op=(ADD|SUB) right=expr                                  # AddSubExpr
     | left=expr op=(LT|LE|GT|GE) right=expr                              # RelationalExpr
