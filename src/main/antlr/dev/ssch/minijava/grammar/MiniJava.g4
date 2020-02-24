@@ -16,18 +16,18 @@ statement: completeStatement
          | incompleteIfStatement
          ;
 
-completeStatement: 'if' '(' condition=expr ')' thenbranch=completeStatement 'else' elsebranch=completeStatement # CompleteIfElse
-                 | 'while' '(' condition=expr ')' body=statement                                                # WhileLoop
-                 | '{' (statement)* '}'                                                                         # Block
-                 | type=IDENT name=IDENT '=' expr ';'                                                           # Vardeclassign
-                 | type=IDENT name=IDENT ';'                                                                    # Vardecl
-                 | name=IDENT '=' expr ';'                                                                      # Varassign
-                 | callExpression ';'                                                                           # Call
-                 | 'return' value=expr ';'                                                                      # Return
+completeStatement: 'if' '(' condition=expr ')' thenbranch=completeStatement 'else' elsebranch=completeStatement # CompleteIfElseStmt
+                 | 'while' '(' condition=expr ')' body=statement                                                # WhileLoopStmt
+                 | '{' (statement)* '}'                                                                         # BlockStmt
+                 | type=IDENT name=IDENT '=' expr ';'                                                           # VardeclassignStmt
+                 | type=IDENT name=IDENT ';'                                                                    # VardeclStmt
+                 | name=IDENT '=' expr ';'                                                                      # VarassignStmt
+                 | callExpression ';'                                                                           # CallStmt
+                 | 'return' value=expr ';'                                                                      # ReturnStmt
                  ;
 
-incompleteIfStatement: 'if' '(' condition=expr ')' thenbranch=statement                                                 # IncompleteIf
-                     | 'if' '(' condition=expr ')' thenbranch=completeStatement 'else' elsebranch=incompleteIfStatement # IncompleteIfElse
+incompleteIfStatement: 'if' '(' condition=expr ')' thenbranch=statement                                                 # IncompleteIfStmt
+                     | 'if' '(' condition=expr ')' thenbranch=completeStatement 'else' elsebranch=incompleteIfStatement # IncompleteIfElseStmt
                      ;
 
 // https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html

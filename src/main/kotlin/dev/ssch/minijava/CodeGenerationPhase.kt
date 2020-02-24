@@ -90,7 +90,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         }
     }
 
-    override fun visitVardeclassign(ctx: MiniJavaParser.VardeclassignContext) {
+    override fun visitVardeclassignStmt(ctx: MiniJavaParser.VardeclassignStmtContext) {
         visit(ctx.expr())
 
         val name = ctx.name.text
@@ -108,7 +108,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         currentFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
     }
 
-    override fun visitVardecl(ctx: MiniJavaParser.VardeclContext) {
+    override fun visitVardeclStmt(ctx: MiniJavaParser.VardeclStmtContext) {
         val name = ctx.name.text
         val type = DataType.fromString(ctx.type.text) ?: throw UnknownTypeException(ctx.type.text, ctx.type)
         if (symbolTable.isDeclared(name)) {
@@ -117,7 +117,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         symbolTable.declareVariable(name, type)
     }
 
-    override fun visitVarassign(ctx: MiniJavaParser.VarassignContext) {
+    override fun visitVarassignStmt(ctx: MiniJavaParser.VarassignStmtContext) {
         visit(ctx.expr())
 
         val name = ctx.IDENT().text
@@ -133,7 +133,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         currentFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
     }
 
-    override fun visitCall(ctx: MiniJavaParser.CallContext) {
+    override fun visitCallStmt(ctx: MiniJavaParser.CallStmtContext) {
         visit(ctx.callExpression())
 
         if (ctx.callExpression().staticType != null) {
@@ -141,7 +141,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         }
     }
 
-    override fun visitReturn(ctx: MiniJavaParser.ReturnContext) {
+    override fun visitReturnStmt(ctx: MiniJavaParser.ReturnStmtContext) {
         visit(ctx.value)
 
         currentFunction.body.instructions.add(Instruction._return())
@@ -287,21 +287,21 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         visitBinaryOperatorExpression(ctx, ctx.left, ctx.right, ctx.op)
     }
 
-    override fun visitBlock(ctx: MiniJavaParser.BlockContext) {
+    override fun visitBlockStmt(ctx: MiniJavaParser.BlockStmtContext) {
         symbolTable.pushScope()
         visitChildren(ctx)
         symbolTable.popScope()
     }
 
-    override fun visitCompleteIfElse(ctx: MiniJavaParser.CompleteIfElseContext) {
+    override fun visitCompleteIfElseStmt(ctx: MiniJavaParser.CompleteIfElseStmtContext) {
         visitIfElse(ctx.condition, ctx.thenbranch, ctx.elsebranch)
     }
 
-    override fun visitIncompleteIf(ctx: MiniJavaParser.IncompleteIfContext) {
+    override fun visitIncompleteIfStmt(ctx: MiniJavaParser.IncompleteIfStmtContext) {
         visitIfElse(ctx.condition, ctx.thenbranch)
     }
 
-    override fun visitIncompleteIfElse(ctx: MiniJavaParser.IncompleteIfElseContext) {
+    override fun visitIncompleteIfElseStmt(ctx: MiniJavaParser.IncompleteIfElseStmtContext) {
         visitIfElse(ctx.condition, ctx.thenbranch, ctx.thenbranch)
     }
 
@@ -319,7 +319,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         currentFunction.body.instructions.add(Instruction.end())
     }
 
-    override fun visitWhileLoop(ctx: MiniJavaParser.WhileLoopContext) {
+    override fun visitWhileLoopStmt(ctx: MiniJavaParser.WhileLoopStmtContext) {
         with(currentFunction.body.instructions) {
             add(Instruction.block())
             add(Instruction.loop())
