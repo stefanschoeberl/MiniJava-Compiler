@@ -9,8 +9,6 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
     val methodSymbolTable = MethodSymbolTable()
 
     override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext?) {
-//        methodSymbolTable.declareNativeMethod(null, "println", listOf(DataType.Integer), false)
-//        methodSymbolTable.declareNativeMethod(null, "println", listOf(DataType.Boolean), false)
         visitChildren(ctx)
     }
 

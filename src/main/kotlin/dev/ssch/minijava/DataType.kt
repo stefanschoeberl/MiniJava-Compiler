@@ -21,8 +21,4 @@ enum class DataType {
             Float -> "float"
         }
     }
-
-    fun isNumeric(): kotlin.Boolean {
-        return this == Integer || this == Float
-    }
 }
