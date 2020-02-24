@@ -8,11 +8,19 @@ import org.junit.jupiter.api.Test
 class MultiplicationDivisionTest : CompilerTest() {
 
     @Test
-    fun `multiply two values`() {
+    fun `multiply two int values`() {
         val output = """
             println(2 * 3);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("6", "")
+    }
+
+    @Test
+    fun `multiply two float values`() {
+        val output = """
+            println(2f * 3f);
+        """.runInMainFunction()
+        output.lines().matches(v(6f, 0.0001f), v(""))
     }
 
     @Test
@@ -54,13 +62,27 @@ class MultiplicationDivisionTest : CompilerTest() {
     }
 
     @Test
-    fun `divide two values`() {
+    fun `divide two int values`() {
         val output = """
             println(1 / 2);
             println(8 / 3);
             println(6 / 3);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("0", "2", "2", "")
+    }
+
+    @Test
+    fun `divide two float values`() {
+        val output = """
+            println(1f / 2f);
+            println(8f / 3f);
+            println(6f / 3f);
+        """.runInMainFunction()
+        output.lines().matches(
+            v(1/2f, 0.0001f),
+            v(8/3f, 0.0001f),
+            v(6/3f, 0.0001f),
+            v(""))
     }
 
     @Test

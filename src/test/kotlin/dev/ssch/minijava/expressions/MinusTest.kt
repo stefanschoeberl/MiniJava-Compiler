@@ -12,8 +12,9 @@ class MinusTest : CompilerTest() {
         val output = """
             println(-1);
             println(-(1+2));
+            println(-1f);
         """.runInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("-1", "-3", "")
+        output.lines().matches(v(-1), v(-3), v(-1f, 0.0001f), v(""))
     }
 
     @Test

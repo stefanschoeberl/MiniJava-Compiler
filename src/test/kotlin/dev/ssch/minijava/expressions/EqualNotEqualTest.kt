@@ -19,11 +19,21 @@ class EqualNotEqualTest : CompilerTest() {
     }
 
     @Test
-    fun `== two arithmetic values`() {
+    fun `== two int values`() {
         val output = """
             println(1 == 2);
             println(1 == 1);
             println(2 == 1);
+        """.runInMainFunction()
+        Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "")
+    }
+
+    @Test
+    fun `== two float values`() {
+        val output = """
+            println(1f == 2f);
+            println(1f == 1f);
+            println(2f == 1f);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "")
     }
@@ -40,11 +50,21 @@ class EqualNotEqualTest : CompilerTest() {
     }
 
     @Test
-    fun `!= two arithmetic values`() {
+    fun `!= two int values`() {
         val output = """
             println(1 != 2);
             println(1 != 1);
             println(2 != 1);
+        """.runInMainFunction()
+        Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "")
+    }
+
+    @Test
+    fun `!= two float values`() {
+        val output = """
+            println(1f != 2f);
+            println(1f != 1f);
+            println(2f != 1f);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "")
     }

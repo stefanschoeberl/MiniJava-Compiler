@@ -1,6 +1,5 @@
 package dev.ssch.minijava
 
-
 enum class DataType {
     Integer, Boolean, Float;
 
@@ -21,5 +20,9 @@ enum class DataType {
             Boolean -> "boolean"
             Float -> "float"
         }
+    }
+
+    fun isNumeric(): kotlin.Boolean {
+        return this == Integer || this == Float
     }
 }

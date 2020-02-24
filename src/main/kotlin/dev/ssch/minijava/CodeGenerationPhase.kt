@@ -5,6 +5,7 @@ import dev.ssch.minijava.ast.Function
 import dev.ssch.minijava.exception.*
 import dev.ssch.minijava.grammar.MiniJavaBaseVisitor
 import dev.ssch.minijava.grammar.MiniJavaParser
+import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.ParseTreeProperty
 
@@ -21,6 +22,8 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
     private var ParseTree.staticType: DataType?
         get() = staticTypes.get(this)
         set(type) = staticTypes.put(this, type)
+
+    private val operatorTable = OperatorTable()
 
     override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext) {
         module = Module()
@@ -166,15 +169,27 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
     }
 
     override fun visitMinusExpr(ctx: MiniJavaParser.MinusExprContext) {
-        currentFunction.body.instructions.add(Instruction.i32_const(0))
-
+        val codePositionBeforeOperand = currentFunction.body.instructions.size
         visit(ctx.expr())
 
-        if (ctx.expr().staticType != DataType.Integer) {
+        val type = ctx.expr().staticType
+        if (type?.isNumeric() != true) {
             throw InvalidUnaryOperationException(ctx.expr().staticType, ctx.SUB().symbol)
         }
-        currentFunction.body.instructions.add(Instruction.i32_sub())
-        ctx.staticType = ctx.expr().staticType
+
+        when (type) {
+            DataType.Integer -> {
+                currentFunction.body.instructions.add(codePositionBeforeOperand, Instruction.i32_const(0))
+                currentFunction.body.instructions.add(Instruction.i32_sub())
+            }
+            DataType.Float -> {
+                currentFunction.body.instructions.add(codePositionBeforeOperand, Instruction.f32_const(0f))
+                currentFunction.body.instructions.add(Instruction.f32_sub())
+            }
+            DataType.Boolean -> throw RuntimeException("Should not happen")
+        }
+
+        ctx.staticType = type
     }
 
     override fun visitCastExpr(ctx: MiniJavaParser.CastExprContext) {
@@ -232,95 +247,44 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         ctx.staticType = ctx.expr().staticType
     }
 
+    private fun visitBinaryOperatorExpression(ctx: MiniJavaParser.ExprContext, left: MiniJavaParser.ExprContext, right: MiniJavaParser.ExprContext, op: Token) {
+        visit(left)
+        val codePositionAfterLeftOperand = currentFunction.body.instructions.size
+        visit(right)
+
+        val binaryOperation = operatorTable.findOperation(left.staticType, right.staticType, op)
+            ?: throw InvalidBinaryOperationException(left.staticType, right.staticType, op)
+
+        binaryOperation.leftPromotion?.let { currentFunction.body.instructions.add(codePositionAfterLeftOperand, it) }
+        binaryOperation.rightPromotion?.let { currentFunction.body.instructions.add(it) }
+
+        currentFunction.body.instructions.add(binaryOperation.operation)
+
+        ctx.staticType = binaryOperation.resultingType
+    }
+
     override fun visitOrExpr(ctx: MiniJavaParser.OrExprContext) {
-        visit(ctx.left)
-        visit(ctx.right)
-
-        if (ctx.left.staticType != DataType.Boolean || ctx.right.staticType != DataType.Boolean) {
-            throw InvalidBinaryOperationException(ctx.left.staticType, ctx.right.staticType, ctx.op)
-        }
-
-        currentFunction.body.instructions.add(Instruction.i32_or())
-        ctx.staticType = DataType.Boolean
+        visitBinaryOperatorExpression(ctx, ctx.left, ctx.right, ctx.op)
     }
 
     override fun visitAndExpr(ctx: MiniJavaParser.AndExprContext) {
-        visit(ctx.left)
-        visit(ctx.right)
-
-        if (ctx.left.staticType != DataType.Boolean || ctx.right.staticType != DataType.Boolean) {
-            throw InvalidBinaryOperationException(ctx.left.staticType, ctx.right.staticType, ctx.op)
-        }
-
-        currentFunction.body.instructions.add(Instruction.i32_and())
-
-        ctx.staticType = DataType.Boolean
+        visitBinaryOperatorExpression(ctx, ctx.left, ctx.right, ctx.op)
     }
 
     override fun visitEqNeqExpr(ctx: MiniJavaParser.EqNeqExprContext) {
-        visit(ctx.left)
-        visit(ctx.right)
-
-        if (ctx.left.staticType == DataType.Integer && ctx.right.staticType != DataType.Integer ||
-            ctx.left.staticType == DataType.Boolean && ctx.right.staticType != DataType.Boolean) {
-            throw InvalidBinaryOperationException(ctx.left.staticType, ctx.right.staticType, ctx.op)
-        }
-
-        when (ctx.op.type) {
-            MiniJavaParser.EQ -> currentFunction.body.instructions.add(Instruction.i32_eq())
-            MiniJavaParser.NEQ -> currentFunction.body.instructions.add(Instruction.i32_ne())
-        }
-
-        ctx.staticType = DataType.Boolean
+        visitBinaryOperatorExpression(ctx, ctx.left, ctx.right, ctx.op)
     }
 
     override fun visitRelationalExpr(ctx: MiniJavaParser.RelationalExprContext) {
-        visit(ctx.left)
-        visit(ctx.right)
-
-        if (ctx.left.staticType == DataType.Integer && ctx.right.staticType != DataType.Integer ||
-            ctx.left.staticType == DataType.Boolean && ctx.right.staticType != DataType.Boolean) {
-            throw InvalidBinaryOperationException(ctx.left.staticType, ctx.right.staticType, ctx.op)
-        }
-
-        when (ctx.op.type) {
-            MiniJavaParser.LT -> currentFunction.body.instructions.add(Instruction.i32_lt_s())
-            MiniJavaParser.LE -> currentFunction.body.instructions.add(Instruction.i32_le_s())
-            MiniJavaParser.GT -> currentFunction.body.instructions.add(Instruction.i32_gt_s())
-            MiniJavaParser.GE -> currentFunction.body.instructions.add(Instruction.i32_ge_s())
-        }
-
-        ctx.staticType = DataType.Boolean
+        visitBinaryOperatorExpression(ctx, ctx.left, ctx.right, ctx.op)
     }
 
     override fun visitAddSubExpr(ctx: MiniJavaParser.AddSubExprContext) {
-        visit(ctx.left)
-        visit(ctx.right)
-
-        if (ctx.left.staticType != DataType.Integer || ctx.right.staticType != DataType.Integer) {
-            throw InvalidBinaryOperationException(ctx.left.staticType, ctx.right.staticType, ctx.op)
-        }
-
-        when (ctx.op.type) {
-            MiniJavaParser.ADD -> currentFunction.body.instructions.add(Instruction.i32_add())
-            MiniJavaParser.SUB -> currentFunction.body.instructions.add(Instruction.i32_sub())
-        }
-        ctx.staticType = DataType.Integer
+        visitBinaryOperatorExpression(ctx, ctx.left, ctx.right, ctx.op)
     }
 
     override fun visitMulDivExpr(ctx: MiniJavaParser.MulDivExprContext) {
-        visit(ctx.left)
-        visit(ctx.right)
-
-        if (ctx.left.staticType != DataType.Integer || ctx.right.staticType != DataType.Integer) {
-            throw InvalidBinaryOperationException(ctx.left.staticType, ctx.right.staticType, ctx.op)
-        }
-
-        when (ctx.op.type) {
-            MiniJavaParser.MUL -> currentFunction.body.instructions.add(Instruction.i32_mul())
-            MiniJavaParser.DIV -> currentFunction.body.instructions.add(Instruction.i32_div_s())
-        }
-        ctx.staticType = DataType.Integer
+        visitBinaryOperatorExpression(ctx, ctx.left, ctx.right, ctx.op)
     }
 
     override fun visitBlock(ctx: MiniJavaParser.BlockContext) {

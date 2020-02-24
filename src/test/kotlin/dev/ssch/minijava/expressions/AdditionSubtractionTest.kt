@@ -8,11 +8,19 @@ import org.junit.jupiter.api.Test
 class AdditionSubtractionTest : CompilerTest() {
 
     @Test
-    fun `add two values`() {
+    fun `add two int values`() {
         val output = """
             println(1 + 2);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("3", "")
+    }
+
+    @Test
+    fun `add two float values`() {
+        val output = """
+            println(1f + 2f);
+        """.runInMainFunction()
+        output.lines().matches(v(3f, 0.0001f), v(""))
     }
 
     @Test
@@ -54,11 +62,19 @@ class AdditionSubtractionTest : CompilerTest() {
     }
 
     @Test
-    fun `subtract two values`() {
+    fun `subtract two int values`() {
         val output = """
             println(1 - 2);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("-1", "")
+    }
+
+    @Test
+    fun `subtract two float values`() {
+        val output = """
+            println(1f - 2f);
+        """.runInMainFunction()
+        output.lines().matches(v(-1f, 0.0001f), v(""))
     }
 
     @Test

@@ -34,13 +34,26 @@ sealed class Instruction {
     class i32_mul : Instruction()
     class i32_div_s : Instruction()
 
+    class f32_add : Instruction()
+    class f32_sub : Instruction()
+    class f32_mul : Instruction()
+    class f32_div : Instruction()
+
     class i32_eq : Instruction()
     class i32_ne : Instruction()
+
+    class f32_eq : Instruction()
+    class f32_ne : Instruction()
 
     class i32_lt_s : Instruction()
     class i32_le_s : Instruction()
     class i32_gt_s : Instruction()
     class i32_ge_s : Instruction()
+
+    class f32_lt : Instruction()
+    class f32_le : Instruction()
+    class f32_gt : Instruction()
+    class f32_ge : Instruction()
 
     class i32_eqz : Instruction()
 
