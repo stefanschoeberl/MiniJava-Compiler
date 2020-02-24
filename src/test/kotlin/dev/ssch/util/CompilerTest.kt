@@ -4,6 +4,8 @@ import dev.ssch.minijava.WebAssemblyAssembler
 import dev.ssch.minijava.Compiler
 import dev.ssch.minijava.WebAssemblyRunner
 import dev.ssch.minijava.ModuleGenerator
+import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.within
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 
@@ -16,6 +18,7 @@ abstract class CompilerTest {
         return if (use) """
             native void println(int a);
             native void println(boolean a);
+            native void println(float a);
         """.trimIndent() else ""
     }
 
@@ -44,5 +47,21 @@ abstract class CompilerTest {
 
         val runner = WebAssemblyRunner()
         return runner.run(wasm.absolutePath)
+    }
+
+    fun v(value: String): (String) -> Unit = { actual ->
+        Assertions.assertThat(actual).isEqualTo(value)
+    }
+
+    fun v(value: Int): (String) -> Unit = { actual ->
+        Assertions.assertThat(actual.toInt()).isEqualTo(value)
+    }
+
+    fun v(value: Float, precision: Float): (String) -> Unit = { actual ->
+        Assertions.assertThat(actual.toFloat()).isEqualTo(value, within(precision))
+    }
+
+    fun List<String>.matches(vararg assertions: (String) -> Unit) {
+        this.zip(assertions).forEach { it.second(it.first) }
     }
 }

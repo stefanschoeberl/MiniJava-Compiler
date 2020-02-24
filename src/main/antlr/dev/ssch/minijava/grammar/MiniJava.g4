@@ -41,6 +41,7 @@ expr: '-' expr                                                           # Minus
     | left=expr op=OR right=expr                                         # OrExpr
     | IDENT                                                              # IdExpr
     | INT                                                                # IntExpr
+    | FLOAT                                                              # FloatExpr
     | value=(TRUE|FALSE)                                                 # BoolExpr
     | callExpression                                                     # CallExpr
     | '(' expr ')'                                                       # ParensExpr
@@ -66,6 +67,7 @@ DIV: '/';
 TRUE: 'true';
 FALSE: 'false';
 IDENT: [_a-zA-Z][_a-zA-Z0-9]*;
+FLOAT: [0-9]+ ('.' [0-9]*)? 'f';
 INT: [0-9]+;
 WS: [ \t\r\n]+ -> skip;
 SINGLE_LINE_COMMENT: '//' .*? [\r\n]+ -> skip;

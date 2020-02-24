@@ -1,5 +1,6 @@
 package dev.ssch.minijava
 
+import dev.ssch.minijava.ast.Instruction
 import dev.ssch.minijava.ast.ValueType
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -33,6 +34,19 @@ fun DataType.toWebAssemblyType(): ValueType {
     return when (this) {
         DataType.Integer -> ValueType.I32
         DataType.Boolean -> ValueType.I32
+        DataType.Float -> ValueType.F32
+    }
+}
+
+val dataTypeWideningConversions = hashMapOf(
+    Pair(Pair(DataType.Integer, DataType.Float), listOf(Instruction.f32_convert_i32_s()))
+)
+
+fun DataType.assignTypeTo(other: DataType): List<Instruction>? {
+    if (this == other) {
+        return listOf()
+    } else {
+        return dataTypeWideningConversions[Pair(this, other)]
     }
 }
 

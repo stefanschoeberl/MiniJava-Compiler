@@ -5,6 +5,10 @@ sealed class Instruction {
         val value: Int
     ) : Instruction()
 
+    class f32_const (
+        val value: Float
+    ) : Instruction()
+
     class call (
         val address: Int
     ) : Instruction()
@@ -52,5 +56,7 @@ sealed class Instruction {
     class drop: Instruction()
     class _return: Instruction()
     class unreachable: Instruction()
+
+    class f32_convert_i32_s : Instruction()
 }
 

@@ -25,6 +25,12 @@ class BasicTest : CompilerTest() {
     }
 
     @Test
+    fun `println a float value`() {
+        val output = "println(1.2f);".runInMainFunction()
+        output.lines().matches(v(1.2f, 0.0001f), v(""))
+    }
+
+    @Test
     fun `println multiple values`() {
         val output = """
             println(1);

@@ -9,6 +9,7 @@ async function runFile(file) {
     const imports = {
         imports: {
             "println#int": arg => console.log(arg),
+            "println#float": arg => console.log(arg),
             "println#boolean": arg => console.log(arg === 0 ? 'false' : 'true')
         }
     };

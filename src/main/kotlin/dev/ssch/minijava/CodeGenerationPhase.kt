@@ -82,6 +82,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
             when (it) {
                 DataType.Integer -> currentFunction.locals.add(ValueType.I32)
                 DataType.Boolean -> currentFunction.locals.add(ValueType.I32)
+                DataType.Float -> currentFunction.locals.add(ValueType.F32)
             }
         }
     }
@@ -96,9 +97,10 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         }
         symbolTable.declareVariable(name, type)
 
-        if (type != ctx.expr().staticType) {
-            throw IncompatibleAssignmentException(type, ctx.expr().staticType, ctx.name)
-        }
+        val conversionCode = ctx.expr().staticType!!.assignTypeTo(type)
+            ?: throw IncompatibleAssignmentException(type, ctx.expr().staticType, ctx.name)
+
+        currentFunction.body.instructions.addAll(conversionCode)
 
         currentFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
     }
@@ -119,9 +121,12 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         if (!symbolTable.isDeclared(name)) {
             throw UndefinedVariableException(name, ctx.name)
         }
-        if (symbolTable.typeOf(name) != ctx.expr().staticType) {
-            throw IncompatibleAssignmentException(symbolTable.typeOf(name), ctx.expr().staticType, ctx.name)
-        }
+
+        val conversionCode = ctx.expr().staticType!!.assignTypeTo(symbolTable.typeOf(name))
+            ?: throw IncompatibleAssignmentException(symbolTable.typeOf(name), ctx.expr().staticType, ctx.name)
+
+        currentFunction.body.instructions.addAll(conversionCode)
+
         currentFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
     }
 
@@ -200,6 +205,12 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
             currentFunction.body.instructions.add(Instruction.i32_const(0))
         }
         ctx.staticType = DataType.Boolean
+    }
+
+    override fun visitFloatExpr(ctx: MiniJavaParser.FloatExprContext) {
+        val value = ctx.FLOAT().text.toFloat()
+        currentFunction.body.instructions.add(Instruction.f32_const(value))
+        ctx.staticType = DataType.Float
     }
 
     override fun visitParensExpr(ctx: MiniJavaParser.ParensExprContext) {

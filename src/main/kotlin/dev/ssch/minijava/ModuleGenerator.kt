@@ -70,6 +70,7 @@ class ModuleGenerator {
     private fun asText(instruction: Instruction): String {
         return when (instruction) {
             is Instruction.i32_const -> "i32.const ${instruction.value}"
+            is Instruction.f32_const -> "f32.const ${instruction.value}"
             is Instruction.call -> "call ${instruction.address}"
             is Instruction.local_set -> "local.set ${instruction.address}"
             is Instruction.local_get -> "local.get ${instruction.address}"
@@ -96,6 +97,7 @@ class ModuleGenerator {
             is Instruction._return -> "return"
             is Instruction.drop -> "drop"
             is Instruction.unreachable -> "unreachable"
+            is Instruction.f32_convert_i32_s -> "f32.convert_i32_s"
         }
     }
 

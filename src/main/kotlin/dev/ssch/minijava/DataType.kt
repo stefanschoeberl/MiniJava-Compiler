@@ -2,13 +2,14 @@ package dev.ssch.minijava
 
 
 enum class DataType {
-    Integer, Boolean;
+    Integer, Boolean, Float;
 
     companion object {
         fun fromString(s: String): DataType? {
             return when (s) {
                 "int" -> Integer
                 "boolean" -> Boolean
+                "float" -> Float
                 else -> null
             }
         }
@@ -18,6 +19,7 @@ enum class DataType {
         return when(this) {
             Integer -> "int"
             Boolean -> "boolean"
+            Float -> "float"
         }
     }
 }

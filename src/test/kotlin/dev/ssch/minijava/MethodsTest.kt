@@ -82,6 +82,19 @@ class MethodsTest : CompilerTest() {
     }
 
     @Test
+    fun `call method with one float parameter`() {
+        val output = """
+            public void main() { 
+                a(123f);
+            }
+            
+            void a(float x) {
+                println(x);
+            }""".compileAndRunMainFunction()
+        output.lines().matches(v(123f, 0.0001f), v(""))
+    }
+
+    @Test
     fun `call method with one parameter and local`() {
         val output = """
             public void main() { 
