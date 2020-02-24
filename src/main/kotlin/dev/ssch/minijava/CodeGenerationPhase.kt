@@ -173,21 +173,11 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         visit(ctx.expr())
 
         val type = ctx.expr().staticType
-        if (type?.isNumeric() != true) {
-            throw InvalidUnaryOperationException(ctx.expr().staticType, ctx.SUB().symbol)
-        }
+        val unaryOperation = operatorTable.findUnaryMinusOperation(type)
+            ?: throw InvalidUnaryOperationException(ctx.expr().staticType, ctx.SUB().symbol)
 
-        when (type) {
-            DataType.Integer -> {
-                currentFunction.body.instructions.add(codePositionBeforeOperand, Instruction.i32_const(0))
-                currentFunction.body.instructions.add(Instruction.i32_sub())
-            }
-            DataType.Float -> {
-                currentFunction.body.instructions.add(codePositionBeforeOperand, Instruction.f32_const(0f))
-                currentFunction.body.instructions.add(Instruction.f32_sub())
-            }
-            DataType.Boolean -> throw RuntimeException("Should not happen")
-        }
+        currentFunction.body.instructions.add(codePositionBeforeOperand, unaryOperation.operationBeforeOperand)
+        currentFunction.body.instructions.add(unaryOperation.operationAfterOperand)
 
         ctx.staticType = type
     }
@@ -252,7 +242,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         val codePositionAfterLeftOperand = currentFunction.body.instructions.size
         visit(right)
 
-        val binaryOperation = operatorTable.findOperation(left.staticType, right.staticType, op)
+        val binaryOperation = operatorTable.findBinaryOperation(left.staticType, right.staticType, op)
             ?: throw InvalidBinaryOperationException(left.staticType, right.staticType, op)
 
         binaryOperation.leftPromotion?.let { currentFunction.body.instructions.add(codePositionAfterLeftOperand, it) }

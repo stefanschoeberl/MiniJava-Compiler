@@ -13,6 +13,11 @@ class OperatorTable {
         val resultingType: DataType
     )
 
+    data class UnaryOperation (
+        val operationBeforeOperand: Instruction,
+        val operationAfterOperand: Instruction
+    )
+
     private val binaryOperations = hashMapOf(
         Triple(DataType.Integer, DataType.Integer, MiniJavaParser.ADD) to BinaryOperation(null, null, Instruction.i32_add(), DataType.Integer),
         Triple(DataType.Integer, DataType.Integer, MiniJavaParser.SUB) to BinaryOperation(null, null, Instruction.i32_sub(), DataType.Integer),
@@ -64,7 +69,15 @@ class OperatorTable {
         Triple(DataType.Boolean, DataType.Boolean, MiniJavaParser.OR) to BinaryOperation(null, null, Instruction.i32_or(), DataType.Boolean)
     )
 
-    fun findOperation(left: DataType?, right: DataType?, op: Token): BinaryOperation? {
+    fun findBinaryOperation(left: DataType?, right: DataType?, op: Token): BinaryOperation? {
         return binaryOperations[Triple(left, right, op.type)]
+    }
+
+    fun findUnaryMinusOperation(type: DataType?): UnaryOperation? {
+        return when (type) {
+            DataType.Integer -> UnaryOperation(Instruction.i32_const(0), Instruction.i32_sub())
+            DataType.Float -> UnaryOperation(Instruction.f32_const(0f), Instruction.f32_sub())
+            else -> null
+        }
     }
 }
