@@ -9,17 +9,18 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
     val methodSymbolTable = MethodSymbolTable()
 
     override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext?) {
+        methodSymbolTable.declareNativeMethod(DataType.Integer, "malloc", listOf(DataType.Integer), false)
         visitChildren(ctx)
     }
 
     override fun visitMethod(ctx: MiniJavaParser.MethodContext) {
         val returnType = when (ctx.returntype.text) {
             "void" -> null
-            else -> DataType.fromString(ctx.returntype.text) ?: throw UnknownTypeException(ctx.returntype.text, ctx.returntype)
+            else -> DataType.fromString(ctx.returntype.text) ?: throw UnknownTypeException(ctx.returntype.text, ctx.returntype.start)
         }
         val name = ctx.name.text
         val parameters = ctx.parameters.map {
-            DataType.fromString(it.type.text) ?: throw UnknownTypeException(it.type.text, it.type)
+            DataType.fromString(it.type.text) ?: throw UnknownTypeException(it.type.text, it.type.start)
         }
         if (methodSymbolTable.isDeclared(name, parameters)) {
             throw RedefinedMethodException(name, ctx.name)

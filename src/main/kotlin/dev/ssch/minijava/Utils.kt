@@ -35,6 +35,7 @@ fun DataType.toWebAssemblyType(): ValueType {
         DataType.Integer -> ValueType.I32
         DataType.Boolean -> ValueType.I32
         DataType.Float -> ValueType.F32
+        is DataType.Array -> ValueType.I32
     }
 }
 

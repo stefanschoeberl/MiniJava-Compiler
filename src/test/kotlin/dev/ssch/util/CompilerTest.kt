@@ -29,13 +29,15 @@ abstract class CompilerTest {
     fun String.compileAndRunMainFunction(withStandardLibrary: Boolean = true): String {
         val compiler = Compiler()
         val source = "${useStandardLibary(withStandardLibrary)}\n\n${this.trimIndent()}"
+
+        println(source)
+        println()
+
         val module = compiler.compile(source)
 
         val moduleGenerator = ModuleGenerator()
         val watText = moduleGenerator.toSExpr(module)
 
-        println(source)
-        println()
         println(watText)
 
         val wat = File(temporaryFolder, "output.wat")

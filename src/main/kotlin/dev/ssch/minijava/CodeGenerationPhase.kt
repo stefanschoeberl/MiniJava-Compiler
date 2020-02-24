@@ -82,11 +82,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         }
 
         symbolTable.allLocalVariables.forEach {
-            when (it) {
-                DataType.Integer -> currentFunction.locals.add(ValueType.I32)
-                DataType.Boolean -> currentFunction.locals.add(ValueType.I32)
-                DataType.Float -> currentFunction.locals.add(ValueType.F32)
-            }
+            currentFunction.locals.add(it.toWebAssemblyType())
         }
     }
 
@@ -94,7 +90,13 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         visit(ctx.expr())
 
         val name = ctx.name.text
-        val type = DataType.fromString(ctx.type.text) ?: throw UnknownTypeException(ctx.type.text, ctx.type)
+
+        val type = when (val type = ctx.type) {
+            is MiniJavaParser.PrimitiveTypeContext -> DataType.fromString(type.IDENT().text)
+            is MiniJavaParser.ArrayTypeContext -> DataType.fromString(type.IDENT().text)?.let { DataType.Array(it) }
+            else -> null
+        }?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
+
         if (symbolTable.isDeclared(name)) {
             throw RedefinedVariableException(name, ctx.name)
         }
@@ -110,7 +112,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
 
     override fun visitVardeclStmt(ctx: MiniJavaParser.VardeclStmtContext) {
         val name = ctx.name.text
-        val type = DataType.fromString(ctx.type.text) ?: throw UnknownTypeException(ctx.type.text, ctx.type)
+        val type = DataType.fromString(ctx.type.text) ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
         if (symbolTable.isDeclared(name)) {
             throw RedefinedVariableException(name, ctx.name)
         }
@@ -118,19 +120,30 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
     }
 
     override fun visitVarassignStmt(ctx: MiniJavaParser.VarassignStmtContext) {
-        visit(ctx.expr())
+        visit(ctx.right)
 
-        val name = ctx.IDENT().text
-        if (!symbolTable.isDeclared(name)) {
-            throw UndefinedVariableException(name, ctx.name)
+        fun checkAndConvertAssigment(leftType: DataType?) {
+            val conversionCode = leftType?.let {
+                ctx.right.staticType?.assignTypeTo(it)
+            } ?: throw IncompatibleAssignmentException(leftType, ctx.right.staticType, ctx.left.start)
+
+            currentFunction.body.instructions.addAll(conversionCode)
         }
 
-        val conversionCode = ctx.expr().staticType!!.assignTypeTo(symbolTable.typeOf(name))
-            ?: throw IncompatibleAssignmentException(symbolTable.typeOf(name), ctx.expr().staticType, ctx.name)
-
-        currentFunction.body.instructions.addAll(conversionCode)
-
-        currentFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
+        when (val left = ctx.left) {
+            is MiniJavaParser.IdExprContext -> {
+                val name = left.IDENT().text
+                if (!symbolTable.isDeclared(name)) {
+                    throw UndefinedVariableException(name, left.IDENT().symbol)
+                }
+                checkAndConvertAssigment(symbolTable.typeOf(name))
+                currentFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
+            }
+            is MiniJavaParser.ArrayAccessExprContext -> {
+                TODO()
+            }
+            else -> throw InvalidAssignmentException(left.start)
+        }
     }
 
     override fun visitCallStmt(ctx: MiniJavaParser.CallStmtContext) {
@@ -183,7 +196,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
     }
 
     override fun visitCastExpr(ctx: MiniJavaParser.CastExprContext) {
-        val type = DataType.fromString(ctx.type.text) ?: throw UnknownTypeException(ctx.type.text, ctx.type)
+        val type = DataType.fromString(ctx.type.text) ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
 
         visit(ctx.expr())
 
@@ -235,6 +248,22 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         visit(ctx.expr())
 
         ctx.staticType = ctx.expr().staticType
+    }
+
+    override fun visitArrayCreationExpr(ctx: MiniJavaParser.ArrayCreationExprContext) {
+        visit(ctx.size)
+        if (ctx.size.staticType != DataType.Integer) {
+            TODO()
+            //throw IncompatibleTypeException(DataType.Integer, ctx.size.staticType, ctx.size.start)
+        }
+        val arrayType = (ctx.type as? MiniJavaParser.PrimitiveTypeContext)?.text?.let { DataType.fromString(it) }
+            ?: TODO()
+
+        currentFunction.body.instructions.add(Instruction.i32_const(arrayType.sizeInBytes()))
+        currentFunction.body.instructions.add(Instruction.i32_mul())
+        currentFunction.body.instructions.add(Instruction.call(methodSymbolTable.addressOf("malloc", listOf(DataType.Integer))))
+
+        ctx.staticType = DataType.Array(arrayType)
     }
 
     private fun visitBinaryOperatorExpression(ctx: MiniJavaParser.ExprContext, left: MiniJavaParser.ExprContext, right: MiniJavaParser.ExprContext, op: Token) {
