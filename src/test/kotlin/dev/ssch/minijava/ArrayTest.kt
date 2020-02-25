@@ -244,6 +244,18 @@ class ArrayTest : CompilerTest() {
         assertThat(output.lines()).containsExactly("1230", "4560", "7890", "")
     }
 
-    // TODO: Pass array to environment
+    @Disabled
+    @Test
+    fun `call imported `() {
+        val output = """
+            int[] a = new int[3];
+            a[0] = 123;
+            a[1] = 456;
+            a[2] = 789;
+            println(a);
+        """.runInMainFunction()
+        assertThat(output.lines()).containsExactly("[123, 456, 789]", "")
+    }
+
     // TODO: Array Exceptions
 }

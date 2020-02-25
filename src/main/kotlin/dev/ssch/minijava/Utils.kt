@@ -33,46 +33,46 @@ fun <T> MutableList<T>.removeFirstOrNull(): T? {
 
 fun DataType.toWebAssemblyType(): ValueType {
     return when (this) {
-        DataType.Integer -> ValueType.I32
-        DataType.Boolean -> ValueType.I32
-        DataType.Float -> ValueType.F32
+        DataType.PrimitiveType.Integer -> ValueType.I32
+        DataType.PrimitiveType.Boolean -> ValueType.I32
+        DataType.PrimitiveType.Float -> ValueType.F32
         is DataType.Array -> ValueType.I32
     }
 }
 
 fun DataType.getStoreMemoryInstruction(): Instruction {
     return when (this) {
-        DataType.Integer -> Instruction.i32_store()
-        DataType.Boolean -> Instruction.i32_store8()
-        DataType.Float -> Instruction.f32_store()
+        DataType.PrimitiveType.Integer -> Instruction.i32_store()
+        DataType.PrimitiveType.Boolean -> Instruction.i32_store8()
+        DataType.PrimitiveType.Float -> Instruction.f32_store()
         is DataType.Array -> Instruction.i32_store()
     }
 }
 
 fun DataType.getLoadMemoryInstruction(): Instruction {
     return when (this) {
-        DataType.Integer -> Instruction.i32_load()
-        DataType.Boolean -> Instruction.i32_load8_s()
-        DataType.Float -> Instruction.f32_load()
+        DataType.PrimitiveType.Integer -> Instruction.i32_load()
+        DataType.PrimitiveType.Boolean -> Instruction.i32_load8_s()
+        DataType.PrimitiveType.Float -> Instruction.f32_load()
         is DataType.Array -> Instruction.i32_load()
     }
 }
 
 fun MiniJavaParser.TypeDefinitionContext.getDataType(): DataType? {
     return when (val ctx = this) {
-        is MiniJavaParser.PrimitiveTypeContext -> DataType.fromString(ctx.IDENT().text)
-        is MiniJavaParser.ArrayTypeContext -> DataType.fromString(ctx.IDENT().text)?.let { DataType.Array(it) }
+        is MiniJavaParser.PrimitiveTypeContext -> DataType.PrimitiveType.fromString(ctx.IDENT().text)
+        is MiniJavaParser.ArrayTypeContext -> DataType.PrimitiveType.fromString(ctx.IDENT().text)?.let { DataType.Array(it) }
         else -> null
     }
 }
 
 val dataTypeWideningConversions = hashMapOf(
-    Pair(Pair(DataType.Integer, DataType.Float), listOf(Instruction.f32_convert_i32_s()))
+    Pair(Pair(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float), listOf(Instruction.f32_convert_i32_s()))
 )
 
 val dataTypeCastingConversions = hashMapOf(
-    Pair(Pair(DataType.Integer, DataType.Float), listOf(Instruction.f32_convert_i32_s())),
-    Pair(Pair(DataType.Float, DataType.Integer), listOf(Instruction.i32_trunc_f32_s()))
+    Pair(Pair(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float), listOf(Instruction.f32_convert_i32_s())),
+    Pair(Pair(DataType.PrimitiveType.Float, DataType.PrimitiveType.Integer), listOf(Instruction.i32_trunc_f32_s()))
 )
 
 fun DataType.assignTypeTo(other: DataType): List<Instruction>? {

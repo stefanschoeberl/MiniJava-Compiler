@@ -123,7 +123,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         visit(ctx.array)
         val arrayType = ctx.array.staticType as? DataType.Array ?: TODO("assert left type is array")
         visit(ctx.index)
-        if (ctx.index.staticType != DataType.Integer) {
+        if (ctx.index.staticType != DataType.PrimitiveType.Integer) {
             TODO()
         }
         currentFunction.body.instructions.add(Instruction.i32_const(arrayType.elementType.sizeInBytes()))
@@ -253,7 +253,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
     override fun visitIntExpr(ctx: MiniJavaParser.IntExprContext) {
         val value = ctx.INT().text.toInt()
         currentFunction.body.instructions.add(Instruction.i32_const(value))
-        ctx.staticType = DataType.Integer
+        ctx.staticType = DataType.PrimitiveType.Integer
     }
 
     override fun visitBoolExpr(ctx: MiniJavaParser.BoolExprContext) {
@@ -262,13 +262,13 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         } else {
             currentFunction.body.instructions.add(Instruction.i32_const(0))
         }
-        ctx.staticType = DataType.Boolean
+        ctx.staticType = DataType.PrimitiveType.Boolean
     }
 
     override fun visitFloatExpr(ctx: MiniJavaParser.FloatExprContext) {
         val value = ctx.FLOAT().text.toFloat()
         currentFunction.body.instructions.add(Instruction.f32_const(value))
-        ctx.staticType = DataType.Float
+        ctx.staticType = DataType.PrimitiveType.Float
     }
 
     override fun visitParensExpr(ctx: MiniJavaParser.ParensExprContext) {
@@ -279,7 +279,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
 
     override fun visitArrayCreationExpr(ctx: MiniJavaParser.ArrayCreationExprContext) {
         visit(ctx.size)
-        if (ctx.size.staticType != DataType.Integer) {
+        if (ctx.size.staticType != DataType.PrimitiveType.Integer) {
             TODO()
             //throw IncompatibleTypeException(DataType.Integer, ctx.size.staticType, ctx.size.start)
         }
@@ -288,7 +288,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
 
         currentFunction.body.instructions.add(Instruction.i32_const(arrayType.sizeInBytes()))
         currentFunction.body.instructions.add(Instruction.i32_mul())
-        currentFunction.body.instructions.add(Instruction.call(methodSymbolTable.addressOf("malloc", listOf(DataType.Integer))))
+        currentFunction.body.instructions.add(Instruction.call(methodSymbolTable.addressOf("malloc", listOf(DataType.PrimitiveType.Integer))))
 
         ctx.staticType = DataType.Array(arrayType)
     }
@@ -353,8 +353,8 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
 
     fun visitIfElse(condition: MiniJavaParser.ExprContext, thenbranch: ParseTree, elsebranch: ParseTree? = null) {
         visit(condition)
-        if (condition.staticType != DataType.Boolean) {
-            throw IncompatibleTypeException(DataType.Boolean, condition.staticType, condition.getStart())
+        if (condition.staticType != DataType.PrimitiveType.Boolean) {
+            throw IncompatibleTypeException(DataType.PrimitiveType.Boolean, condition.staticType, condition.getStart())
         }
         currentFunction.body.instructions.add(Instruction._if())
         visit(thenbranch)
@@ -371,8 +371,8 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
             add(Instruction.loop())
 
             visit(ctx.condition)
-            if (ctx.condition.staticType != DataType.Boolean) {
-                throw IncompatibleTypeException(DataType.Boolean, ctx.condition.staticType, ctx.condition.getStart())
+            if (ctx.condition.staticType != DataType.PrimitiveType.Boolean) {
+                throw IncompatibleTypeException(DataType.PrimitiveType.Boolean, ctx.condition.staticType, ctx.condition.getStart())
             }
             add(Instruction.i32_eqz())
             add(Instruction.br_if(1))

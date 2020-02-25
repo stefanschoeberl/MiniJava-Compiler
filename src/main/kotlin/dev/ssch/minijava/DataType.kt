@@ -1,37 +1,40 @@
 package dev.ssch.minijava
 
 sealed class DataType {
-    object Integer: DataType()
-    object Boolean: DataType()
-    object Float: DataType()
-    data class Array(val elementType: DataType): DataType()
-
-    companion object {
-        fun fromString(s: String): DataType? {
-            return when (s) {
-                "int" -> Integer
-                "boolean" -> Boolean
-                "float" -> Float
-                else -> null
+    sealed class PrimitiveType(val name: String, val sizeInBytes: Int): DataType() {
+        companion object {
+            fun fromString(s: String): PrimitiveType? {
+                return when (s) {
+                    "int" -> PrimitiveType.Integer
+                    "boolean" -> PrimitiveType.Boolean
+                    "float" -> PrimitiveType.Float
+                    else -> null
+                }
             }
         }
-    }
 
-    override fun toString(): String {
-        return when(this) {
-            Integer -> "int"
-            Boolean -> "boolean"
-            Float -> "float"
-            is Array -> "$elementType[]"
+        object Integer: PrimitiveType("int", 4)
+        object Boolean: PrimitiveType("boolean", 1)
+        object Float: PrimitiveType("float", 4)
+
+        override fun toString(): String {
+            return name
+        }
+
+        override fun sizeInBytes(): Int {
+            return sizeInBytes
         }
     }
 
-    fun sizeInBytes(): Int {
-        return when (this) {
-            Integer -> 4
-            Boolean -> 1
-            Float -> 4
-            is Array -> 4
+    data class Array(val elementType: DataType): DataType() {
+        override fun toString(): String {
+            return "$elementType[]"
+        }
+
+        override fun sizeInBytes(): Int {
+            return 4
         }
     }
+
+    abstract fun sizeInBytes(): Int
 }

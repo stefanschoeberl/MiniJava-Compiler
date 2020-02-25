@@ -9,7 +9,7 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
     val methodSymbolTable = MethodSymbolTable()
 
     override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext?) {
-        methodSymbolTable.declareNativeMethod(DataType.Integer, "malloc", listOf(DataType.Integer), false)
+        methodSymbolTable.declareNativeMethod(DataType.PrimitiveType.Integer, "malloc", listOf(DataType.PrimitiveType.Integer), false)
         visitChildren(ctx)
     }
 
