@@ -7,7 +7,7 @@ const readFile = promisify(fs.readFile);
 
 async function runFile(file) {
     const memory = new WebAssembly.Memory({initial:1});
-    let nextFreeAddress = 0;
+    let nextFreeAddress = 1;
 
     const imports = {
         internal: {

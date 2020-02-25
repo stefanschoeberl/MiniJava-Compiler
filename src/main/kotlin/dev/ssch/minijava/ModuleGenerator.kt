@@ -52,6 +52,7 @@ class ModuleGenerator {
         sb.append("(import \"${import.module}\" \"${import.name}\" ")
         when (import.desc) {
             is ImportDesc.Func -> sb.append("(func (type ${import.desc.typeidx}))")
+            is ImportDesc.Memory -> sb.append("(memory ${import.desc.memtype.min})")
         }
         sb.append(") ")
     }
@@ -109,6 +110,9 @@ class ModuleGenerator {
             is Instruction.unreachable -> "unreachable"
             is Instruction.f32_convert_i32_s -> "f32.convert_i32_s"
             is Instruction.i32_trunc_f32_s -> "i32.trunc_f32_s"
+            is Instruction.i32_store -> "i32.store"
+            is Instruction.f32_store -> "f32.store"
+            is Instruction.i32_store8 -> "i32.store8"
         }
     }
 

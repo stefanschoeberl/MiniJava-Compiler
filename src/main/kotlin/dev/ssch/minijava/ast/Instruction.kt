@@ -72,5 +72,9 @@ sealed class Instruction {
 
     class f32_convert_i32_s : Instruction()
     class i32_trunc_f32_s : Instruction()
+
+    class i32_store: Instruction()
+    class f32_store: Instruction()
+    class i32_store8: Instruction()
 }
 

@@ -39,6 +39,15 @@ fun DataType.toWebAssemblyType(): ValueType {
     }
 }
 
+fun DataType.getStoreMemoryInstruction(): Instruction {
+    return when (this) {
+        DataType.Integer -> Instruction.i32_store()
+        DataType.Boolean -> Instruction.i32_store8()
+        DataType.Float -> Instruction.f32_store()
+        is DataType.Array -> Instruction.i32_store()
+    }
+}
+
 val dataTypeWideningConversions = hashMapOf(
     Pair(Pair(DataType.Integer, DataType.Float), listOf(Instruction.f32_convert_i32_s()))
 )

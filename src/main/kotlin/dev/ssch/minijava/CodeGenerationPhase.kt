@@ -54,6 +54,8 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         }
 
         visitChildren(ctx)
+
+        module.imports.add(Import("internal", "memory", ImportDesc.Memory(MemType(1))))
     }
 
     override fun visitMethod(ctx: MiniJavaParser.MethodContext) {
@@ -120,7 +122,6 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
     }
 
     override fun visitVarassignStmt(ctx: MiniJavaParser.VarassignStmtContext) {
-        visit(ctx.right)
 
         fun checkAndConvertAssigment(leftType: DataType?) {
             val conversionCode = leftType?.let {
@@ -132,6 +133,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
 
         when (val left = ctx.left) {
             is MiniJavaParser.IdExprContext -> {
+                visit(ctx.right)
                 val name = left.IDENT().text
                 if (!symbolTable.isDeclared(name)) {
                     throw UndefinedVariableException(name, left.IDENT().symbol)
@@ -140,7 +142,23 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
                 currentFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
             }
             is MiniJavaParser.ArrayAccessExprContext -> {
-                TODO()
+                // address = arraystart + itemsize * index
+                visit(left.array)
+                val arrayType = left.array.staticType as? DataType.Array ?: TODO("assert left type is array")
+                visit(left.index)
+                if (left.index.staticType != DataType.Integer) {
+                    TODO()
+                }
+                currentFunction.body.instructions.add(Instruction.i32_const(arrayType.elementType.sizeInBytes()))
+
+                currentFunction.body.instructions.add(Instruction.i32_mul())
+                currentFunction.body.instructions.add(Instruction.i32_add())
+
+                visit(ctx.right)
+                checkAndConvertAssigment(arrayType.elementType)
+
+                currentFunction.body.instructions.add(arrayType.elementType.getStoreMemoryInstruction())
+
             }
             else -> throw InvalidAssignmentException(left.start)
         }
