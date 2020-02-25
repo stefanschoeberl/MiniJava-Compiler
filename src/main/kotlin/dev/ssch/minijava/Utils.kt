@@ -2,6 +2,7 @@ package dev.ssch.minijava
 
 import dev.ssch.minijava.ast.Instruction
 import dev.ssch.minijava.ast.ValueType
+import dev.ssch.minijava.grammar.MiniJavaParser
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -45,6 +46,23 @@ fun DataType.getStoreMemoryInstruction(): Instruction {
         DataType.Boolean -> Instruction.i32_store8()
         DataType.Float -> Instruction.f32_store()
         is DataType.Array -> Instruction.i32_store()
+    }
+}
+
+fun DataType.getLoadMemoryInstruction(): Instruction {
+    return when (this) {
+        DataType.Integer -> Instruction.i32_load()
+        DataType.Boolean -> Instruction.i32_load8_s()
+        DataType.Float -> Instruction.f32_load()
+        is DataType.Array -> Instruction.i32_load()
+    }
+}
+
+fun MiniJavaParser.TypeDefinitionContext.getDataType(): DataType? {
+    return when (val ctx = this) {
+        is MiniJavaParser.PrimitiveTypeContext -> DataType.fromString(ctx.IDENT().text)
+        is MiniJavaParser.ArrayTypeContext -> DataType.fromString(ctx.IDENT().text)?.let { DataType.Array(it) }
+        else -> null
     }
 }
 

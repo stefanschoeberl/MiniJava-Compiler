@@ -66,7 +66,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         // reset scope
         symbolTable = SymbolTable()
 
-        val parameters = ctx.parameters.map { Pair(it.name.text, DataType.fromString(it.type.text)!!) }
+        val parameters = ctx.parameters.map { Pair(it.name.text, it.type.getDataType()!!) }
         val parameterTypes = parameters.map { it.second }
         currentFunction = functions[MethodSymbolTable.MethodSignature(ctx.name.text, parameterTypes)]!!
 
@@ -93,11 +93,8 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
 
         val name = ctx.name.text
 
-        val type = when (val type = ctx.type) {
-            is MiniJavaParser.PrimitiveTypeContext -> DataType.fromString(type.IDENT().text)
-            is MiniJavaParser.ArrayTypeContext -> DataType.fromString(type.IDENT().text)?.let { DataType.Array(it) }
-            else -> null
-        }?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
+        val type = ctx.type.getDataType()
+            ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
 
         if (symbolTable.isDeclared(name)) {
             throw RedefinedVariableException(name, ctx.name)
@@ -114,11 +111,27 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
 
     override fun visitVardeclStmt(ctx: MiniJavaParser.VardeclStmtContext) {
         val name = ctx.name.text
-        val type = DataType.fromString(ctx.type.text) ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
+        val type = ctx.type.getDataType() ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
         if (symbolTable.isDeclared(name)) {
             throw RedefinedVariableException(name, ctx.name)
         }
         symbolTable.declareVariable(name, type)
+    }
+
+    fun generateArrayAddressCodeAndReturnElementType(ctx: MiniJavaParser.ArrayAccessExprContext): DataType {
+        // address = arraystart + itemsize * index
+        visit(ctx.array)
+        val arrayType = ctx.array.staticType as? DataType.Array ?: TODO("assert left type is array")
+        visit(ctx.index)
+        if (ctx.index.staticType != DataType.Integer) {
+            TODO()
+        }
+        currentFunction.body.instructions.add(Instruction.i32_const(arrayType.elementType.sizeInBytes()))
+
+        currentFunction.body.instructions.add(Instruction.i32_mul())
+        currentFunction.body.instructions.add(Instruction.i32_add())
+
+        return arrayType.elementType
     }
 
     override fun visitVarassignStmt(ctx: MiniJavaParser.VarassignStmtContext) {
@@ -142,22 +155,12 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
                 currentFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
             }
             is MiniJavaParser.ArrayAccessExprContext -> {
-                // address = arraystart + itemsize * index
-                visit(left.array)
-                val arrayType = left.array.staticType as? DataType.Array ?: TODO("assert left type is array")
-                visit(left.index)
-                if (left.index.staticType != DataType.Integer) {
-                    TODO()
-                }
-                currentFunction.body.instructions.add(Instruction.i32_const(arrayType.elementType.sizeInBytes()))
-
-                currentFunction.body.instructions.add(Instruction.i32_mul())
-                currentFunction.body.instructions.add(Instruction.i32_add())
+                val elementType = generateArrayAddressCodeAndReturnElementType(left)
 
                 visit(ctx.right)
-                checkAndConvertAssigment(arrayType.elementType)
+                checkAndConvertAssigment(elementType)
 
-                currentFunction.body.instructions.add(arrayType.elementType.getStoreMemoryInstruction())
+                currentFunction.body.instructions.add(elementType.getStoreMemoryInstruction())
 
             }
             else -> throw InvalidAssignmentException(left.start)
@@ -199,6 +202,12 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         ctx.staticType = methodSymbolTable.returnTypeOf(name, parameters)
     }
 
+    override fun visitArrayAccessExpr(ctx: MiniJavaParser.ArrayAccessExprContext) {
+        val elementType = generateArrayAddressCodeAndReturnElementType(ctx)
+        currentFunction.body.instructions.add(elementType.getLoadMemoryInstruction())
+        ctx.staticType = elementType
+    }
+
     override fun visitMinusExpr(ctx: MiniJavaParser.MinusExprContext) {
         val codePositionBeforeOperand = currentFunction.body.instructions.size
         visit(ctx.expr())
@@ -214,7 +223,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
     }
 
     override fun visitCastExpr(ctx: MiniJavaParser.CastExprContext) {
-        val type = DataType.fromString(ctx.type.text) ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
+        val type = ctx.type.getDataType() ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
 
         visit(ctx.expr())
 
@@ -274,7 +283,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
             TODO()
             //throw IncompatibleTypeException(DataType.Integer, ctx.size.staticType, ctx.size.start)
         }
-        val arrayType = (ctx.type as? MiniJavaParser.PrimitiveTypeContext)?.text?.let { DataType.fromString(it) }
+        val arrayType = (ctx.type as? MiniJavaParser.PrimitiveTypeContext)?.getDataType()
             ?: TODO()
 
         currentFunction.body.instructions.add(Instruction.i32_const(arrayType.sizeInBytes()))

@@ -113,6 +113,9 @@ class ModuleGenerator {
             is Instruction.i32_store -> "i32.store"
             is Instruction.f32_store -> "f32.store"
             is Instruction.i32_store8 -> "i32.store8"
+            is Instruction.i32_load -> "i32.load"
+            is Instruction.f32_load -> "f32.load"
+            is Instruction.i32_load8_s -> "i32.load8_s"
         }
     }
 

@@ -76,5 +76,9 @@ sealed class Instruction {
     class i32_store: Instruction()
     class f32_store: Instruction()
     class i32_store8: Instruction()
+
+    class i32_load: Instruction()
+    class f32_load: Instruction()
+    class i32_load8_s: Instruction()
 }
 
