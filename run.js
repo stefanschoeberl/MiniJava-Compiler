@@ -29,6 +29,27 @@ async function runFile(file) {
                 }
                 console.log('[' + result.join(', ') + ']');
             },
+            "println#boolean[]": offset => {
+                const size = memoryView.getInt32(offset, true);
+                const firstElement = offset + 4;
+                const lastElement = firstElement + size;
+                let result = [];
+                for (let i = firstElement; i < lastElement; i++) {
+                    result.push(memoryView.getInt8(i) === 0 ? 'false' : 'true');
+                }
+                console.log('[' + result.join(', ') + ']');
+            },
+            "println#float[]": offset => {
+                const size = memoryView.getInt32(offset, true);
+                const firstElement = offset + 4;
+                const elementSize = 4;
+                const lastElement = firstElement + size * elementSize;
+                let result = [];
+                for (let i = firstElement; i < lastElement; i += elementSize) {
+                    result.push(memoryView.getFloat32(i, true));
+                }
+                console.log('[' + result.join(', ') + ']');
+            },
             "malloc#int": numBytes => {
                 const address = nextFreeAddress;
                 nextFreeAddress += numBytes;

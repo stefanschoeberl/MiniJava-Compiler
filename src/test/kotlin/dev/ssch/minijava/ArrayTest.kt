@@ -264,7 +264,7 @@ class ArrayTest : CompilerTest() {
     }
 
     @Test
-    fun `call imported `() {
+    fun `call imported int array`() {
         val output = """
             int[] a = new int[3];
             a[0] = 123;
@@ -273,6 +273,30 @@ class ArrayTest : CompilerTest() {
             println(a);
         """.runInMainFunction()
         assertThat(output.lines()).containsExactly("[123, 456, 789]", "")
+    }
+
+    @Test
+    fun `call imported float array`() {
+        val output = """
+            float[] a = new float[3];
+            a[0] = 1.5f;
+            a[1] = 2.5f;
+            a[2] = 3.5f;
+            println(a);
+        """.runInMainFunction()
+        assertThat(output.lines()).containsExactly("[1.5, 2.5, 3.5]", "")
+    }
+
+    @Test
+    fun `call imported boolean array`() {
+        val output = """
+            boolean[] a = new boolean[3];
+            a[0] = true;
+            a[1] = false;
+            a[2] = true;
+            println(a);
+        """.runInMainFunction()
+        assertThat(output.lines()).containsExactly("[true, false, true]", "")
     }
 
     // TODO: Array Exceptions
