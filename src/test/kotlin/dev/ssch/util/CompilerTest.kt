@@ -19,6 +19,7 @@ abstract class CompilerTest {
             native void println(int a);
             native void println(boolean a);
             native void println(float a);
+            native void println(int[] a);
         """.trimIndent() else ""
     }
 

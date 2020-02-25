@@ -75,6 +75,7 @@ class ModuleGenerator {
             is Instruction.call -> "call ${instruction.address}"
             is Instruction.local_set -> "local.set ${instruction.address}"
             is Instruction.local_get -> "local.get ${instruction.address}"
+            is Instruction.local_tee -> "local.tee ${instruction.address}"
             is Instruction.i32_add -> "i32.add"
             is Instruction.i32_sub -> "i32.sub"
             is Instruction.i32_mul -> "i32.mul"

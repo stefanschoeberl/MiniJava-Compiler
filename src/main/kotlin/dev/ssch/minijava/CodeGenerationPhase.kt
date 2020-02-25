@@ -119,7 +119,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
     }
 
     fun generateArrayAddressCodeAndReturnElementType(ctx: MiniJavaParser.ArrayAccessExprContext): DataType {
-        // address = arraystart + itemsize * index
+        // address = arraystart + itemsize * index + 4
         visit(ctx.array)
         val arrayType = ctx.array.staticType as? DataType.Array ?: TODO("assert left type is array")
         visit(ctx.index)
@@ -129,6 +129,10 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         currentFunction.body.instructions.add(Instruction.i32_const(arrayType.elementType.sizeInBytes()))
 
         currentFunction.body.instructions.add(Instruction.i32_mul())
+        currentFunction.body.instructions.add(Instruction.i32_add())
+
+        // skip size part
+        currentFunction.body.instructions.add(Instruction.i32_const(4))
         currentFunction.body.instructions.add(Instruction.i32_add())
 
         return arrayType.elementType
@@ -286,9 +290,41 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         val arrayType = (ctx.type as? MiniJavaParser.PrimitiveTypeContext)?.getDataType()
             ?: TODO()
 
+        val sizeVariable = if (symbolTable.isDeclared("#size")) {
+            symbolTable.addressOf("#size")
+        } else {
+            symbolTable.declareVariable("#size", DataType.PrimitiveType.Integer)
+        }
+
+        // store array size in #size (no dup)
+        // https://github.com/WebAssembly/design/issues/1102
+        currentFunction.body.instructions.add(Instruction.local_tee(sizeVariable))
+
         currentFunction.body.instructions.add(Instruction.i32_const(arrayType.sizeInBytes()))
         currentFunction.body.instructions.add(Instruction.i32_mul())
+
+        // 4 extra bytes for array size
+        currentFunction.body.instructions.add(Instruction.i32_const(4))
+        currentFunction.body.instructions.add(Instruction.i32_add())
+
+        // allocate memory
         currentFunction.body.instructions.add(Instruction.call(methodSymbolTable.addressOf("malloc", listOf(DataType.PrimitiveType.Integer))))
+
+        val arrayAddressVariable = if (symbolTable.isDeclared("#array")) {
+            symbolTable.addressOf("#array")
+        } else {
+            symbolTable.declareVariable("#array", DataType.PrimitiveType.Integer)
+        }
+
+        // store array address in #array
+        currentFunction.body.instructions.add(Instruction.local_tee(arrayAddressVariable))
+
+        // store array size in first 4 bytes
+        currentFunction.body.instructions.add(Instruction.local_get(sizeVariable))
+        currentFunction.body.instructions.add(Instruction.i32_store())
+
+        // put array address on top of stack
+        currentFunction.body.instructions.add(Instruction.local_get(arrayAddressVariable))
 
         ctx.staticType = DataType.Array(arrayType)
     }

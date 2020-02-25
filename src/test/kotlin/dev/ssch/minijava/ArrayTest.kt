@@ -2,7 +2,6 @@ package dev.ssch.minijava
 
 import dev.ssch.util.CompilerTest
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class ArrayTest : CompilerTest() {
@@ -220,7 +219,27 @@ class ArrayTest : CompilerTest() {
     }
 
     @Test
-    fun `complex array expressions`() {
+    fun `complex array expressions 1`() {
+        val output = """
+            int[] map(int[] input) {
+                int[] a = new int[1];
+                a[0] = input[0] * 10;
+                return a;
+            }
+            
+            public void main() {
+                int[] a = new int[1];
+                a[0] = 123;
+            
+                println(map(a)[0]);
+                println(map(a)[0]);
+            }
+        """.compileAndRunMainFunction()
+        assertThat(output.lines()).containsExactly("1230", "1230", "")
+    }
+
+    @Test
+    fun `complex array expressions 2`() {
         val output = """
             int[] map(int[] input) {
                 int[] a = new int[3];
@@ -244,7 +263,6 @@ class ArrayTest : CompilerTest() {
         assertThat(output.lines()).containsExactly("1230", "4560", "7890", "")
     }
 
-    @Disabled
     @Test
     fun `call imported `() {
         val output = """

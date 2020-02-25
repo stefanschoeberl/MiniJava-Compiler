@@ -21,6 +21,10 @@ sealed class Instruction {
         val address: Int
     ) : Instruction()
 
+    class local_tee (
+        val address: Int
+    ) : Instruction()
+
     class br (
         val label: Int
     ) : Instruction()
