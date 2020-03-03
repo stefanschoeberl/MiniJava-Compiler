@@ -18,59 +18,62 @@ class OperatorTable {
         val operationAfterOperand: Instruction
     )
 
-    private val binaryOperations = hashMapOf(
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Integer, MiniJavaParser.ADD) to BinaryOperation(null, null, Instruction.i32_add, DataType.PrimitiveType.Integer),
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Integer, MiniJavaParser.SUB) to BinaryOperation(null, null, Instruction.i32_sub, DataType.PrimitiveType.Integer),
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Integer, MiniJavaParser.MUL) to BinaryOperation(null, null, Instruction.i32_mul, DataType.PrimitiveType.Integer),
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Integer, MiniJavaParser.DIV) to BinaryOperation(null, null, Instruction.i32_div_s, DataType.PrimitiveType.Integer),
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Integer, MiniJavaParser.LT) to BinaryOperation(null, null, Instruction.i32_lt_s, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Integer, MiniJavaParser.LE) to BinaryOperation(null, null, Instruction.i32_le_s, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Integer, MiniJavaParser.GT) to BinaryOperation(null, null, Instruction.i32_gt_s, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Integer, MiniJavaParser.GE) to BinaryOperation(null, null, Instruction.i32_ge_s, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Integer, MiniJavaParser.EQ) to BinaryOperation(null, null, Instruction.i32_eq, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Integer, MiniJavaParser.NEQ) to BinaryOperation(null, null, Instruction.i32_ne, DataType.PrimitiveType.Boolean),
+    private val numericTypes = hashSetOf(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float)
+    private val floatPromotions = hashMapOf(DataType.PrimitiveType.Integer to Instruction.f32_convert_i32_s)
 
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Float, MiniJavaParser.ADD) to BinaryOperation(null, null, Instruction.f32_add, DataType.PrimitiveType.Float),
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Float, MiniJavaParser.SUB) to BinaryOperation(null, null, Instruction.f32_sub, DataType.PrimitiveType.Float),
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Float, MiniJavaParser.MUL) to BinaryOperation(null, null, Instruction.f32_mul, DataType.PrimitiveType.Float),
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Float, MiniJavaParser.DIV) to BinaryOperation(null, null, Instruction.f32_div, DataType.PrimitiveType.Float),
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Float, MiniJavaParser.LT) to BinaryOperation(null, null, Instruction.f32_lt, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Float, MiniJavaParser.LE) to BinaryOperation(null, null, Instruction.f32_le, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Float, MiniJavaParser.GT) to BinaryOperation(null, null, Instruction.f32_gt, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Float, MiniJavaParser.GE) to BinaryOperation(null, null, Instruction.f32_ge, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Float, MiniJavaParser.EQ) to BinaryOperation(null, null, Instruction.f32_eq, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Float, MiniJavaParser.NEQ) to BinaryOperation(null, null, Instruction.f32_ne, DataType.PrimitiveType.Boolean),
+    private val intOperations = hashMapOf(
+        MiniJavaParser.ADD to Pair(Instruction.i32_add, DataType.PrimitiveType.Integer),
+        MiniJavaParser.SUB to Pair(Instruction.i32_sub, DataType.PrimitiveType.Integer),
+        MiniJavaParser.MUL to Pair(Instruction.i32_mul, DataType.PrimitiveType.Integer),
+        MiniJavaParser.DIV to Pair(Instruction.i32_div_s, DataType.PrimitiveType.Integer),
+        MiniJavaParser.LT to Pair(Instruction.i32_lt_s, DataType.PrimitiveType.Boolean),
+        MiniJavaParser.LE to Pair(Instruction.i32_le_s, DataType.PrimitiveType.Boolean),
+        MiniJavaParser.GT to Pair(Instruction.i32_gt_s, DataType.PrimitiveType.Boolean),
+        MiniJavaParser.GE to Pair(Instruction.i32_ge_s, DataType.PrimitiveType.Boolean),
+        MiniJavaParser.EQ to Pair(Instruction.i32_eq, DataType.PrimitiveType.Boolean),
+        MiniJavaParser.NEQ to Pair(Instruction.i32_ne, DataType.PrimitiveType.Boolean)
+    )
 
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Integer, MiniJavaParser.ADD) to BinaryOperation(null, Instruction.f32_convert_i32_s, Instruction.f32_add, DataType.PrimitiveType.Float),
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Integer, MiniJavaParser.SUB) to BinaryOperation(null, Instruction.f32_convert_i32_s, Instruction.f32_sub, DataType.PrimitiveType.Float),
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Integer, MiniJavaParser.MUL) to BinaryOperation(null, Instruction.f32_convert_i32_s, Instruction.f32_mul, DataType.PrimitiveType.Float),
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Integer, MiniJavaParser.DIV) to BinaryOperation(null, Instruction.f32_convert_i32_s, Instruction.f32_div, DataType.PrimitiveType.Float),
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Integer, MiniJavaParser.LT) to BinaryOperation(null, Instruction.f32_convert_i32_s, Instruction.f32_lt, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Integer, MiniJavaParser.LE) to BinaryOperation(null, Instruction.f32_convert_i32_s, Instruction.f32_le, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Integer, MiniJavaParser.GT) to BinaryOperation(null, Instruction.f32_convert_i32_s, Instruction.f32_gt, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Integer, MiniJavaParser.GE) to BinaryOperation(null, Instruction.f32_convert_i32_s, Instruction.f32_ge, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Integer, MiniJavaParser.EQ) to BinaryOperation(null, Instruction.f32_convert_i32_s, Instruction.f32_eq, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Float, DataType.PrimitiveType.Integer, MiniJavaParser.NEQ) to BinaryOperation(null, Instruction.f32_convert_i32_s, Instruction.f32_ne, DataType.PrimitiveType.Boolean),
+    private val floatOperations = hashMapOf(
+        MiniJavaParser.ADD to Pair(Instruction.f32_add, DataType.PrimitiveType.Float),
+        MiniJavaParser.SUB to Pair(Instruction.f32_sub, DataType.PrimitiveType.Float),
+        MiniJavaParser.MUL to Pair(Instruction.f32_mul, DataType.PrimitiveType.Float),
+        MiniJavaParser.DIV to Pair(Instruction.f32_div, DataType.PrimitiveType.Float),
+        MiniJavaParser.LT to Pair(Instruction.f32_lt, DataType.PrimitiveType.Boolean),
+        MiniJavaParser.LE to Pair(Instruction.f32_le, DataType.PrimitiveType.Boolean),
+        MiniJavaParser.GT to Pair(Instruction.f32_gt, DataType.PrimitiveType.Boolean),
+        MiniJavaParser.GE to Pair(Instruction.f32_ge, DataType.PrimitiveType.Boolean),
+        MiniJavaParser.EQ to Pair(Instruction.f32_eq, DataType.PrimitiveType.Boolean),
+        MiniJavaParser.NEQ to Pair(Instruction.f32_ne, DataType.PrimitiveType.Boolean)
+    )
 
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float, MiniJavaParser.ADD) to BinaryOperation(Instruction.f32_convert_i32_s, null, Instruction.f32_add, DataType.PrimitiveType.Float),
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float, MiniJavaParser.SUB) to BinaryOperation(Instruction.f32_convert_i32_s, null, Instruction.f32_sub, DataType.PrimitiveType.Float),
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float, MiniJavaParser.MUL) to BinaryOperation(Instruction.f32_convert_i32_s, null, Instruction.f32_mul, DataType.PrimitiveType.Float),
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float, MiniJavaParser.DIV) to BinaryOperation(Instruction.f32_convert_i32_s, null, Instruction.f32_div, DataType.PrimitiveType.Float),
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float, MiniJavaParser.LT) to BinaryOperation(Instruction.f32_convert_i32_s, null, Instruction.f32_lt, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float, MiniJavaParser.LE) to BinaryOperation(Instruction.f32_convert_i32_s, null, Instruction.f32_le, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float, MiniJavaParser.GT) to BinaryOperation(Instruction.f32_convert_i32_s, null, Instruction.f32_gt, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float, MiniJavaParser.GE) to BinaryOperation(Instruction.f32_convert_i32_s, null, Instruction.f32_ge, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float, MiniJavaParser.EQ) to BinaryOperation(Instruction.f32_convert_i32_s, null, Instruction.f32_eq, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float, MiniJavaParser.NEQ) to BinaryOperation(Instruction.f32_convert_i32_s, null, Instruction.f32_ne, DataType.PrimitiveType.Boolean),
-
-        Triple(DataType.PrimitiveType.Boolean, DataType.PrimitiveType.Boolean, MiniJavaParser.EQ) to BinaryOperation(null, null, Instruction.i32_eq, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Boolean, DataType.PrimitiveType.Boolean, MiniJavaParser.NEQ) to BinaryOperation(null, null, Instruction.i32_ne, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Boolean, DataType.PrimitiveType.Boolean, MiniJavaParser.AND) to BinaryOperation(null, null, Instruction.i32_and, DataType.PrimitiveType.Boolean),
-        Triple(DataType.PrimitiveType.Boolean, DataType.PrimitiveType.Boolean, MiniJavaParser.OR) to BinaryOperation(null, null, Instruction.i32_or, DataType.PrimitiveType.Boolean)
+    private val booleanOperations = hashMapOf(
+        MiniJavaParser.EQ to Pair(Instruction.i32_eq, DataType.PrimitiveType.Boolean),
+        MiniJavaParser.NEQ to Pair(Instruction.i32_ne, DataType.PrimitiveType.Boolean),
+        MiniJavaParser.AND to Pair(Instruction.i32_and, DataType.PrimitiveType.Boolean),
+        MiniJavaParser.OR to Pair(Instruction.i32_or, DataType.PrimitiveType.Boolean)
     )
 
     fun findBinaryOperation(left: DataType?, right: DataType?, op: Token): BinaryOperation? {
-        return binaryOperations[Triple(left, right, op.type)]
+        return if (numericTypes.contains(left) && numericTypes.contains(right)) {
+            if (left == DataType.PrimitiveType.Float || right == DataType.PrimitiveType.Float) {
+                floatOperations[op.type]?.let {
+                    BinaryOperation(floatPromotions[left], floatPromotions[right], it.first, it.second)
+                }
+            } else {
+                intOperations[op.type]?.let {
+                    BinaryOperation(null, null, it.first, it.second)
+                }
+            }
+        }
+        else if (left == DataType.PrimitiveType.Boolean && right == DataType.PrimitiveType.Boolean) {
+            booleanOperations[op.type]?.let {
+                BinaryOperation(null, null, it.first, it.second)
+            }
+        }
+        else {
+            null
+        }
     }
 
     fun findUnaryMinusOperation(type: DataType?): UnaryOperation? {
