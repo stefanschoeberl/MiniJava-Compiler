@@ -1,6 +1,9 @@
 package dev.ssch.minijava
 
+import dev.ssch.minijava.exception.ExpressionIsNotAnArrayException
+import dev.ssch.minijava.exception.IncompatibleTypeException
 import dev.ssch.util.CompilerTest
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -299,5 +302,32 @@ class ArrayTest : CompilerTest() {
         assertThat(output.lines()).containsExactly("[true, false, true]", "")
     }
 
-    // TODO: Array Exceptions
+    @Test
+    fun `create array with non-int size`() {
+        Assertions.assertThatThrownBy {
+            """
+            int[] a = new int[true];
+        """.runInMainFunction()
+        }.isInstanceOf(IncompatibleTypeException::class.java)
+    }
+
+    @Test
+    fun `index non-array variable`() {
+        Assertions.assertThatThrownBy {
+            """
+            boolean a;
+            println(a[0]);
+        """.runInMainFunction()
+        }.isInstanceOf(ExpressionIsNotAnArrayException::class.java)
+    }
+
+    @Test
+    fun `index array with non-int expression`() {
+        Assertions.assertThatThrownBy {
+            """
+            int[] a = new int[1];
+            println(a[true]);
+        """.runInMainFunction()
+        }.isInstanceOf(IncompatibleTypeException::class.java)
+    }
 }

@@ -121,10 +121,10 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
     fun generateArrayAddressCodeAndReturnElementType(ctx: MiniJavaParser.ArrayAccessExprContext): DataType {
         // address = arraystart + itemsize * index + 4
         visit(ctx.array)
-        val arrayType = ctx.array.staticType as? DataType.Array ?: TODO("assert left type is array")
+        val arrayType = ctx.array.staticType as? DataType.Array ?: throw ExpressionIsNotAnArrayException(ctx.array.start)
         visit(ctx.index)
         if (ctx.index.staticType != DataType.PrimitiveType.Integer) {
-            TODO()
+            throw IncompatibleTypeException(DataType.PrimitiveType.Integer, ctx.index.staticType, ctx.index.start)
         }
         currentFunction.body.instructions.add(Instruction.i32_const(arrayType.elementType.sizeInBytes()))
 
@@ -284,8 +284,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
     override fun visitArrayCreationExpr(ctx: MiniJavaParser.ArrayCreationExprContext) {
         visit(ctx.size)
         if (ctx.size.staticType != DataType.PrimitiveType.Integer) {
-            TODO()
-            //throw IncompatibleTypeException(DataType.Integer, ctx.size.staticType, ctx.size.start)
+            throw IncompatibleTypeException(DataType.PrimitiveType.Integer, ctx.size.staticType, ctx.size.start)
         }
         val arrayType = (ctx.type as? MiniJavaParser.PrimitiveTypeContext)?.getDataType()
             ?: TODO()
