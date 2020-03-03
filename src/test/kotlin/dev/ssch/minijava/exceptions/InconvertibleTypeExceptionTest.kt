@@ -29,11 +29,11 @@ class InconvertibleTypeExceptionTest : CompilerTest() {
     fun `cast void method to int`() {
         assertThatThrownBy {
         """
-            void test() {}
-            public void main() {
+            static void test() {}
+            public static void main() {
                 int a = (int) test();
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRunMainFunctionInMainClass()
         }.isInstanceOf(InconvertibleTypeException::class.java)
     }
 }

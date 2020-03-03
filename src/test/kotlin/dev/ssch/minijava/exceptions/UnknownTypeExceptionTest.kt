@@ -31,7 +31,7 @@ class UnknownTypeExceptionTest : CompilerTest() {
         """
             void a(xyz b) {}
             public void main() {}
-        """.compileAndRunMainFunction()
+        """.compileAndRunMainFunctionInMainClass()
         }.isInstanceOf(UnknownTypeException::class.java)
     }
 

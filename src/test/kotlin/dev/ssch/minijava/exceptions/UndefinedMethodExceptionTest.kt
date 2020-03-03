@@ -20,11 +20,11 @@ class UndefinedMethodExceptionTest : CompilerTest() {
     fun `wrong parameter types`() {
         assertThatThrownBy {
         """
-            void a(int b) {}
-            public void main() {
+            static void a(int b) {}
+            public static void main() {
                 a(true);
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRunMainFunctionInMainClass()
         }.isInstanceOf(UndefinedMethodException::class.java)
     }
 }

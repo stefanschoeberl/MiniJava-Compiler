@@ -31,11 +31,15 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         functions = mutableMapOf()
 
         fun declareFunctionType(signature: MethodSymbolTable.MethodSignature, information: MethodSymbolTable.MethodInformation): Int {
-            val parameters = signature.parameterTypes.map { type -> type.toWebAssemblyType() }.toMutableList()
-            val returnType = information.returnType
-                ?.let { type -> mutableListOf(type.toWebAssemblyType()) }
-                ?: mutableListOf()
-           return module.declareType(FuncType(parameters, returnType))
+            if (information.isStatic) {
+                val parameters = signature.parameterTypes.map { type -> type.toWebAssemblyType() }.toMutableList()
+                val returnType = information.returnType
+                    ?.let { type -> mutableListOf(type.toWebAssemblyType()) }
+                    ?: mutableListOf()
+                return module.declareType(FuncType(parameters, returnType))
+            } else {
+                TODO()
+            }
         }
 
         methodSymbolTable.nativeMethods.entries.sortedBy { it.value.address }.forEach {

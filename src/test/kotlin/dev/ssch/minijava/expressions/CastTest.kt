@@ -56,17 +56,17 @@ class CastTest : CompilerTest() {
     @Test
     fun `cast with method call`() {
         val output = """
-            void a(int x) {
+            static void a(int x) {
                 println(1111);
                 println(x);
             }
             
-            void a(float x) {
+            static void a(float x) {
                 println(2222);
                 println(x);
             }
             
-            public void main() {
+            public static void main() {
                 a(1);
                 a(1f);
                 a((float)1);
@@ -74,7 +74,7 @@ class CastTest : CompilerTest() {
                 a((int)1);
                 a((int)1f);
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRunMainFunctionInMainClass()
         output.lines().matches(
             v(1111), v(1),
             v(2222), v(1f, 0.0001f),

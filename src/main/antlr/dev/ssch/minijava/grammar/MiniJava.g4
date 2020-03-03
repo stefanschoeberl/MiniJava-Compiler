@@ -6,9 +6,11 @@ package dev.ssch.minijava.grammar;
 
 // https://docs.oracle.com/javase/specs/jls/se8/html/jls-19.html
 
-minijava: (method)*;
+minijava: (javaclass)*;
 
-method: (publicmodifier+='public' | nativemodifier+='native')* returntype=typeDefinition name=IDENT
+javaclass: 'class' name=IDENT '{' (methods+=method)* '}';
+
+method: (publicmodifier+='public' | nativemodifier+='native' | staticmodifier+='static')* returntype=typeDefinition name=IDENT
         '(' (parameters+=formalParameter (',' parameters+=formalParameter)*)? ')'
         (block='{' (statements+=statement)* '}' | semicolon=';');
 

@@ -9,7 +9,10 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
     val methodSymbolTable = MethodSymbolTable()
 
     override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext?) {
-        methodSymbolTable.declareNativeMethod(DataType.PrimitiveType.Integer, "malloc", listOf(DataType.PrimitiveType.Integer), false)
+        methodSymbolTable.declareNativeMethod(DataType.PrimitiveType.Integer, "malloc", listOf(DataType.PrimitiveType.Integer),
+            isPublic = false,
+            isStatic = true
+        )
         visitChildren(ctx)
     }
 
@@ -34,16 +37,26 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
             throw InvalidModifierException(ctx.nativemodifier.last().text, ctx.nativemodifier.last())
         }
 
+        if (ctx.staticmodifier.size > 1) {
+            throw InvalidModifierException(ctx.staticmodifier.last().text, ctx.staticmodifier.last())
+        }
+
         if (ctx.nativemodifier.isEmpty()) {
             if (ctx.block == null) {
                 throw MissingMethodBodyException(name, ctx.name)
             }
-            methodSymbolTable.declareMethod(returnType, name, parameters, ctx.publicmodifier.size == 1)
+            methodSymbolTable.declareMethod(returnType, name, parameters,
+                isPublic = ctx.publicmodifier.size == 1,
+                isStatic = ctx.staticmodifier.size == 1
+            )
         } else {
             if (ctx.semicolon == null) {
                 throw InvalidMethodBodyException(name, ctx.name)
             }
-            methodSymbolTable.declareNativeMethod(returnType, name, parameters, ctx.publicmodifier.size == 1)
+            methodSymbolTable.declareNativeMethod(returnType, name, parameters,
+                isPublic = ctx.publicmodifier.size == 1,
+                isStatic = ctx.staticmodifier.size == 1
+            )
         }
     }
 }

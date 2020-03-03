@@ -44,13 +44,13 @@ class SingleLineCommentsTest : CompilerTest() {
     fun `single lines combined with code`() {
         val output = """
             // this is main
-            public void main() {
+            public static void main() {
                 // some variable
                 int a = 123; // two
                 println(a);
                 // done
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRunMainFunctionInMainClass()
         assertThat(output.lines()).containsExactly("123", "")
     }
 

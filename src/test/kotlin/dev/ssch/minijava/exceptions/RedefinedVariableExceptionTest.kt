@@ -51,10 +51,10 @@ class RedefinedVariableExceptionTest : CompilerTest() {
     fun `redefine variable with same name as local variable`() {
         assertThatThrownBy {
         """
-            void a(int x) {
+            static void a(int x) {
                 int x = 123;
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRunMainFunctionInMainClass()
         }.isInstanceOf(RedefinedVariableException::class.java)
     }
 }

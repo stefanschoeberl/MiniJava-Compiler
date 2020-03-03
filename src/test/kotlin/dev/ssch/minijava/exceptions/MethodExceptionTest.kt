@@ -15,7 +15,7 @@ class MethodExceptionTest : CompilerTest() {
         assertThatThrownBy {
         """
             public public void a() {}
-        """.compileAndRunMainFunction(false)
+        """.compileAndRunMainFunctionInMainClass(false)
         }.isInstanceOf(InvalidModifierException::class.java)
     }
 
@@ -24,7 +24,16 @@ class MethodExceptionTest : CompilerTest() {
         assertThatThrownBy {
         """
             native native void a() {}
-        """.compileAndRunMainFunction(false)
+        """.compileAndRunMainFunctionInMainClass(false)
+        }.isInstanceOf(InvalidModifierException::class.java)
+    }
+
+    @Test
+    fun `static static`() {
+        assertThatThrownBy {
+        """
+            static static void a() {}
+        """.compileAndRunMainFunctionInMainClass(false)
         }.isInstanceOf(InvalidModifierException::class.java)
     }
 
@@ -33,7 +42,7 @@ class MethodExceptionTest : CompilerTest() {
         assertThatThrownBy {
         """
             public native public void a() {}
-        """.compileAndRunMainFunction(false)
+        """.compileAndRunMainFunctionInMainClass(false)
         }.isInstanceOf(InvalidModifierException::class.java)
     }
 
@@ -42,7 +51,7 @@ class MethodExceptionTest : CompilerTest() {
         assertThatThrownBy {
         """
             native public native void a() {}
-        """.compileAndRunMainFunction(false)
+        """.compileAndRunMainFunctionInMainClass(false)
         }.isInstanceOf(InvalidModifierException::class.java)
     }
 
@@ -51,7 +60,7 @@ class MethodExceptionTest : CompilerTest() {
         assertThatThrownBy {
         """
             native void a() {}
-        """.compileAndRunMainFunction(false)
+        """.compileAndRunMainFunctionInMainClass(false)
         }.isInstanceOf(InvalidMethodBodyException::class.java)
     }
 
@@ -60,7 +69,7 @@ class MethodExceptionTest : CompilerTest() {
         assertThatThrownBy {
         """
             public void a();
-        """.compileAndRunMainFunction(false)
+        """.compileAndRunMainFunctionInMainClass(false)
         }.isInstanceOf(MissingMethodBodyException::class.java)
     }
 
@@ -68,14 +77,14 @@ class MethodExceptionTest : CompilerTest() {
     fun `void parameter`() {
         assertThatThrownBy {
             """
-            public void a() { }
+            public static void a() { }
             
-            public void b(int a) {}
+            public static void b(int a) {}
             
-            public void c() {
+            public static void c() {
                 b(a());
             }
-        """.compileAndRunMainFunction(false)
+        """.compileAndRunMainFunctionInMainClass(false)
         }.isInstanceOf(VoidParameterException::class.java)
     }
 

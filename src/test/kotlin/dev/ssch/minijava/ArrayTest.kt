@@ -163,27 +163,27 @@ class ArrayTest : CompilerTest() {
     @Test
     fun `array as parameter`() {
         val output = """
-            void writeArray(int[] x) {
+            static void writeArray(int[] x) {
                 println(x[0]);
                 println(x[1]);
                 println(x[2]);
             }
             
-            public void main() {
+            public static void main() {
                 int[] a = new int[3];
                 a[0] = 123;
                 a[1] = 456;
                 a[2] = 789;
                 writeArray(a);
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRunMainFunctionInMainClass()
         assertThat(output.lines()).containsExactly("123", "456", "789", "")
     }
 
     @Test
     fun `array as return value 1`() {
         val output = """
-            int[] generateArray() {
+            static int[] generateArray() {
                 int[] a = new int[3];
                 a[0] = 123;
                 a[1] = 456;
@@ -191,20 +191,20 @@ class ArrayTest : CompilerTest() {
                 return a;
             }
             
-            public void main() {
+            public static void main() {
                 int[] x = generateArray();
                 println(x[0]);
                 println(x[1]);
                 println(x[2]);
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRunMainFunctionInMainClass()
         assertThat(output.lines()).containsExactly("123", "456", "789", "")
     }
 
     @Test
     fun `array as return value 2`() {
         val output = """
-            int[] generateArray() {
+            static int[] generateArray() {
                 int[] a = new int[3];
                 a[0] = 123;
                 a[1] = 456;
@@ -212,39 +212,39 @@ class ArrayTest : CompilerTest() {
                 return a;
             }
             
-            public void main() {
+            public static void main() {
                 println(generateArray()[0]);
                 println(generateArray()[1]);
                 println(generateArray()[2]);
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRunMainFunctionInMainClass()
         assertThat(output.lines()).containsExactly("123", "456", "789", "")
     }
 
     @Test
     fun `complex array expressions 1`() {
         val output = """
-            int[] map(int[] input) {
+            static int[] map(int[] input) {
                 int[] a = new int[1];
                 a[0] = input[0] * 10;
                 return a;
             }
             
-            public void main() {
+            public static void main() {
                 int[] a = new int[1];
                 a[0] = 123;
             
                 println(map(a)[0]);
                 println(map(a)[0]);
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRunMainFunctionInMainClass()
         assertThat(output.lines()).containsExactly("1230", "1230", "")
     }
 
     @Test
     fun `complex array expressions 2`() {
         val output = """
-            int[] map(int[] input) {
+            static int[] map(int[] input) {
                 int[] a = new int[3];
                 a[0] = input[0] * 10;
                 a[1] = input[1] * 10;
@@ -252,7 +252,7 @@ class ArrayTest : CompilerTest() {
                 return a;
             }
             
-            public void main() {
+            public static void main() {
                 int[] a = new int[3];
                 a[0] = 123;
                 a[1] = 456;
@@ -262,7 +262,7 @@ class ArrayTest : CompilerTest() {
                 println(map(a)[1]);
                 println(map(a)[2]);
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRunMainFunctionInMainClass()
         assertThat(output.lines()).containsExactly("1230", "4560", "7890", "")
     }
 
