@@ -42,19 +42,19 @@ fun DataType.toWebAssemblyType(): ValueType {
 
 fun DataType.getStoreMemoryInstruction(): Instruction {
     return when (this) {
-        DataType.PrimitiveType.Integer -> Instruction.i32_store()
-        DataType.PrimitiveType.Boolean -> Instruction.i32_store8()
-        DataType.PrimitiveType.Float -> Instruction.f32_store()
-        is DataType.Array -> Instruction.i32_store()
+        DataType.PrimitiveType.Integer -> Instruction.i32_store
+        DataType.PrimitiveType.Boolean -> Instruction.i32_store8
+        DataType.PrimitiveType.Float -> Instruction.f32_store
+        is DataType.Array -> Instruction.i32_store
     }
 }
 
 fun DataType.getLoadMemoryInstruction(): Instruction {
     return when (this) {
-        DataType.PrimitiveType.Integer -> Instruction.i32_load()
-        DataType.PrimitiveType.Boolean -> Instruction.i32_load8_s()
-        DataType.PrimitiveType.Float -> Instruction.f32_load()
-        is DataType.Array -> Instruction.i32_load()
+        DataType.PrimitiveType.Integer -> Instruction.i32_load
+        DataType.PrimitiveType.Boolean -> Instruction.i32_load8_s
+        DataType.PrimitiveType.Float -> Instruction.f32_load
+        is DataType.Array -> Instruction.i32_load
     }
 }
 
@@ -67,12 +67,12 @@ fun MiniJavaParser.TypeDefinitionContext.getDataType(): DataType? {
 }
 
 val dataTypeWideningConversions = hashMapOf(
-    Pair(Pair(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float), listOf(Instruction.f32_convert_i32_s()))
+    Pair(Pair(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float), listOf(Instruction.f32_convert_i32_s))
 )
 
 val dataTypeCastingConversions = hashMapOf(
-    Pair(Pair(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float), listOf(Instruction.f32_convert_i32_s())),
-    Pair(Pair(DataType.PrimitiveType.Float, DataType.PrimitiveType.Integer), listOf(Instruction.i32_trunc_f32_s()))
+    Pair(Pair(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float), listOf(Instruction.f32_convert_i32_s)),
+    Pair(Pair(DataType.PrimitiveType.Float, DataType.PrimitiveType.Integer), listOf(Instruction.i32_trunc_f32_s))
 )
 
 fun DataType.assignTypeTo(other: DataType): List<Instruction>? {

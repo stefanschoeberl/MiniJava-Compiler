@@ -80,7 +80,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
 
         // "workaround" idea from https://github.com/WebAssembly/wabt/issues/1075
         if (methodSymbolTable.returnTypeOf(ctx.name.text, parameters.map { it.second }) != null) {
-            currentFunction.body.instructions.add(Instruction.unreachable())
+            currentFunction.body.instructions.add(Instruction.unreachable)
         }
 
         symbolTable.allLocalVariables.forEach {
@@ -128,12 +128,12 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         }
         currentFunction.body.instructions.add(Instruction.i32_const(arrayType.elementType.sizeInBytes()))
 
-        currentFunction.body.instructions.add(Instruction.i32_mul())
-        currentFunction.body.instructions.add(Instruction.i32_add())
+        currentFunction.body.instructions.add(Instruction.i32_mul)
+        currentFunction.body.instructions.add(Instruction.i32_add)
 
         // skip size part
         currentFunction.body.instructions.add(Instruction.i32_const(4))
-        currentFunction.body.instructions.add(Instruction.i32_add())
+        currentFunction.body.instructions.add(Instruction.i32_add)
 
         return arrayType.elementType
     }
@@ -175,14 +175,14 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         visit(ctx.callExpression())
 
         if (ctx.callExpression().staticType != null) {
-            currentFunction.body.instructions.add(Instruction.drop())
+            currentFunction.body.instructions.add(Instruction.drop)
         }
     }
 
     override fun visitReturnStmt(ctx: MiniJavaParser.ReturnStmtContext) {
         visit(ctx.value)
 
-        currentFunction.body.instructions.add(Instruction._return())
+        currentFunction.body.instructions.add(Instruction._return)
     }
 
     override fun visitCallExpression(ctx: MiniJavaParser.CallExpressionContext) {
@@ -300,11 +300,11 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         currentFunction.body.instructions.add(Instruction.local_tee(sizeVariable))
 
         currentFunction.body.instructions.add(Instruction.i32_const(arrayType.sizeInBytes()))
-        currentFunction.body.instructions.add(Instruction.i32_mul())
+        currentFunction.body.instructions.add(Instruction.i32_mul)
 
         // 4 extra bytes for array size
         currentFunction.body.instructions.add(Instruction.i32_const(4))
-        currentFunction.body.instructions.add(Instruction.i32_add())
+        currentFunction.body.instructions.add(Instruction.i32_add)
 
         // allocate memory
         currentFunction.body.instructions.add(Instruction.call(methodSymbolTable.addressOf("malloc", listOf(DataType.PrimitiveType.Integer))))
@@ -320,7 +320,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
 
         // store array size in first 4 bytes
         currentFunction.body.instructions.add(Instruction.local_get(sizeVariable))
-        currentFunction.body.instructions.add(Instruction.i32_store())
+        currentFunction.body.instructions.add(Instruction.i32_store)
 
         // put array address on top of stack
         currentFunction.body.instructions.add(Instruction.local_get(arrayAddressVariable))
@@ -391,33 +391,33 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
         if (condition.staticType != DataType.PrimitiveType.Boolean) {
             throw IncompatibleTypeException(DataType.PrimitiveType.Boolean, condition.staticType, condition.getStart())
         }
-        currentFunction.body.instructions.add(Instruction._if())
+        currentFunction.body.instructions.add(Instruction._if)
         visit(thenbranch)
         if (elsebranch != null) {
-            currentFunction.body.instructions.add(Instruction._else())
+            currentFunction.body.instructions.add(Instruction._else)
             visit(elsebranch)
         }
-        currentFunction.body.instructions.add(Instruction.end())
+        currentFunction.body.instructions.add(Instruction.end)
     }
 
     override fun visitWhileLoopStmt(ctx: MiniJavaParser.WhileLoopStmtContext) {
         with(currentFunction.body.instructions) {
-            add(Instruction.block())
-            add(Instruction.loop())
+            add(Instruction.block)
+            add(Instruction.loop)
 
             visit(ctx.condition)
             if (ctx.condition.staticType != DataType.PrimitiveType.Boolean) {
                 throw IncompatibleTypeException(DataType.PrimitiveType.Boolean, ctx.condition.staticType, ctx.condition.getStart())
             }
-            add(Instruction.i32_eqz())
+            add(Instruction.i32_eqz)
             add(Instruction.br_if(1))
 
             visit(ctx.body)
 
             add(Instruction.br(0))
 
-            add(Instruction.end())
-            add(Instruction.end())
+            add(Instruction.end)
+            add(Instruction.end)
         }
     }
 }
