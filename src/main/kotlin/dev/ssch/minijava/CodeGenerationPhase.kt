@@ -5,6 +5,9 @@ import dev.ssch.minijava.ast.Function
 import dev.ssch.minijava.exception.*
 import dev.ssch.minijava.grammar.MiniJavaBaseVisitor
 import dev.ssch.minijava.grammar.MiniJavaParser
+import dev.ssch.minijava.symboltable.ClassSymbolTable
+import dev.ssch.minijava.symboltable.MethodSymbolTable
+import dev.ssch.minijava.symboltable.LocalVariableSymbolTable
 import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.ParseTreeProperty
@@ -15,7 +18,7 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
     private lateinit var currentClass: String
     private lateinit var currentFunction: Function
 
-    private lateinit var symbolTable: SymbolTable
+    private lateinit var localsVariableSymbolTable: LocalVariableSymbolTable
     private lateinit var methodSymbolTable: MethodSymbolTable
     private lateinit var staticTypes: ParseTreeProperty<DataType>
 
@@ -109,14 +112,14 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
         }
 
         // reset scope
-        symbolTable = SymbolTable()
+        localsVariableSymbolTable = LocalVariableSymbolTable()
 
         val parameters = ctx.parameters.map { Pair(it.name.text, it.type.getDataType(classSymbolTable)!!) }
         val parameterTypes = parameters.map { it.second }
         currentFunction = functions[Pair(currentClass, MethodSymbolTable.MethodSignature(ctx.name.text, parameterTypes))]!!
 
         parameters.forEach {
-            symbolTable.declareParameter(it.first, it.second)
+            localsVariableSymbolTable.declareParameter(it.first, it.second)
         }
 
         ctx.statements.forEach {
@@ -128,7 +131,7 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
             currentFunction.body.instructions.add(Instruction.unreachable)
         }
 
-        symbolTable.allLocalVariables.forEach {
+        localsVariableSymbolTable.allLocalVariables.forEach {
             currentFunction.locals.add(it.toWebAssemblyType())
         }
     }
@@ -141,26 +144,26 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
         val type = ctx.type.getDataType(classSymbolTable)
             ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
 
-        if (symbolTable.isDeclared(name)) {
+        if (localsVariableSymbolTable.isDeclared(name)) {
             throw RedefinedVariableException(name, ctx.name)
         }
-        symbolTable.declareVariable(name, type)
+        localsVariableSymbolTable.declareVariable(name, type)
 
         val conversionCode = ctx.expr().staticType!!.assignTypeTo(type)
             ?: throw IncompatibleAssignmentException(type, ctx.expr().staticType, ctx.name)
 
         currentFunction.body.instructions.addAll(conversionCode)
 
-        currentFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
+        currentFunction.body.instructions.add(Instruction.local_set(localsVariableSymbolTable.addressOf(name)))
     }
 
     override fun visitVardeclStmt(ctx: MiniJavaParser.VardeclStmtContext) {
         val name = ctx.name.text
         val type = ctx.type.getDataType(classSymbolTable) ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
-        if (symbolTable.isDeclared(name)) {
+        if (localsVariableSymbolTable.isDeclared(name)) {
             throw RedefinedVariableException(name, ctx.name)
         }
-        symbolTable.declareVariable(name, type)
+        localsVariableSymbolTable.declareVariable(name, type)
     }
 
     fun generateArrayAddressCodeAndReturnElementType(ctx: MiniJavaParser.ArrayAccessExprContext): DataType {
@@ -211,11 +214,11 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
             is MiniJavaParser.IdExprContext -> {
                 visit(ctx.right)
                 val name = left.IDENT().text
-                if (!symbolTable.isDeclared(name)) {
+                if (!localsVariableSymbolTable.isDeclared(name)) {
                     throw UndefinedVariableException(name, left.IDENT().symbol)
                 }
-                checkAndConvertAssigment(symbolTable.typeOf(name))
-                currentFunction.body.instructions.add(Instruction.local_set(symbolTable.addressOf(name)))
+                checkAndConvertAssigment(localsVariableSymbolTable.typeOf(name))
+                currentFunction.body.instructions.add(Instruction.local_set(localsVariableSymbolTable.addressOf(name)))
             }
             is MiniJavaParser.ArrayAccessExprContext -> {
                 val elementType = generateArrayAddressCodeAndReturnElementType(left)
@@ -339,11 +342,11 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
 
     override fun visitIdExpr(ctx: MiniJavaParser.IdExprContext) {
         val name = ctx.IDENT().text
-        if (!symbolTable.isDeclared(name)) {
+        if (!localsVariableSymbolTable.isDeclared(name)) {
             throw UndefinedVariableException(name, ctx.IDENT().symbol)
         }
-        currentFunction.body.instructions.add(Instruction.local_get(symbolTable.addressOf(name)))
-        ctx.staticType = symbolTable.typeOf(name)
+        currentFunction.body.instructions.add(Instruction.local_get(localsVariableSymbolTable.addressOf(name)))
+        ctx.staticType = localsVariableSymbolTable.typeOf(name)
     }
 
     override fun visitIntExpr(ctx: MiniJavaParser.IntExprContext) {
@@ -395,10 +398,10 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
         val arrayType = (ctx.type as? MiniJavaParser.SimpleTypeContext)?.getDataType(classSymbolTable)
             ?: TODO()
 
-        val sizeVariable = if (symbolTable.isDeclared("#size")) {
-            symbolTable.addressOf("#size")
+        val sizeVariable = if (localsVariableSymbolTable.isDeclared("#size")) {
+            localsVariableSymbolTable.addressOf("#size")
         } else {
-            symbolTable.declareVariable("#size", DataType.PrimitiveType.Integer)
+            localsVariableSymbolTable.declareVariable("#size", DataType.PrimitiveType.Integer)
         }
 
         // store array size in #size (no dup)
@@ -415,10 +418,10 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
         // allocate memory
         currentFunction.body.instructions.add(Instruction.call(mallocAddress))
 
-        val arrayAddressVariable = if (symbolTable.isDeclared("#array")) {
-            symbolTable.addressOf("#array")
+        val arrayAddressVariable = if (localsVariableSymbolTable.isDeclared("#array")) {
+            localsVariableSymbolTable.addressOf("#array")
         } else {
-            symbolTable.declareVariable("#array", DataType.PrimitiveType.Integer)
+            localsVariableSymbolTable.declareVariable("#array", DataType.PrimitiveType.Integer)
         }
 
         // store array address in #array
@@ -475,9 +478,9 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
     }
 
     override fun visitBlockStmt(ctx: MiniJavaParser.BlockStmtContext) {
-        symbolTable.pushScope()
+        localsVariableSymbolTable.pushScope()
         visitChildren(ctx)
-        symbolTable.popScope()
+        localsVariableSymbolTable.popScope()
     }
 
     override fun visitCompleteIfElseStmt(ctx: MiniJavaParser.CompleteIfElseStmtContext) {

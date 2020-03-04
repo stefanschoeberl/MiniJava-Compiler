@@ -1,4 +1,4 @@
-package dev.ssch.minijava
+package dev.ssch.minijava.symboltable
 
 class ClassSymbolTable {
 
@@ -14,7 +14,10 @@ class ClassSymbolTable {
     }
 
     fun declareClass(className: String): ClassInformation {
-        val classInformation = ClassInformation(MethodSymbolTable(), FieldSymbolTable())
+        val classInformation = ClassInformation(
+            MethodSymbolTable(),
+            FieldSymbolTable()
+        )
         classes[className] = classInformation
         return classInformation
     }

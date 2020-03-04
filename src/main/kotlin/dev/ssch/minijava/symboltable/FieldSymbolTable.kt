@@ -1,4 +1,6 @@
-package dev.ssch.minijava
+package dev.ssch.minijava.symboltable
+
+import dev.ssch.minijava.DataType
 
 class FieldSymbolTable {
 

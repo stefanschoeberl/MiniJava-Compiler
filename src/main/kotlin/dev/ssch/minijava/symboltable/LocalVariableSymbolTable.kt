@@ -1,6 +1,9 @@
-package dev.ssch.minijava
+package dev.ssch.minijava.symboltable
 
-class SymbolTable {
+import dev.ssch.minijava.DataType
+import dev.ssch.minijava.removeFirstOrNull
+
+class LocalVariableSymbolTable {
 
     class SymbolInformation (
         val address: Int,

@@ -3,6 +3,9 @@ package dev.ssch.minijava
 import dev.ssch.minijava.exception.*
 import dev.ssch.minijava.grammar.MiniJavaBaseVisitor
 import dev.ssch.minijava.grammar.MiniJavaParser
+import dev.ssch.minijava.symboltable.ClassSymbolTable
+import dev.ssch.minijava.symboltable.FieldSymbolTable
+import dev.ssch.minijava.symboltable.MethodSymbolTable
 
 class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
 

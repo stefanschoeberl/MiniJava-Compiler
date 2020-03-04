@@ -3,6 +3,8 @@ package dev.ssch.minijava
 import dev.ssch.minijava.ast.Instruction
 import dev.ssch.minijava.ast.ValueType
 import dev.ssch.minijava.grammar.MiniJavaParser
+import dev.ssch.minijava.symboltable.ClassSymbolTable
+import dev.ssch.minijava.symboltable.MethodSymbolTable
 import java.io.File
 import java.util.concurrent.TimeUnit
 
