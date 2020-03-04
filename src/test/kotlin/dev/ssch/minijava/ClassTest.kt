@@ -185,4 +185,55 @@ class ClassTest : CompilerTest() {
             v("")
         )
     }
+
+    @Test
+    fun `pass object as parameter`() {
+        val output = """
+            class Main {
+                static void writePoint(Point point) {
+                    Console.println(point.x);
+                    Console.println(point.y);
+                }
+            
+                public static void main() {
+                    Point p = new Point();
+                    p.x = 10;
+                    p.y = 20;
+                    writePoint(p);
+                }
+            }
+            
+            class Point {
+                int x;
+                int y;
+            }
+        """.compileAndRunMainFunction()
+        assertThat(output.lines()).containsExactly("10", "20", "")
+    }
+
+    @Test
+    fun `pass object as return value`() {
+        val output = """
+            class Main {
+                static Point generatePoint() {
+                    Point p = new Point();
+                    p.x = 10;
+                    p.y = 20;
+                    return p;
+                }
+            
+                public static void main() {
+                    Point p = generatePoint();
+                    Console.println(p.x);
+                    Console.println(p.y);
+                }
+            }
+            
+            class Point {
+                int x;
+                int y;
+            }
+        """.compileAndRunMainFunction()
+        assertThat(output.lines()).containsExactly("10", "20", "")
+    }
 }
