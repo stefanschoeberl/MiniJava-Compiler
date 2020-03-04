@@ -12,8 +12,14 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
     private var currentNativeMethodAddress = 1 // malloc
     private var currentMethodAddress = 0
 
+    var declareOnly = true
+
     override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext) {
+        declareOnly = true
         visitChildren(ctx)
+        declareOnly = false
+        visitChildren(ctx)
+
         recalculateMethodAddresses()
     }
 
@@ -25,24 +31,26 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
 
     override fun visitJavaclass(ctx: MiniJavaParser.JavaclassContext) {
         val className = ctx.name.text
-        if (classSymbolTable.isDeclared(className)) {
-            throw RedefinedClassException(className, ctx.name)
+        if (declareOnly) {
+            if (classSymbolTable.isDeclared(className)) {
+                throw RedefinedClassException(className, ctx.name)
+            }
+
+            classSymbolTable.declareClass(className)
+        } else {
+            methodSymbolTable = classSymbolTable.getMethodSymbolTable(className)
+            visitChildren(ctx)
         }
-
-        val classInformation = classSymbolTable.declareClass(className)
-
-        methodSymbolTable = classInformation.methodSymbolTable
-        visitChildren(ctx)
     }
 
     override fun visitMethod(ctx: MiniJavaParser.MethodContext) {
         val returnType = when (ctx.returntype.text) {
             "void" -> null
-            else -> ctx.returntype.getDataType() ?: throw UnknownTypeException(ctx.returntype.text, ctx.returntype.start)
+            else -> ctx.returntype.getDataType(classSymbolTable) ?: throw UnknownTypeException(ctx.returntype.text, ctx.returntype.start)
         }
         val name = ctx.name.text
         val parameters = ctx.parameters.map {
-            it.type.getDataType() ?: throw UnknownTypeException(it.type.text, it.type.start)
+            it.type.getDataType(classSymbolTable) ?: throw UnknownTypeException(it.type.text, it.type.start)
         }
         if (methodSymbolTable.isDeclared(name, parameters)) {
             throw RedefinedMethodException(name, ctx.name)

@@ -52,4 +52,22 @@ class ClassTest : CompilerTest() {
         assertThat(output.lines()).containsExactly("123", "")
     }
 
+    @Test
+    fun `declare variable of class`() {
+        val output = """
+            class Main {
+                public static void main() {
+                    Point p;
+                    Console.println(123);
+                }
+            }
+            
+            class Point {
+                int x;
+                int y;
+            }
+        """.compileAndRunMainFunction()
+        assertThat(output.lines()).containsExactly("123", "")
+    }
+
 }

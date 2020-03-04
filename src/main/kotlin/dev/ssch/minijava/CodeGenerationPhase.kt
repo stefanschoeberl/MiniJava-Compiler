@@ -111,7 +111,7 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
         // reset scope
         symbolTable = SymbolTable()
 
-        val parameters = ctx.parameters.map { Pair(it.name.text, it.type.getDataType()!!) }
+        val parameters = ctx.parameters.map { Pair(it.name.text, it.type.getDataType(classSymbolTable)!!) }
         val parameterTypes = parameters.map { it.second }
         currentFunction = functions[Pair(currentClass, MethodSymbolTable.MethodSignature(ctx.name.text, parameterTypes))]!!
 
@@ -138,7 +138,7 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
 
         val name = ctx.name.text
 
-        val type = ctx.type.getDataType()
+        val type = ctx.type.getDataType(classSymbolTable)
             ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
 
         if (symbolTable.isDeclared(name)) {
@@ -156,7 +156,7 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
 
     override fun visitVardeclStmt(ctx: MiniJavaParser.VardeclStmtContext) {
         val name = ctx.name.text
-        val type = ctx.type.getDataType() ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
+        val type = ctx.type.getDataType(classSymbolTable) ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
         if (symbolTable.isDeclared(name)) {
             throw RedefinedVariableException(name, ctx.name)
         }
@@ -255,7 +255,7 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
     }
 
     override fun visitCastExpr(ctx: MiniJavaParser.CastExprContext) {
-        val type = ctx.type.getDataType() ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
+        val type = ctx.type.getDataType(classSymbolTable) ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
 
         visit(ctx.expr())
 
@@ -353,7 +353,7 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
         if (ctx.size.staticType != DataType.PrimitiveType.Integer) {
             throw IncompatibleTypeException(DataType.PrimitiveType.Integer, ctx.size.staticType, ctx.size.start)
         }
-        val arrayType = (ctx.type as? MiniJavaParser.SimpleTypeContext)?.getDataType()
+        val arrayType = (ctx.type as? MiniJavaParser.SimpleTypeContext)?.getDataType(classSymbolTable)
             ?: TODO()
 
         val sizeVariable = if (symbolTable.isDeclared("#size")) {

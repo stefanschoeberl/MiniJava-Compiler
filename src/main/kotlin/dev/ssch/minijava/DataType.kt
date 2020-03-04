@@ -5,9 +5,9 @@ sealed class DataType {
         companion object {
             fun fromString(s: String): PrimitiveType? {
                 return when (s) {
-                    "int" -> PrimitiveType.Integer
-                    "boolean" -> PrimitiveType.Boolean
-                    "float" -> PrimitiveType.Float
+                    "int" -> Integer
+                    "boolean" -> Boolean
+                    "float" -> Float
                     else -> null
                 }
             }
@@ -23,6 +23,16 @@ sealed class DataType {
 
         override fun sizeInBytes(): Int {
             return sizeInBytes
+        }
+    }
+
+    data class ReferenceType(val name: String): DataType() {
+        override fun toString(): String {
+            return name
+        }
+
+        override fun sizeInBytes(): Int {
+            return 4
         }
     }
 

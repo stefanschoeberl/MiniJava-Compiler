@@ -37,6 +37,7 @@ fun DataType.toWebAssemblyType(): ValueType {
         DataType.PrimitiveType.Boolean -> ValueType.I32
         DataType.PrimitiveType.Float -> ValueType.F32
         is DataType.Array -> ValueType.I32
+        is DataType.ReferenceType -> ValueType.I32
     }
 }
 
@@ -46,6 +47,7 @@ fun DataType.getStoreMemoryInstruction(): Instruction {
         DataType.PrimitiveType.Boolean -> Instruction.i32_store8
         DataType.PrimitiveType.Float -> Instruction.f32_store
         is DataType.Array -> Instruction.i32_store
+        is DataType.ReferenceType -> Instruction.i32_store
     }
 }
 
@@ -55,12 +57,22 @@ fun DataType.getLoadMemoryInstruction(): Instruction {
         DataType.PrimitiveType.Boolean -> Instruction.i32_load8_s
         DataType.PrimitiveType.Float -> Instruction.f32_load
         is DataType.Array -> Instruction.i32_load
+        is DataType.ReferenceType -> Instruction.i32_load
     }
 }
 
-fun MiniJavaParser.TypeDefinitionContext.getDataType(): DataType? {
+fun MiniJavaParser.TypeDefinitionContext.getDataType(classSymbolTable: ClassSymbolTable): DataType? {
     return when (val ctx = this) {
-        is MiniJavaParser.SimpleTypeContext -> DataType.PrimitiveType.fromString(ctx.IDENT().text)
+        is MiniJavaParser.SimpleTypeContext -> {
+            val primitiveType = DataType.PrimitiveType.fromString(ctx.IDENT().text)
+            if (primitiveType != null) {
+                primitiveType
+            } else if (classSymbolTable.classes.containsKey(ctx.IDENT().text)) {
+                DataType.ReferenceType(ctx.IDENT().text)
+            } else {
+                null
+            }
+        }
         is MiniJavaParser.ArrayTypeContext -> DataType.PrimitiveType.fromString(ctx.IDENT().text)?.let { DataType.Array(it) }
         else -> null
     }
