@@ -1,6 +1,5 @@
 package dev.ssch.minijava
 
-import dev.ssch.minijava.exception.RedefinedClassException
 import dev.ssch.util.CompilerTest
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
@@ -33,6 +32,24 @@ class ClassTest : CompilerTest() {
             class A {}
             class A {}
         """.compileAndRunMainFunction()
-        }.isInstanceOf(RedefinedClassException::class.java)
+        }
     }
+
+    @Test
+    fun `declare fields`() {
+        val output = """
+            class Main {
+                public static void main() {
+                    Console.println(123);
+                }
+            }
+            
+            class Point {
+                int x;
+                int y;
+            }
+        """.compileAndRunMainFunction()
+        assertThat(output.lines()).containsExactly("123", "")
+    }
+
 }

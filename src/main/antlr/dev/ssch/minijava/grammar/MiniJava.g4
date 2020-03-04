@@ -8,7 +8,9 @@ package dev.ssch.minijava.grammar;
 
 minijava: (javaclass)*;
 
-javaclass: 'class' name=IDENT '{' (methods+=method)* '}';
+javaclass: 'class' name=IDENT '{' (fields+=field | methods+=method)* '}';
+
+field: type=typeDefinition name=IDENT ';';
 
 method: (publicmodifier+='public' | nativemodifier+='native' | staticmodifier+='static')* returntype=typeDefinition name=IDENT
         '(' (parameters+=formalParameter (',' parameters+=formalParameter)*)? ')'

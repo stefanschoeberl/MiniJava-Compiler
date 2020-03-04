@@ -37,7 +37,7 @@ abstract class CompilerTest {
 
     fun String.compileAndRunMainFunction(withStandardLibrary: Boolean = true): String {
         val compiler = Compiler()
-        val source = "${useStandardLibary(withStandardLibrary)}\n$this"
+        val source = "${useStandardLibary(withStandardLibrary)}\n${this.trimIndent()}"
 
         println(source)
         println()
