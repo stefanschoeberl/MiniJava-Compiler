@@ -9,7 +9,7 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
     val classSymbolTable = ClassSymbolTable()
     private lateinit var methodSymbolTable: MethodSymbolTable
 
-    private var currentNativeMethodAddress = 0
+    private var currentNativeMethodAddress = 1 // malloc
     private var currentMethodAddress = 0
 
     override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext) {
@@ -29,10 +29,6 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
         val classInformation = classSymbolTable.declareClass(className)
 
         methodSymbolTable = classInformation.methodSymbolTable
-        methodSymbolTable.declareNativeMethod(currentNativeMethodAddress++, DataType.PrimitiveType.Integer, "malloc", listOf(DataType.PrimitiveType.Integer),
-            isPublic = false,
-            isStatic = true
-        )
         visitChildren(ctx)
     }
 

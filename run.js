@@ -13,6 +13,11 @@ async function runFile(file) {
     const imports = {
         internal: {
             "memory": memory,
+            "malloc": numBytes => {
+                const address = nextFreeAddress;
+                nextFreeAddress += numBytes;
+                return address;
+            }
         },
         imports: {
             "Main.println#int": arg => console.log(arg),
@@ -49,11 +54,6 @@ async function runFile(file) {
                     result.push(memoryView.getFloat32(i, true));
                 }
                 console.log('[' + result.join(', ') + ']');
-            },
-            "Main.malloc#int": numBytes => {
-                const address = nextFreeAddress;
-                nextFreeAddress += numBytes;
-                return address;
             }
         }
     };

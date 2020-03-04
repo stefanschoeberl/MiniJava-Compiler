@@ -20,7 +20,8 @@ data class Module (
         funcs.add(function)
     }
 
-    fun importFunction(import: Import) {
+    fun importFunction(import: Import): Int {
         imports.add(import)
+        return imports.size - 1
     }
 }

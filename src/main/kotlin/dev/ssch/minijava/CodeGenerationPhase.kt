@@ -27,6 +27,8 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
 
     private val operatorTable = OperatorTable()
 
+    private var mallocAddress: Int = 0
+
     override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext) {
         module = Module()
         staticTypes = ParseTreeProperty()
@@ -43,6 +45,15 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
                 TODO()
             }
         }
+
+        mallocAddress = module.importFunction(Import("internal", "malloc",
+            ImportDesc.Func(declareFunctionType(
+                MethodSymbolTable.MethodSignature("malloc", listOf(DataType.PrimitiveType.Integer)),
+                MethodSymbolTable.MethodInformation(-1, DataType.PrimitiveType.Integer,
+                    isPublic = false,
+                    isStatic = true
+                )
+            ))))
 
         classSymbolTable.classes.flatMap { classEntry ->
             classEntry.value.methodSymbolTable.nativeMethods.map {
@@ -341,7 +352,7 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
         currentFunction.body.instructions.add(Instruction.i32_add)
 
         // allocate memory
-        currentFunction.body.instructions.add(Instruction.call(methodSymbolTable.addressOf("malloc", listOf(DataType.PrimitiveType.Integer))))
+        currentFunction.body.instructions.add(Instruction.call(mallocAddress))
 
         val arrayAddressVariable = if (symbolTable.isDeclared("#array")) {
             symbolTable.addressOf("#array")
