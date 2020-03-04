@@ -212,6 +212,23 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
                 currentFunction.body.instructions.add(elementType.getStoreMemoryInstruction())
 
             }
+            is MiniJavaParser.MemberExprContext -> {
+                visit(left.expr())
+                val type = left.expr().staticType as? DataType.ReferenceType ?: TODO()
+                val fieldName = left.right.text
+                val fieldSymbolTable = classSymbolTable.getFieldSymbolTable(type.name)
+                val fieldInfo = fieldSymbolTable.findFieldInfo(fieldName) ?: TODO()
+
+                // add offset
+                currentFunction.body.instructions.add(Instruction.i32_const(fieldInfo.offset))
+                currentFunction.body.instructions.add(Instruction.i32_add)
+
+                visit(ctx.right)
+                checkAndConvertAssigment(fieldInfo.type)
+
+                currentFunction.body.instructions.add(fieldInfo.type.getStoreMemoryInstruction())
+
+            }
             else -> throw InvalidAssignmentException(left.start)
         }
     }
@@ -353,7 +370,7 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
             as? DataType.ReferenceType // TODO
             ?: TODO()
 
-        val size = classSymbolTable.getFieldsOfClass(type.name).values.map { it.sizeInBytes() }.sum()
+        val size = classSymbolTable.getFieldSymbolTable(type.name).getSize()
         currentFunction.body.instructions.add(Instruction.i32_const(size))
 
         // allocate memory

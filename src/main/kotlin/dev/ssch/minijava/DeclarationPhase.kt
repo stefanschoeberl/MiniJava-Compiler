@@ -8,6 +8,7 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
 
     val classSymbolTable = ClassSymbolTable()
     private lateinit var methodSymbolTable: MethodSymbolTable
+    private lateinit var fieldSymbolTable: FieldSymbolTable
 
     private var currentNativeMethodAddress = 1 // malloc
     private var currentMethodAddress = 0
@@ -39,8 +40,19 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
             classSymbolTable.declareClass(className)
         } else {
             methodSymbolTable = classSymbolTable.getMethodSymbolTable(className)
+            fieldSymbolTable = classSymbolTable.getFieldSymbolTable(className)
             visitChildren(ctx)
         }
+    }
+
+    override fun visitField(ctx: MiniJavaParser.FieldContext) {
+        val type = ctx.type.getDataType(classSymbolTable) ?: TODO()
+        val name = ctx.name.text
+        if (fieldSymbolTable.isDeclared(name)) {
+            TODO()
+        }
+
+        fieldSymbolTable.declareField(name, type)
     }
 
     override fun visitMethod(ctx: MiniJavaParser.MethodContext) {

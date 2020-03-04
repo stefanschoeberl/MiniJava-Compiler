@@ -88,4 +88,22 @@ class ClassTest : CompilerTest() {
         assertThat(output.lines()).containsExactly("123", "")
     }
 
+    @Test
+    fun `assign value to field of class`() {
+        val output = """
+            class Main {
+                public static void main() {
+                    Point p = new Point();
+                    p.x = 10;
+                    Console.println(123);
+                }
+            }
+            
+            class Point {
+                int x;
+                int y;
+            }
+        """.compileAndRunMainFunction()
+        assertThat(output.lines()).containsExactly("123", "")
+    }
 }
