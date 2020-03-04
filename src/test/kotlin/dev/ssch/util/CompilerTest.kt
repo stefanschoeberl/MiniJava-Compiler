@@ -30,8 +30,12 @@ abstract class CompilerTest {
     }
 
     fun String.compileAndRunMainFunctionInMainClass(withStandardLibrary: Boolean = true): String {
+        return "class Main {\n${useStandardLibary(withStandardLibrary).prependIndent("    ")}\n\n${this.trimIndent().prependIndent("    ")}\n}".compileAndRunMainFunction()
+    }
+
+    fun String.compileAndRunMainFunction(): String {
         val compiler = Compiler()
-        val source = "class Main {\n${useStandardLibary(withStandardLibrary).prependIndent("    ")}\n\n${this.trimIndent().prependIndent("    ")}\n}"
+        val source = this
 
         println(source)
         println()

@@ -216,11 +216,15 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
         }
     }
 
-    override fun visitCallStmt(ctx: MiniJavaParser.CallStmtContext) {
-        visit(ctx.callExpression())
+    override fun visitExpressionStmt(ctx: MiniJavaParser.ExpressionStmtContext) {
+        if (ctx.expr() is MiniJavaParser.CallExprContext) {
+            visit(ctx.expr())
 
-        if (ctx.callExpression().staticType != null) {
-            currentFunction.body.instructions.add(Instruction.drop)
+            if (ctx.expr().staticType != null) {
+                currentFunction.body.instructions.add(Instruction.drop)
+            }
+        } else {
+            TODO()
         }
     }
 
@@ -228,27 +232,6 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
         visit(ctx.value)
 
         currentFunction.body.instructions.add(Instruction._return)
-    }
-
-    override fun visitCallExpression(ctx: MiniJavaParser.CallExpressionContext) {
-        ctx.parameters.forEach {
-            visit(it)
-        }
-
-        val name = ctx.name.text
-        val parameters = ctx.parameters.map {
-            it.staticType ?: throw VoidParameterException(it.start)
-        }
-
-        if (!methodSymbolTable.isDeclared(name, parameters)) {
-            throw UndefinedMethodException(name, ctx.name)
-        }
-
-        val address = methodSymbolTable.addressOf(name, parameters)
-
-        currentFunction.body.instructions.add(Instruction.call(address))
-
-        ctx.staticType = methodSymbolTable.returnTypeOf(name, parameters)
     }
 
     override fun visitArrayAccessExpr(ctx: MiniJavaParser.ArrayAccessExprContext) {
@@ -285,9 +268,50 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
     }
 
     override fun visitCallExpr(ctx: MiniJavaParser.CallExprContext) {
-        visit(ctx.callExpression())
+        ctx.parameters.forEach {
+            visit(it)
+        }
 
-        ctx.staticType = ctx.callExpression().staticType
+        val target = ctx.target
+
+        val (className, methodName) = when (target) {
+            is MiniJavaParser.IdExprContext -> Pair(currentClass, target.IDENT().text)
+            is MiniJavaParser.MemberExprContext -> {
+                val left = target.left
+                val right = target.right
+
+                if (left is MiniJavaParser.IdExprContext && right is MiniJavaParser.IdExprContext) {
+                    Pair(left.IDENT().text, right.IDENT().text)
+                } else {
+                    TODO("currently unsupported")
+                }
+            }
+            else -> TODO("currently unsupported")
+        }
+
+        val parameters = ctx.parameters.map {
+            it.staticType ?: throw VoidParameterException(it.start)
+        }
+
+        if (!classSymbolTable.isDeclared(className)) {
+            throw UndefinedMethodException("$className.$methodName", ctx.target.start)
+        }
+
+        val methodSymbolTableOfTargetClass = classSymbolTable.getMethodSymbolTable(className)
+
+        if (!methodSymbolTableOfTargetClass.isDeclared(methodName, parameters)) {
+            throw UndefinedMethodException("$className.$methodName", ctx.target.start)
+        }
+
+        val address = methodSymbolTableOfTargetClass.addressOf(methodName, parameters)
+
+        currentFunction.body.instructions.add(Instruction.call(address))
+
+        ctx.staticType = methodSymbolTableOfTargetClass.returnTypeOf(methodName, parameters)
+    }
+
+    override fun visitMemberExpr(ctx: MiniJavaParser.MemberExprContext?) {
+        TODO("currently unsupported")
     }
 
     override fun visitIdExpr(ctx: MiniJavaParser.IdExprContext) {

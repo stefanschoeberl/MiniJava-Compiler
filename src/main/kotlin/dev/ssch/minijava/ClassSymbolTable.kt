@@ -8,7 +8,9 @@ class ClassSymbolTable {
 
     val classes = mutableMapOf<String, ClassInformation>()
 
-    // TODO isDeclared
+    fun isDeclared(className: String): Boolean {
+        return classes.containsKey(className)
+    }
 
     fun declareClass(className: String): ClassInformation {
         val classInformation = ClassInformation(MethodSymbolTable())

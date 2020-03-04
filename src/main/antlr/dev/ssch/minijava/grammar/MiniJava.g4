@@ -26,7 +26,7 @@ completeStatement: 'if' '(' condition=expr ')' thenbranch=completeStatement 'els
                  | type=typeDefinition name=IDENT '=' expr ';'                                                  # VardeclassignStmt
                  | type=typeDefinition name=IDENT ';'                                                           # VardeclStmt
                  | left=expr '=' right=expr ';'                                                                 # VarassignStmt
-                 | callExpression ';'                                                                           # CallStmt
+                 | expr ';'                                                                                     # ExpressionStmt
                  | 'return' value=expr ';'                                                                      # ReturnStmt
                  ;
 
@@ -39,26 +39,24 @@ typeDefinition: IDENT         # PrimitiveType
 
 // https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html
 
-expr: array=expr '[' index=expr ']'               # ArrayAccessExpr
-    | '-' expr                                    # MinusExpr
-    | '(' type=typeDefinition ')' expr            # CastExpr
-    | left=expr op=(MUL|DIV) right=expr           # MulDivExpr
-    | left=expr op=(ADD|SUB) right=expr           # AddSubExpr
-    | left=expr op=(LT|LE|GT|GE) right=expr       # RelationalExpr
-    | left=expr op=(EQ|NEQ) right=expr            # EqNeqExpr
-    | left=expr op=AND right=expr                 # AndExpr
-    | left=expr op=OR right=expr                  # OrExpr
-    | IDENT                                       # IdExpr
-    | INT                                         # IntExpr
-    | FLOAT                                       # FloatExpr
-    | value=(TRUE|FALSE)                          # BoolExpr
-    | callExpression                              # CallExpr
-    | '(' expr ')'                                # ParensExpr
-    | 'new' type=typeDefinition '[' size=expr ']' # ArrayCreationExpr
+expr: array=expr '[' index=expr ']'                                   # ArrayAccessExpr
+    | left=expr '.' right=expr                                        # MemberExpr
+    | target=expr '(' (parameters+=expr (',' parameters+=expr)*)? ')' # CallExpr
+    | '-' expr                                                        # MinusExpr
+    | '(' type=typeDefinition ')' expr                                # CastExpr
+    | left=expr op=(MUL|DIV) right=expr                               # MulDivExpr
+    | left=expr op=(ADD|SUB) right=expr                               # AddSubExpr
+    | left=expr op=(LT|LE|GT|GE) right=expr                           # RelationalExpr
+    | left=expr op=(EQ|NEQ) right=expr                                # EqNeqExpr
+    | left=expr op=AND right=expr                                     # AndExpr
+    | left=expr op=OR right=expr                                      # OrExpr
+    | IDENT                                                           # IdExpr
+    | INT                                                             # IntExpr
+    | FLOAT                                                           # FloatExpr
+    | value=(TRUE|FALSE)                                              # BoolExpr
+    | '(' expr ')'                                                    # ParensExpr
+    | 'new' type=typeDefinition '[' size=expr ']'                     # ArrayCreationExpr
     ;
-
-callExpression:
-    name=IDENT '(' (parameters+=expr (',' parameters+=expr)*)? ')';
 
 EQ:  '==';
 NEQ: '!=';
