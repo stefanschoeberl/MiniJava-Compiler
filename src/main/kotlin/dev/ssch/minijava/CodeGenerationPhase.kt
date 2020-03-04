@@ -27,7 +27,7 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
 
     private val operatorTable = OperatorTable()
 
-    private var mallocAddress: Int = 0
+    private var mallocAddress: Int = -1
 
     override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext) {
         module = Module()

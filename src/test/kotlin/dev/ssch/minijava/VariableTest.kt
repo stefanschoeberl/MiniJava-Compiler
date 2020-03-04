@@ -18,7 +18,7 @@ class VariableTest : CompilerTest() {
     fun `declare a variable and initialize it with a value`() {
         val output = """
             int a = 123;
-            println(a);
+            Console.println(a);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("123", "")
     }
@@ -28,7 +28,7 @@ class VariableTest : CompilerTest() {
         val output = """
             int a = 123;
             int b = a;
-            println(b);
+            Console.println(b);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("123", "")
     }
@@ -38,7 +38,7 @@ class VariableTest : CompilerTest() {
         val output = """
             int a;
             a = 123;
-            println(a);
+            Console.println(a);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("123", "")
     }
@@ -48,7 +48,7 @@ class VariableTest : CompilerTest() {
         val output = """
             int a = 123;
             int b = a;
-            println(b);
+            Console.println(b);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("123", "")
     }

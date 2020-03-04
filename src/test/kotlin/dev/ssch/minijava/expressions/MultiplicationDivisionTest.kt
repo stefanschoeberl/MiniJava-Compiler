@@ -10,7 +10,7 @@ class MultiplicationDivisionTest : CompilerTest() {
     @Test
     fun `multiply two int values`() {
         val output = """
-            println(2 * 3);
+            Console.println(2 * 3);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("6", "")
     }
@@ -18,7 +18,7 @@ class MultiplicationDivisionTest : CompilerTest() {
     @Test
     fun `multiply two float values`() {
         val output = """
-            println(2f * 3f);
+            Console.println(2f * 3f);
         """.runInMainFunction()
         output.lines().matches(v(6f, 0.0001f), v(""))
     }
@@ -26,7 +26,7 @@ class MultiplicationDivisionTest : CompilerTest() {
     @Test
     fun `multiply two negative values`() {
         val output = """
-            println(-2 * -3);
+            Console.println(-2 * -3);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("6", "")
     }
@@ -36,7 +36,7 @@ class MultiplicationDivisionTest : CompilerTest() {
         val output = """
             int a = 2;
             int b = 3;
-            println(a * b);
+            Console.println(a * b);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("6", "")
     }
@@ -46,7 +46,7 @@ class MultiplicationDivisionTest : CompilerTest() {
         val output = """
             int a = 2;
             int b = 3;
-            println(-a * -b);
+            Console.println(-a * -b);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("6", "")
     }
@@ -54,9 +54,9 @@ class MultiplicationDivisionTest : CompilerTest() {
     @Test
     fun `nested multiplication`() {
         val output = """
-            println((2 * 3) * 4);
-            println(2 * 3 * 4);
-            println(2 * (3 * 4));
+            Console.println((2 * 3) * 4);
+            Console.println(2 * 3 * 4);
+            Console.println(2 * (3 * 4));
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("24", "24", "24", "")
     }
@@ -64,9 +64,9 @@ class MultiplicationDivisionTest : CompilerTest() {
     @Test
     fun `divide two int values`() {
         val output = """
-            println(1 / 2);
-            println(8 / 3);
-            println(6 / 3);
+            Console.println(1 / 2);
+            Console.println(8 / 3);
+            Console.println(6 / 3);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("0", "2", "2", "")
     }
@@ -74,9 +74,9 @@ class MultiplicationDivisionTest : CompilerTest() {
     @Test
     fun `divide two float values`() {
         val output = """
-            println(1f / 2f);
-            println(8f / 3f);
-            println(6f / 3f);
+            Console.println(1f / 2f);
+            Console.println(8f / 3f);
+            Console.println(6f / 3f);
         """.runInMainFunction()
         output.lines().matches(
             v(1/2f, 0.0001f),
@@ -88,9 +88,9 @@ class MultiplicationDivisionTest : CompilerTest() {
     @Test
     fun `divide two negative values`() {
         val output = """
-            println(-1 / 2);
-            println(8 / -3);
-            println(-6 / -3);
+            Console.println(-1 / 2);
+            Console.println(8 / -3);
+            Console.println(-6 / -3);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("0", "-2", "2", "")
     }
@@ -103,9 +103,9 @@ class MultiplicationDivisionTest : CompilerTest() {
             int three = 3;
             int six = 6;
             int eight = 8;
-            println(one / two);
-            println(eight / three);
-            println(six / three);
+            Console.println(one / two);
+            Console.println(eight / three);
+            Console.println(six / three);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("0", "2", "2", "")
     }
@@ -118,9 +118,9 @@ class MultiplicationDivisionTest : CompilerTest() {
             int three = 3;
             int six = 6;
             int eight = 8;
-            println(-one / two);
-            println(eight / -three);
-            println(-six / -three);
+            Console.println(-one / two);
+            Console.println(eight / -three);
+            Console.println(-six / -three);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("0", "-2", "2", "")
     }
@@ -128,9 +128,9 @@ class MultiplicationDivisionTest : CompilerTest() {
     @Test
     fun `nested division`() {
         val output = """
-            println((8 / 3) / 2);
-            println(8 / 3 / 2);
-            println(8 / (3 / 2));
+            Console.println((8 / 3) / 2);
+            Console.println(8 / 3 / 2);
+            Console.println(8 / (3 / 2));
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("1", "1", "8", "")
     }

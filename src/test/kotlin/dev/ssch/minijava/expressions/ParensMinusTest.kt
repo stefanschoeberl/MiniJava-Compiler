@@ -9,13 +9,13 @@ class ParensMinusTest : CompilerTest() {
     @Test
     fun `arithmetic expressions`() {
         val output = """
-            println(((1)));
-            println((1));
-            println(-(1));
-            println((-1));
-            println(-(-1));
-            println(-(-(-1)));
-            println(-(1+2));
+            Console.println(((1)));
+            Console.println((1));
+            Console.println(-(1));
+            Console.println((-1));
+            Console.println(-(-1));
+            Console.println(-(-(-1)));
+            Console.println(-(1+2));
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("1", "1", "-1", "-1", "1", "-1", "-3", "")
     }

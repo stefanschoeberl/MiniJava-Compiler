@@ -20,10 +20,10 @@ async function runFile(file) {
             }
         },
         imports: {
-            "Main.println#int": arg => console.log(arg),
-            "Main.println#float": arg => console.log(arg),
-            "Main.println#boolean": arg => console.log(arg === 0 ? 'false' : 'true'),
-            "Main.println#int[]": offset => {
+            "Console.println#int": arg => console.log(arg),
+            "Console.println#float": arg => console.log(arg),
+            "Console.println#boolean": arg => console.log(arg === 0 ? 'false' : 'true'),
+            "Console.println#int[]": offset => {
                 const size = memoryView.getInt32(offset, true);
                 const firstElement = offset + 4;
                 const elementSize = 4;
@@ -34,7 +34,7 @@ async function runFile(file) {
                 }
                 console.log('[' + result.join(', ') + ']');
             },
-            "Main.println#boolean[]": offset => {
+            "Console.println#boolean[]": offset => {
                 const size = memoryView.getInt32(offset, true);
                 const firstElement = offset + 4;
                 const lastElement = firstElement + size;
@@ -44,7 +44,7 @@ async function runFile(file) {
                 }
                 console.log('[' + result.join(', ') + ']');
             },
-            "Main.println#float[]": offset => {
+            "Console.println#float[]": offset => {
                 const size = memoryView.getInt32(offset, true);
                 const firstElement = offset + 4;
                 const elementSize = 4;

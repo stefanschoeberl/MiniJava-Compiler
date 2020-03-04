@@ -10,8 +10,6 @@ class ClassTest : CompilerTest() {
     fun `call static method of other class`() {
         val output = """
             class Main {
-                native static void println(int a);
-                
                 public static void main() {
                     Other.doSomething(123);
                 }
@@ -19,7 +17,7 @@ class ClassTest : CompilerTest() {
             
             class Other {
                 static void doSomething(int x) {
-                    Main.println(x);
+                    Console.println(x);
                 }
             }
         """.compileAndRunMainFunction()

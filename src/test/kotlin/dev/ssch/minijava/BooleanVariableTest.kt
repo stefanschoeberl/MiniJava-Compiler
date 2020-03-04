@@ -18,7 +18,7 @@ class BooleanVariableTest : CompilerTest() {
     fun `declare a variable and initilize it with a value`() {
         val output = """
             boolean a = true;
-            println(a);
+            Console.println(a);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "")
     }
@@ -28,7 +28,7 @@ class BooleanVariableTest : CompilerTest() {
         val output = """
             boolean a = false;
             boolean b = a;
-            println(b);
+            Console.println(b);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("false", "")
     }
@@ -38,7 +38,7 @@ class BooleanVariableTest : CompilerTest() {
         val output = """
             boolean a;
             a = true;
-            println(a);
+            Console.println(a);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "")
     }
@@ -48,7 +48,7 @@ class BooleanVariableTest : CompilerTest() {
         val output = """
             boolean a = false;
             boolean b = a;
-            println(b);
+            Console.println(b);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("false", "")
     }

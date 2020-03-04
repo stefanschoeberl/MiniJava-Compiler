@@ -16,7 +16,7 @@ class MethodsTest : CompilerTest() {
     fun `simple main`() {
         val output = """
             public static void main() { 
-                println(1);
+                Console.println(1);
             }""".compileAndRunMainFunctionInMainClass()
         assertThat(output.lines()).containsExactly("1", "")
     }
@@ -25,11 +25,11 @@ class MethodsTest : CompilerTest() {
     fun `declare multiple methods`() {
         val output = """
             static void other() {
-                println(2);
+                Console.println(2);
             }
             
             public static void main() { 
-                println(1);
+                Console.println(1);
             }""".compileAndRunMainFunctionInMainClass()
         assertThat(output.lines()).containsExactly("1", "")
     }
@@ -38,7 +38,7 @@ class MethodsTest : CompilerTest() {
     fun `call other method without parameters`() {
         val output = """
             static void other() {
-                println(2);
+                Console.println(2);
             }
             
             public static void main() { 
@@ -51,19 +51,19 @@ class MethodsTest : CompilerTest() {
     fun `nested calls without parameters`() {
         val output = """
             public static void main() { 
-                println(1);
+                Console.println(1);
                 a();
-                println(11);
+                Console.println(11);
             }
             
             static void a() {
-                println(2);
+                Console.println(2);
                 b();
-                println(22);
+                Console.println(22);
             }
             
             static void b() {
-                println(3);
+                Console.println(3);
             }""".compileAndRunMainFunctionInMainClass()
         assertThat(output.lines()).containsExactly("1", "2", "3", "22", "11", "")
     }
@@ -76,7 +76,7 @@ class MethodsTest : CompilerTest() {
             }
             
             static void a(int x) {
-                println(x);
+                Console.println(x);
             }""".compileAndRunMainFunctionInMainClass()
         assertThat(output.lines()).containsExactly("123", "")
     }
@@ -89,7 +89,7 @@ class MethodsTest : CompilerTest() {
             }
             
             static void a(float x) {
-                println(x);
+                Console.println(x);
             }""".compileAndRunMainFunctionInMainClass()
         output.lines().matches(v(123f, 0.0001f), v(""))
     }
@@ -103,7 +103,7 @@ class MethodsTest : CompilerTest() {
             
             static void a(int x) {
                 int a = 100;
-                println(x * a);
+                Console.println(x * a);
             }""".compileAndRunMainFunctionInMainClass()
         assertThat(output.lines()).containsExactly("12300", "")
     }
@@ -117,11 +117,11 @@ class MethodsTest : CompilerTest() {
             }
             
             static void add(int x, int y) {
-                println(x + y);
+                Console.println(x + y);
             }
             
             static void sub(int x, int y) {
-                println(x - y);
+                Console.println(x - y);
             }
             """.compileAndRunMainFunctionInMainClass()
         assertThat(output.lines()).containsExactly("5", "8", "")
@@ -135,12 +135,12 @@ class MethodsTest : CompilerTest() {
             }
             
             static void add(int x, int y) {
-                println(x + y);
+                Console.println(x + y);
                 sub(x, y);
             }
             
             static void sub(int x, int y) {
-                println(x - y);
+                Console.println(x - y);
             }
             """.compileAndRunMainFunctionInMainClass()
         assertThat(output.lines()).containsExactly("5", "-1", "")
@@ -154,12 +154,12 @@ class MethodsTest : CompilerTest() {
             }
             
             static void add(int x, int y, int z) {
-                println(x + y + z);
+                Console.println(x + y + z);
                 sub(x, y, z);
             }
             
             static void sub(int x, int y, int z) {
-                println(x - y - z);
+                Console.println(x - y - z);
             }
             """.compileAndRunMainFunctionInMainClass()
         assertThat(output.lines()).containsExactly("9", "-5", "")
@@ -170,7 +170,7 @@ class MethodsTest : CompilerTest() {
         val output = """
             public static void main() {
                 int a = increment(10);
-                println(a);
+                Console.println(a);
             }
             
             static int increment(int x) {
@@ -184,7 +184,7 @@ class MethodsTest : CompilerTest() {
     fun `nested calls`() {
         val output = """
             public static void main() {
-                println(increment(increment(increment(1))));
+                Console.println(increment(increment(increment(1))));
             }
             
             static int increment(int x) {
@@ -199,7 +199,7 @@ class MethodsTest : CompilerTest() {
         val output = """
             public static void main() { 
                 increment(5);
-                println(increment(10));
+                Console.println(increment(10));
             }
             
             static int increment(int x) {
@@ -213,7 +213,7 @@ class MethodsTest : CompilerTest() {
     fun `simple recursion`() {
         val output = """
             public static void main() { 
-                println(duplicate(1, 5));
+                Console.println(duplicate(1, 5));
             }
             
             static int duplicate(int a, int n) {
@@ -233,7 +233,7 @@ class MethodsTest : CompilerTest() {
             public static void main() {
                 int i = 0;
                 while (i < 10) {
-                    println(fib(i));
+                    Console.println(fib(i));
                     i = i + 1;
                 }
             }

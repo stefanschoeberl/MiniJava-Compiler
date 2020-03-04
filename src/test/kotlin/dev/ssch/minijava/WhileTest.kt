@@ -11,8 +11,8 @@ class WhileTest : CompilerTest() {
     @Test
     fun `while (false)`() {
         val output = """
-            while (false) println(123);
-            println(-1);
+            while (false) Console.println(123);
+            Console.println(-1);
         """.runInMainFunction()
         assertThat(output.lines()).containsExactly("-1", "")
     }
@@ -21,9 +21,9 @@ class WhileTest : CompilerTest() {
     fun `while (false) {}`() {
         val output = """
             while (false) {
-                println(123);
+                Console.println(123);
             }
-            println(-1);
+            Console.println(-1);
         """.runInMainFunction()
         assertThat(output.lines()).containsExactly("-1", "")
     }
@@ -33,10 +33,10 @@ class WhileTest : CompilerTest() {
         val output = """
             int i = 0;
             while (i != 3) {
-                println(i);
+                Console.println(i);
                 i = i + 1;
             }
-            println(-1);
+            Console.println(-1);
         """.runInMainFunction()
         assertThat(output.lines()).containsExactly("0", "1", "2", "-1", "")
     }
@@ -48,12 +48,12 @@ class WhileTest : CompilerTest() {
             while (i != 3) {
                 int j = 1;
                 while (j != 3) {
-                    println(i * 100 + j);
+                    Console.println(i * 100 + j);
                     j = j + 1;
                 }
                 i = i + 1;
             }
-            println(-1);
+            Console.println(-1);
         """.runInMainFunction()
         assertThat(output.lines()).containsExactly("101", "102", "201", "202", "-1", "")
     }
@@ -64,11 +64,11 @@ class WhileTest : CompilerTest() {
             int i = 0;
             while (i != 10) {
                 if (i == 1 || i == 3 || i == 5) {
-                    println(i);
+                    Console.println(i);
                 }
                 i = i + 1;
             }
-            println(-1);
+            Console.println(-1);
         """.runInMainFunction()
         assertThat(output.lines()).containsExactly("1", "3", "5", "-1", "")
     }
@@ -79,11 +79,11 @@ class WhileTest : CompilerTest() {
             int i = 0;
             while (i < 10) {
                 if (i >= 2 && i < 5) {
-                    println(i);
+                    Console.println(i);
                 }
                 i = i + 1;
             }
-            println(-1);
+            Console.println(-1);
         """.runInMainFunction()
         assertThat(output.lines()).containsExactly("2", "3", "4", "-1", "")
     }
@@ -93,7 +93,7 @@ class WhileTest : CompilerTest() {
         Assertions.assertThatThrownBy {
             """
                 while (1 + 2) {
-                    println(123);
+                    Console.println(123);
                 }
             """.runInMainFunction()
         }.isInstanceOf(IncompatibleTypeException::class.java)

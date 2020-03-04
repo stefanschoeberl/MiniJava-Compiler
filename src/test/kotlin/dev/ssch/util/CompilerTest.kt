@@ -16,12 +16,14 @@ abstract class CompilerTest {
 
     fun useStandardLibary(use: Boolean): String {
         return if (use) """
-            native static void println(int a);
-            native static void println(boolean a);
-            native static void println(float a);
-            native static void println(int[] a);
-            native static void println(boolean[] a);
-            native static void println(float[] a);
+            class Console {
+                native static void println(int a);
+                native static void println(boolean a);
+                native static void println(float a);
+                native static void println(int[] a);
+                native static void println(boolean[] a);
+                native static void println(float[] a);
+            }
         """.trimIndent() else ""
     }
 
@@ -30,12 +32,12 @@ abstract class CompilerTest {
     }
 
     fun String.compileAndRunMainFunctionInMainClass(withStandardLibrary: Boolean = true): String {
-        return "class Main {\n${useStandardLibary(withStandardLibrary).prependIndent("    ")}\n\n${this.trimIndent().prependIndent("    ")}\n}".compileAndRunMainFunction()
+        return "class Main {\n${this.trimIndent().prependIndent("    ")}\n}".compileAndRunMainFunction(withStandardLibrary)
     }
 
-    fun String.compileAndRunMainFunction(): String {
+    fun String.compileAndRunMainFunction(withStandardLibrary: Boolean = true): String {
         val compiler = Compiler()
-        val source = this
+        val source = "${useStandardLibary(withStandardLibrary)}\n$this"
 
         println(source)
         println()

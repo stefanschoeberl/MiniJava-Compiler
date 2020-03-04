@@ -14,11 +14,11 @@ class CastTest : CompilerTest() {
             float d = (float) 123f;
             boolean e = (boolean) true;
             
-            println(a);
-            println(b);
-            println(c);
-            println(d);
-            println(e);
+            Console.println(a);
+            Console.println(b);
+            Console.println(c);
+            Console.println(d);
+            Console.println(e);
         """.runInMainFunction()
         output.lines().matches(
             v(123),
@@ -40,10 +40,10 @@ class CastTest : CompilerTest() {
             float c = (float) x;
             float d = (float) y;
             
-            println(a);
-            println(b);
-            println(c);
-            println(d);
+            Console.println(a);
+            Console.println(b);
+            Console.println(c);
+            Console.println(d);
         """.runInMainFunction()
         output.lines().matches(
             v(123),
@@ -57,13 +57,13 @@ class CastTest : CompilerTest() {
     fun `cast with method call`() {
         val output = """
             static void a(int x) {
-                println(1111);
-                println(x);
+                Console.println(1111);
+                Console.println(x);
             }
             
             static void a(float x) {
-                println(2222);
-                println(x);
+                Console.println(2222);
+                Console.println(x);
             }
             
             public static void main() {

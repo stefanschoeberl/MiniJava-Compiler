@@ -10,10 +10,10 @@ class RelationalTest : CompilerTest() {
     @Test
     fun `lt two int values`() {
         val output = """
-            println(1 < 2);
-            println(2 < 1);
-            println(-1 < 15);
-            println(15 < -1);
+            Console.println(1 < 2);
+            Console.println(2 < 1);
+            Console.println(-1 < 15);
+            Console.println(15 < -1);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "false", "")
     }
@@ -21,10 +21,10 @@ class RelationalTest : CompilerTest() {
     @Test
     fun `lt two float values`() {
         val output = """
-            println(1f < 2f);
-            println(2f < 1f);
-            println(-1f < 15f);
-            println(15f < -1f);
+            Console.println(1f < 2f);
+            Console.println(2f < 1f);
+            Console.println(-1f < 15f);
+            Console.println(15f < -1f);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "false", "")
     }
@@ -32,12 +32,12 @@ class RelationalTest : CompilerTest() {
     @Test
     fun `lte two int values`() {
         val output = """
-            println(1 <= 2);
-            println(2 <= 1);
-            println(-1 <= 15);
-            println(15 <= -1);
-            println(1 <= 1);
-            println(-10 <= -10);
+            Console.println(1 <= 2);
+            Console.println(2 <= 1);
+            Console.println(-1 <= 15);
+            Console.println(15 <= -1);
+            Console.println(1 <= 1);
+            Console.println(-10 <= -10);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "false", "true", "true", "")
     }
@@ -45,12 +45,12 @@ class RelationalTest : CompilerTest() {
     @Test
     fun `lte two float values`() {
         val output = """
-            println(1f <= 2f);
-            println(2f <= 1f);
-            println(-1f <= 15f);
-            println(15f <= -1f);
-            println(1f <= 1f);
-            println(-10f <= -10f);
+            Console.println(1f <= 2f);
+            Console.println(2f <= 1f);
+            Console.println(-1f <= 15f);
+            Console.println(15f <= -1f);
+            Console.println(1f <= 1f);
+            Console.println(-10f <= -10f);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "false", "true", "true", "")
     }
@@ -58,10 +58,10 @@ class RelationalTest : CompilerTest() {
     @Test
     fun `gt two int values`() {
         val output = """
-            println(1 > 2);
-            println(2 > 1);
-            println(-1 > 15);
-            println(15 > -1);
+            Console.println(1 > 2);
+            Console.println(2 > 1);
+            Console.println(-1 > 15);
+            Console.println(15 > -1);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "true", "")
     }
@@ -69,10 +69,10 @@ class RelationalTest : CompilerTest() {
     @Test
     fun `gt two float values`() {
         val output = """
-            println(1f > 2f);
-            println(2f > 1f);
-            println(-1f > 15f);
-            println(15f > -1f);
+            Console.println(1f > 2f);
+            Console.println(2f > 1f);
+            Console.println(-1f > 15f);
+            Console.println(15f > -1f);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "true", "")
     }
@@ -80,12 +80,12 @@ class RelationalTest : CompilerTest() {
     @Test
     fun `gte two int values`() {
         val output = """
-            println(1 >= 2);
-            println(2 >= 1);
-            println(-1 >= 15);
-            println(15 >= -1);
-            println(1 >= 1);
-            println(-10 >= -10);
+            Console.println(1 >= 2);
+            Console.println(2 >= 1);
+            Console.println(-1 >= 15);
+            Console.println(15 >= -1);
+            Console.println(1 >= 1);
+            Console.println(-10 >= -10);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "true", "true", "true", "")
     }
@@ -93,12 +93,12 @@ class RelationalTest : CompilerTest() {
     @Test
     fun `gte two float values`() {
         val output = """
-            println(1f >= 2f);
-            println(2f >= 1f);
-            println(-1f >= 15f);
-            println(15f >= -1f);
-            println(1f >= 1f);
-            println(-10f >= -10f);
+            Console.println(1f >= 2f);
+            Console.println(2f >= 1f);
+            Console.println(-1f >= 15f);
+            Console.println(15f >= -1f);
+            Console.println(1f >= 1f);
+            Console.println(-10f >= -10f);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "true", "true", "true", "")
     }
@@ -142,10 +142,10 @@ class RelationalTest : CompilerTest() {
     @Test
     fun `complex expressions`() {
         val output = """
-            println(1 < 2 && 2 < 3);
-            println(1 > 2 && 2 > 3);
-            println(1 <= 2 && 2 <= 3);
-            println(1 >= 2 && 2 >= 3);
+            Console.println(1 < 2 && 2 < 3);
+            Console.println(1 > 2 && 2 > 3);
+            Console.println(1 <= 2 && 2 <= 3);
+            Console.println(1 >= 2 && 2 >= 3);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "false", "")
     }

@@ -10,10 +10,10 @@ class EqualNotEqualTest : CompilerTest() {
     @Test
     fun `== two boolean values`() {
         val output = """
-            println(true == false);
-            println(false == true);
-            println(true == true);
-            println(false == false);
+            Console.println(true == false);
+            Console.println(false == true);
+            Console.println(true == true);
+            Console.println(false == false);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("false", "false", "true", "true", "")
     }
@@ -21,9 +21,9 @@ class EqualNotEqualTest : CompilerTest() {
     @Test
     fun `== two int values`() {
         val output = """
-            println(1 == 2);
-            println(1 == 1);
-            println(2 == 1);
+            Console.println(1 == 2);
+            Console.println(1 == 1);
+            Console.println(2 == 1);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "")
     }
@@ -31,9 +31,9 @@ class EqualNotEqualTest : CompilerTest() {
     @Test
     fun `== two float values`() {
         val output = """
-            println(1f == 2f);
-            println(1f == 1f);
-            println(2f == 1f);
+            Console.println(1f == 2f);
+            Console.println(1f == 1f);
+            Console.println(2f == 1f);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "")
     }
@@ -41,10 +41,10 @@ class EqualNotEqualTest : CompilerTest() {
     @Test
     fun `!= two boolean values`() {
         val output = """
-            println(true != false);
-            println(false != true);
-            println(true != true);
-            println(false != false);
+            Console.println(true != false);
+            Console.println(false != true);
+            Console.println(true != true);
+            Console.println(false != false);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "true", "false", "false", "")
     }
@@ -52,9 +52,9 @@ class EqualNotEqualTest : CompilerTest() {
     @Test
     fun `!= two int values`() {
         val output = """
-            println(1 != 2);
-            println(1 != 1);
-            println(2 != 1);
+            Console.println(1 != 2);
+            Console.println(1 != 1);
+            Console.println(2 != 1);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "")
     }
@@ -62,9 +62,9 @@ class EqualNotEqualTest : CompilerTest() {
     @Test
     fun `!= two float values`() {
         val output = """
-            println(1f != 2f);
-            println(1f != 1f);
-            println(2f != 1f);
+            Console.println(1f != 2f);
+            Console.println(1f != 1f);
+            Console.println(2f != 1f);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "")
     }

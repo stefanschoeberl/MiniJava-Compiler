@@ -10,7 +10,7 @@ class BlockStatementTest : CompilerTest() {
     fun `simple block`() {
         val output = """
             {
-                println(123);
+                Console.println(123);
             }
         """.runInMainFunction()
         assertThat(output.lines()).containsExactly("123", "")
@@ -21,10 +21,10 @@ class BlockStatementTest : CompilerTest() {
         val output = """
             {
                 {
-                    println(123);
+                    Console.println(123);
                 }
                 {
-                    println(456);
+                    Console.println(456);
                 }
             }
         """.runInMainFunction()

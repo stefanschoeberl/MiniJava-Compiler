@@ -15,7 +15,7 @@ class ScopesTest : CompilerTest() {
             {
                 int b = 123;
             }
-            println(b);
+            Console.println(b);
         """.runInMainFunction()
         }.isInstanceOf(UndefinedVariableException::class.java)
     }
@@ -31,7 +31,7 @@ class ScopesTest : CompilerTest() {
                     int c = 333;
                 }
             }
-            println(c);
+            Console.println(c);
         """.runInMainFunction()
         }.isInstanceOf(UndefinedVariableException::class.java)
     }
@@ -46,7 +46,7 @@ class ScopesTest : CompilerTest() {
                 {
                     int c = 333;
                 }
-                println(c);
+                Console.println(c);
             }
         """.runInMainFunction()
         }.isInstanceOf(UndefinedVariableException::class.java)
@@ -63,7 +63,7 @@ class ScopesTest : CompilerTest() {
                     int c = 333;
                 }
             }
-            println(b);
+            Console.println(b);
         """.runInMainFunction()
         }.isInstanceOf(UndefinedVariableException::class.java)
     }
@@ -72,33 +72,33 @@ class ScopesTest : CompilerTest() {
     fun `multiple nested blocks`() {
         val output = """
             int a = 1;
-            println(a);
+            Console.println(a);
             {
                 int b = 2;
-                println(b);
+                Console.println(b);
                 {
                     int c = 3;
-                    println(c);
+                    Console.println(c);
                 }
-                println(b);
+                Console.println(b);
             }
-            println(a);
+            Console.println(a);
             {
                 int b = 4;
-                println(b);
+                Console.println(b);
                 {
                     int c = 5;
-                    println(c);
+                    Console.println(c);
                 }
-                println(b);
+                Console.println(b);
                 {
                     int c = 6;
-                    println(c);
-                    println(a);
+                    Console.println(c);
+                    Console.println(a);
                 }
-                println(b);
+                Console.println(b);
             }
-            println(a);
+            Console.println(a);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("1", "2", "3", "2", "1", "4", "5", "4", "6", "1", "4", "1", "")
     }

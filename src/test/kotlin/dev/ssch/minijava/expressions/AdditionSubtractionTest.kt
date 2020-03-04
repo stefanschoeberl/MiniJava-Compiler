@@ -10,7 +10,7 @@ class AdditionSubtractionTest : CompilerTest() {
     @Test
     fun `add two int values`() {
         val output = """
-            println(1 + 2);
+            Console.println(1 + 2);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("3", "")
     }
@@ -18,7 +18,7 @@ class AdditionSubtractionTest : CompilerTest() {
     @Test
     fun `add two float values`() {
         val output = """
-            println(1f + 2f);
+            Console.println(1f + 2f);
         """.runInMainFunction()
         output.lines().matches(v(3f, 0.0001f), v(""))
     }
@@ -26,7 +26,7 @@ class AdditionSubtractionTest : CompilerTest() {
     @Test
     fun `add two negative values`() {
         val output = """
-            println(-1 + -2);
+            Console.println(-1 + -2);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("-3", "")
     }
@@ -36,7 +36,7 @@ class AdditionSubtractionTest : CompilerTest() {
         val output = """
             int a = 1;
             int b = 2;
-            println(a + b);
+            Console.println(a + b);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("3", "")
     }
@@ -46,7 +46,7 @@ class AdditionSubtractionTest : CompilerTest() {
         val output = """
             int a = 1;
             int b = 2;
-            println(-a + -b);
+            Console.println(-a + -b);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("-3", "")
     }
@@ -54,9 +54,9 @@ class AdditionSubtractionTest : CompilerTest() {
     @Test
     fun `nested addition`() {
         val output = """
-            println((1 + 2) + 3);
-            println(1 + 2 + 3);
-            println(1 + (2 + 3));
+            Console.println((1 + 2) + 3);
+            Console.println(1 + 2 + 3);
+            Console.println(1 + (2 + 3));
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("6", "6", "6", "")
     }
@@ -64,7 +64,7 @@ class AdditionSubtractionTest : CompilerTest() {
     @Test
     fun `subtract two int values`() {
         val output = """
-            println(1 - 2);
+            Console.println(1 - 2);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("-1", "")
     }
@@ -72,7 +72,7 @@ class AdditionSubtractionTest : CompilerTest() {
     @Test
     fun `subtract two float values`() {
         val output = """
-            println(1f - 2f);
+            Console.println(1f - 2f);
         """.runInMainFunction()
         output.lines().matches(v(-1f, 0.0001f), v(""))
     }
@@ -82,7 +82,7 @@ class AdditionSubtractionTest : CompilerTest() {
         val output = """
             int a = 1;
             int b = 2;
-            println(a - b);
+            Console.println(a - b);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("-1", "")
     }
@@ -90,9 +90,9 @@ class AdditionSubtractionTest : CompilerTest() {
     @Test
     fun `nested subtraction`() {
         val output = """
-            println((1 - 2) - 3);
-            println(1 - 2 - 3);
-            println(1 - (2 - 3));
+            Console.println((1 - 2) - 3);
+            Console.println(1 - 2 - 3);
+            Console.println(1 - (2 - 3));
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("-4", "-4", "2", "")
     }

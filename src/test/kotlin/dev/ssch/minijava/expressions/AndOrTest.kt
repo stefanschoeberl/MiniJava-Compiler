@@ -10,10 +10,10 @@ class AndOrTest : CompilerTest() {
     @Test
     fun `&& two boolean values`() {
         val output = """
-            println(true && false);
-            println(false && true);
-            println(true && true);
-            println(false && false);
+            Console.println(true && false);
+            Console.println(false && true);
+            Console.println(true && true);
+            Console.println(false && false);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("false", "false", "true", "false", "")
     }
@@ -21,10 +21,10 @@ class AndOrTest : CompilerTest() {
     @Test
     fun `|| two boolean values`() {
         val output = """
-            println(true || false);
-            println(false || true);
-            println(true || true);
-            println(false || false);
+            Console.println(true || false);
+            Console.println(false || true);
+            Console.println(true || true);
+            Console.println(false || false);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "true", "true", "false", "")
     }
@@ -152,14 +152,14 @@ class AndOrTest : CompilerTest() {
     @Test
     fun `mixed boolean expressions`() {
         val output = """
-            println(true || (false && true));
-            println(true || false && true);
-            println((true || false) && true);
-            println((true || false) && (false || true));
-            println(true || false && false || true);
-            println(true && false || false && true);
-            println(true && false || true && false);
-            println(true && (false || true) && false);
+            Console.println(true || (false && true));
+            Console.println(true || false && true);
+            Console.println((true || false) && true);
+            Console.println((true || false) && (false || true));
+            Console.println(true || false && false || true);
+            Console.println(true && false || false && true);
+            Console.println(true && false || true && false);
+            Console.println(true && (false || true) && false);
         """.runInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "true", "true", "true", "true", "false", "false", "false", "")
     }
