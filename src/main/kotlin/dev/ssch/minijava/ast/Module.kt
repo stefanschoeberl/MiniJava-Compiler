@@ -16,13 +16,11 @@ data class Module (
         }
     }
 
-    fun declareFunction(function: Function): Int {
+    fun declareFunction(function: Function) {
         funcs.add(function)
-        return imports.size + funcs.size - 1
     }
 
-    fun importFunction(import: Import): Int {
+    fun importFunction(import: Import) {
         imports.add(import)
-        return imports.size - 1
     }
 }

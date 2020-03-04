@@ -9,15 +9,17 @@ import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.ParseTreeProperty
 
-class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : MiniJavaBaseVisitor<Unit>() {
+class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : MiniJavaBaseVisitor<Unit>() {
 
     lateinit var module: Module
+    private lateinit var currentClass: String
     private lateinit var currentFunction: Function
 
     private lateinit var symbolTable: SymbolTable
+    private lateinit var methodSymbolTable: MethodSymbolTable
     private lateinit var staticTypes: ParseTreeProperty<DataType>
 
-    private lateinit var functions: MutableMap<MethodSymbolTable.MethodSignature, Function>
+    private lateinit var functions: MutableMap<Pair<String, MethodSymbolTable.MethodSignature>, Function>
 
     private var ParseTree.staticType: DataType?
         get() = staticTypes.get(this)
@@ -42,24 +44,52 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
             }
         }
 
-        methodSymbolTable.nativeMethods.entries.sortedBy { it.value.address }.forEach {
-            val functionType = declareFunctionType(it.key, it.value)
-            module.importFunction(Import("imports", it.key.externalName(), ImportDesc.Func(functionType)))
+        classSymbolTable.classes.flatMap { classEntry ->
+            classEntry.value.methodSymbolTable.nativeMethods.map {
+                Pair(classEntry.key, it)
+            }
+        }.sortedBy { it.second.value.address }.forEach {
+            val className = it.first
+            val methodSignature = it.second.key
+            val methodInfo = it.second.value
+
+            val functionType = declareFunctionType(methodSignature, methodInfo)
+            module.importFunction(Import(
+                "imports",
+                "$className.${methodSignature.externalName()}",
+                ImportDesc.Func(functionType)))
         }
 
-        methodSymbolTable.methods.entries.sortedBy { it.value.address }.forEach {
-            val functionType = declareFunctionType(it.key, it.value)
-            val function = Function(functionType, mutableListOf(), Expr(mutableListOf()))
-            functions[it.key] = function
-            val functionAddress = module.declareFunction(function)
-            if (it.value.isPublic) {
-                module.exports.add(Export(it.key.externalName(), ExportDesc.Func(functionAddress)))
+        classSymbolTable.classes
+            .flatMap { classEntry ->
+                classEntry.value.methodSymbolTable.methods.entries.map { Pair(classEntry.key, it) }
             }
-        }
+            .sortedBy { it.second.value.address }
+            .forEach {
+                val className = it.first
+                val methodSignature = it.second.key
+                val methodInfo = it.second.value
+
+                val functionType = declareFunctionType(methodSignature, methodInfo)
+                val function = Function(functionType, mutableListOf(), Expr(mutableListOf()))
+                module.declareFunction(function)
+                functions[Pair(className, methodSignature)] = function
+                if (methodInfo.isPublic) {
+                    module.exports.add(Export(
+                        "$className.${methodSignature.externalName()}",
+                        ExportDesc.Func(methodInfo.address)))
+                }
+            }
 
         visitChildren(ctx)
 
         module.imports.add(Import("internal", "memory", ImportDesc.Memory(MemType(1))))
+    }
+
+    override fun visitJavaclass(ctx: MiniJavaParser.JavaclassContext) {
+        currentClass = ctx.name.text
+        methodSymbolTable = classSymbolTable.getMethodSymbolTable(currentClass)
+        visitChildren(ctx)
     }
 
     override fun visitMethod(ctx: MiniJavaParser.MethodContext) {
@@ -72,7 +102,7 @@ class CodeGenerationPhase(private val methodSymbolTable: MethodSymbolTable) : Mi
 
         val parameters = ctx.parameters.map { Pair(it.name.text, it.type.getDataType()!!) }
         val parameterTypes = parameters.map { it.second }
-        currentFunction = functions[MethodSymbolTable.MethodSignature(ctx.name.text, parameterTypes)]!!
+        currentFunction = functions[Pair(currentClass, MethodSymbolTable.MethodSignature(ctx.name.text, parameterTypes))]!!
 
         parameters.forEach {
             symbolTable.declareParameter(it.first, it.second)

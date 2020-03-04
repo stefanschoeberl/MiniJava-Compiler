@@ -15,10 +15,10 @@ async function runFile(file) {
             "memory": memory,
         },
         imports: {
-            "println#int": arg => console.log(arg),
-            "println#float": arg => console.log(arg),
-            "println#boolean": arg => console.log(arg === 0 ? 'false' : 'true'),
-            "println#int[]": offset => {
+            "Main.println#int": arg => console.log(arg),
+            "Main.println#float": arg => console.log(arg),
+            "Main.println#boolean": arg => console.log(arg === 0 ? 'false' : 'true'),
+            "Main.println#int[]": offset => {
                 const size = memoryView.getInt32(offset, true);
                 const firstElement = offset + 4;
                 const elementSize = 4;
@@ -29,7 +29,7 @@ async function runFile(file) {
                 }
                 console.log('[' + result.join(', ') + ']');
             },
-            "println#boolean[]": offset => {
+            "Main.println#boolean[]": offset => {
                 const size = memoryView.getInt32(offset, true);
                 const firstElement = offset + 4;
                 const lastElement = firstElement + size;
@@ -39,7 +39,7 @@ async function runFile(file) {
                 }
                 console.log('[' + result.join(', ') + ']');
             },
-            "println#float[]": offset => {
+            "Main.println#float[]": offset => {
                 const size = memoryView.getInt32(offset, true);
                 const firstElement = offset + 4;
                 const elementSize = 4;
@@ -50,7 +50,7 @@ async function runFile(file) {
                 }
                 console.log('[' + result.join(', ') + ']');
             },
-            "malloc#int": numBytes => {
+            "Main.malloc#int": numBytes => {
                 const address = nextFreeAddress;
                 nextFreeAddress += numBytes;
                 return address;
@@ -60,7 +60,7 @@ async function runFile(file) {
     const bytes = await readFile(file);
     const module = await WebAssembly.compile(bytes);
     const instance = new WebAssembly.Instance(module, imports);
-    instance.exports.main();
+    instance.exports["Main.main"]();
 }
 
 runFile(process.argv[2]);

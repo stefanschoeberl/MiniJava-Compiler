@@ -6,10 +6,30 @@ import dev.ssch.minijava.grammar.MiniJavaParser
 
 class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
 
-    val methodSymbolTable = MethodSymbolTable()
+    val classSymbolTable = ClassSymbolTable()
+    private lateinit var methodSymbolTable: MethodSymbolTable
 
-    override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext?) {
-        methodSymbolTable.declareNativeMethod(DataType.PrimitiveType.Integer, "malloc", listOf(DataType.PrimitiveType.Integer),
+    private var currentNativeMethodAddress = 0
+    private var currentMethodAddress = 0
+
+    override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext) {
+        visitChildren(ctx)
+        recalculateMethodAddresses()
+    }
+
+    private fun recalculateMethodAddresses() {
+        classSymbolTable.classes
+            .flatMap { it.value.methodSymbolTable.methods.values }
+            .forEach { it.address += currentNativeMethodAddress }
+    }
+
+    override fun visitJavaclass(ctx: MiniJavaParser.JavaclassContext) {
+        val className = ctx.name.text
+        // TODO check if class is not declared yet
+        val classInformation = classSymbolTable.declareClass(className)
+
+        methodSymbolTable = classInformation.methodSymbolTable
+        methodSymbolTable.declareNativeMethod(currentNativeMethodAddress++, DataType.PrimitiveType.Integer, "malloc", listOf(DataType.PrimitiveType.Integer),
             isPublic = false,
             isStatic = true
         )
@@ -45,7 +65,7 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
             if (ctx.block == null) {
                 throw MissingMethodBodyException(name, ctx.name)
             }
-            methodSymbolTable.declareMethod(returnType, name, parameters,
+            methodSymbolTable.declareMethod(currentMethodAddress++, returnType, name, parameters,
                 isPublic = ctx.publicmodifier.size == 1,
                 isStatic = ctx.staticmodifier.size == 1
             )
@@ -53,7 +73,7 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
             if (ctx.semicolon == null) {
                 throw InvalidMethodBodyException(name, ctx.name)
             }
-            methodSymbolTable.declareNativeMethod(returnType, name, parameters,
+            methodSymbolTable.declareNativeMethod(currentNativeMethodAddress++, returnType, name, parameters,
                 isPublic = ctx.publicmodifier.size == 1,
                 isStatic = ctx.staticmodifier.size == 1
             )

@@ -8,7 +8,7 @@ class MethodSymbolTable {
     )
 
     class MethodInformation(
-        val address: Int,
+        var address: Int,
         val returnType: DataType?,
         val isPublic: Boolean,
         val isStatic: Boolean
@@ -22,14 +22,18 @@ class MethodSymbolTable {
         return nativeMethods.contains(signature) || methods.contains(signature)
     }
 
-    fun declareNativeMethod(returnType: DataType?, name: String, parameters: List<DataType>, isPublic: Boolean, isStatic: Boolean) {
+    fun declareNativeMethod(address: Int, returnType: DataType?, name: String, parameters: List<DataType>, isPublic: Boolean, isStatic: Boolean): MethodInformation {
         val signature = MethodSignature(name, parameters)
-        nativeMethods[signature] = MethodInformation(nativeMethods.size, returnType, isPublic, isStatic)
+        val methodInformation = MethodInformation(address, returnType, isPublic, isStatic)
+        nativeMethods[signature] = methodInformation
+        return methodInformation
     }
 
-    fun declareMethod(returnType: DataType?, name: String, parameters: List<DataType>, isPublic: Boolean, isStatic: Boolean) {
+    fun declareMethod(address: Int, returnType: DataType?, name: String, parameters: List<DataType>, isPublic: Boolean, isStatic: Boolean): MethodInformation {
         val signature = MethodSignature(name, parameters)
-        methods[signature] = MethodInformation(methods.size, returnType, isPublic, isStatic)
+        val methodInformation = MethodInformation(address, returnType, isPublic, isStatic)
+        methods[signature] = methodInformation
+        return methodInformation
     }
 
     private fun findMethodInformation(name: String, parameters: List<DataType>): MethodInformation? {
@@ -39,7 +43,7 @@ class MethodSymbolTable {
             return nativeMethod
         }
 
-        return methods[signature]?.let { MethodInformation(nativeMethods.size + it.address, it.returnType, it.isPublic, it.isStatic) }
+        return methods[signature]
     }
 
     fun addressOf(name: String, parameters: List<DataType>): Int = findMethodInformation(name, parameters)!!.address
