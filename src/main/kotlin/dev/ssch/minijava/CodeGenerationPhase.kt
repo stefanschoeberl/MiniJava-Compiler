@@ -278,10 +278,8 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
             is MiniJavaParser.IdExprContext -> Pair(currentClass, target.IDENT().text)
             is MiniJavaParser.MemberExprContext -> {
                 val left = target.left
-                val right = target.right
-
-                if (left is MiniJavaParser.IdExprContext && right is MiniJavaParser.IdExprContext) {
-                    Pair(left.IDENT().text, right.IDENT().text)
+                if (left is MiniJavaParser.IdExprContext) {
+                    Pair(left.IDENT().text, target.right.text)
                 } else {
                     TODO("currently unsupported")
                 }

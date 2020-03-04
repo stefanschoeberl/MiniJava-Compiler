@@ -40,7 +40,7 @@ typeDefinition: IDENT         # PrimitiveType
 // https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html
 
 expr: array=expr '[' index=expr ']'                                   # ArrayAccessExpr
-    | left=expr '.' right=expr                                        # MemberExpr
+    | left=expr '.' right=IDENT                                       # MemberExpr
     | target=expr '(' (parameters+=expr (',' parameters+=expr)*)? ')' # CallExpr
     | '-' expr                                                        # MinusExpr
     | '(' type=typeDefinition ')' expr                                # CastExpr
