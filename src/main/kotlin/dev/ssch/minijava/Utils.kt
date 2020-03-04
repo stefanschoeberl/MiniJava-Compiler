@@ -60,7 +60,7 @@ fun DataType.getLoadMemoryInstruction(): Instruction {
 
 fun MiniJavaParser.TypeDefinitionContext.getDataType(): DataType? {
     return when (val ctx = this) {
-        is MiniJavaParser.PrimitiveTypeContext -> DataType.PrimitiveType.fromString(ctx.IDENT().text)
+        is MiniJavaParser.SimpleTypeContext -> DataType.PrimitiveType.fromString(ctx.IDENT().text)
         is MiniJavaParser.ArrayTypeContext -> DataType.PrimitiveType.fromString(ctx.IDENT().text)?.let { DataType.Array(it) }
         else -> null
     }

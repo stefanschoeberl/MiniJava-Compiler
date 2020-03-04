@@ -353,7 +353,7 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
         if (ctx.size.staticType != DataType.PrimitiveType.Integer) {
             throw IncompatibleTypeException(DataType.PrimitiveType.Integer, ctx.size.staticType, ctx.size.start)
         }
-        val arrayType = (ctx.type as? MiniJavaParser.PrimitiveTypeContext)?.getDataType()
+        val arrayType = (ctx.type as? MiniJavaParser.SimpleTypeContext)?.getDataType()
             ?: TODO()
 
         val sizeVariable = if (symbolTable.isDeclared("#size")) {

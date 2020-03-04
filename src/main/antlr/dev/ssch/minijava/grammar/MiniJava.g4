@@ -36,7 +36,7 @@ incompleteIfStatement: 'if' '(' condition=expr ')' thenbranch=statement         
                      | 'if' '(' condition=expr ')' thenbranch=completeStatement 'else' elsebranch=incompleteIfStatement # IncompleteIfElseStmt
                      ;
 
-typeDefinition: IDENT         # PrimitiveType
+typeDefinition: IDENT         # SimpleType
               | IDENT '[' ']' # ArrayType;
 
 // https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html
