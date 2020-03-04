@@ -1,6 +1,8 @@
 package dev.ssch.minijava
 
+import dev.ssch.minijava.exception.RedefinedClassException
 import dev.ssch.util.CompilerTest
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -24,6 +26,13 @@ class ClassTest : CompilerTest() {
         assertThat(output.lines()).containsExactly("123", "")
     }
 
-
-
+    @Test
+    fun `redefine class`() {
+        Assertions.assertThatThrownBy {
+            """
+            class A {}
+            class A {}
+        """.compileAndRunMainFunction()
+        }.isInstanceOf(RedefinedClassException::class.java)
+    }
 }

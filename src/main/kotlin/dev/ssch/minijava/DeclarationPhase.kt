@@ -25,7 +25,10 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
 
     override fun visitJavaclass(ctx: MiniJavaParser.JavaclassContext) {
         val className = ctx.name.text
-        // TODO check if class is not declared yet
+        if (classSymbolTable.isDeclared(className)) {
+            throw RedefinedClassException(className, ctx.name)
+        }
+
         val classInformation = classSymbolTable.declareClass(className)
 
         methodSymbolTable = classInformation.methodSymbolTable
