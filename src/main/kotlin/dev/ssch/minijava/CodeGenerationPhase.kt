@@ -348,6 +348,20 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
         ctx.staticType = ctx.expr().staticType
     }
 
+    override fun visitClassInstanceCreationExpr(ctx: MiniJavaParser.ClassInstanceCreationExprContext) {
+        val type = (ctx.type as? MiniJavaParser.SimpleTypeContext)?.getDataType(classSymbolTable)
+            as? DataType.ReferenceType // TODO
+            ?: TODO()
+
+        val size = classSymbolTable.getFieldsOfClass(type.name).values.map { it.sizeInBytes() }.sum()
+        currentFunction.body.instructions.add(Instruction.i32_const(size))
+
+        // allocate memory
+        currentFunction.body.instructions.add(Instruction.call(mallocAddress))
+
+        ctx.staticType = type
+    }
+
     override fun visitArrayCreationExpr(ctx: MiniJavaParser.ArrayCreationExprContext) {
         visit(ctx.size)
         if (ctx.size.staticType != DataType.PrimitiveType.Integer) {

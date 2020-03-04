@@ -3,7 +3,8 @@ package dev.ssch.minijava
 class ClassSymbolTable {
 
     class ClassInformation(
-        val methodSymbolTable: MethodSymbolTable
+        val methodSymbolTable: MethodSymbolTable,
+        val fieldSymbolTable: MutableMap<String, DataType>
     )
 
     val classes = mutableMapOf<String, ClassInformation>()
@@ -13,12 +14,16 @@ class ClassSymbolTable {
     }
 
     fun declareClass(className: String): ClassInformation {
-        val classInformation = ClassInformation(MethodSymbolTable())
+        val classInformation = ClassInformation(MethodSymbolTable(), mutableMapOf())
         classes[className] = classInformation
         return classInformation
     }
 
     fun getMethodSymbolTable(className: String): MethodSymbolTable {
         return classes[className]!!.methodSymbolTable
+    }
+
+    fun getFieldsOfClass(className: String): Map<String, DataType> {
+        return classes[className]!!.fieldSymbolTable
     }
 }

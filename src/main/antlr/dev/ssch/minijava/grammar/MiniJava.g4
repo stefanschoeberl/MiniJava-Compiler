@@ -57,6 +57,7 @@ expr: array=expr '[' index=expr ']'                                   # ArrayAcc
     | FLOAT                                                           # FloatExpr
     | value=(TRUE|FALSE)                                              # BoolExpr
     | '(' expr ')'                                                    # ParensExpr
+    | 'new' type=typeDefinition '(' ')'                               # ClassInstanceCreationExpr
     | 'new' type=typeDefinition '[' size=expr ']'                     # ArrayCreationExpr
     ;
 
