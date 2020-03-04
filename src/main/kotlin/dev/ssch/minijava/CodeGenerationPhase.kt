@@ -183,6 +183,20 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
         return arrayType.elementType
     }
 
+    private fun generateMemberExprAddressAndReturnResultingType(ctx: MiniJavaParser.MemberExprContext): DataType {
+        visit(ctx.expr())
+        val type = ctx.expr().staticType as? DataType.ReferenceType ?: TODO()
+        val fieldName = ctx.right.text
+        val fieldSymbolTable = classSymbolTable.getFieldSymbolTable(type.name)
+        val fieldInfo = fieldSymbolTable.findFieldInfo(fieldName) ?: TODO()
+
+        // add offset
+        currentFunction.body.instructions.add(Instruction.i32_const(fieldInfo.offset))
+        currentFunction.body.instructions.add(Instruction.i32_add)
+
+        return fieldInfo.type
+    }
+
     override fun visitVarassignStmt(ctx: MiniJavaParser.VarassignStmtContext) {
 
         fun checkAndConvertAssigment(leftType: DataType?) {
@@ -213,20 +227,12 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
 
             }
             is MiniJavaParser.MemberExprContext -> {
-                visit(left.expr())
-                val type = left.expr().staticType as? DataType.ReferenceType ?: TODO()
-                val fieldName = left.right.text
-                val fieldSymbolTable = classSymbolTable.getFieldSymbolTable(type.name)
-                val fieldInfo = fieldSymbolTable.findFieldInfo(fieldName) ?: TODO()
-
-                // add offset
-                currentFunction.body.instructions.add(Instruction.i32_const(fieldInfo.offset))
-                currentFunction.body.instructions.add(Instruction.i32_add)
+                val type = generateMemberExprAddressAndReturnResultingType(left)
 
                 visit(ctx.right)
-                checkAndConvertAssigment(fieldInfo.type)
+                checkAndConvertAssigment(type)
 
-                currentFunction.body.instructions.add(fieldInfo.type.getStoreMemoryInstruction())
+                currentFunction.body.instructions.add(type.getStoreMemoryInstruction())
 
             }
             else -> throw InvalidAssignmentException(left.start)
@@ -325,8 +331,10 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
         ctx.staticType = methodSymbolTableOfTargetClass.returnTypeOf(methodName, parameters)
     }
 
-    override fun visitMemberExpr(ctx: MiniJavaParser.MemberExprContext?) {
-        TODO("currently unsupported")
+    override fun visitMemberExpr(ctx: MiniJavaParser.MemberExprContext) {
+        val type = generateMemberExprAddressAndReturnResultingType(ctx)
+        currentFunction.body.instructions.add(type.getLoadMemoryInstruction())
+        ctx.staticType = type
     }
 
     override fun visitIdExpr(ctx: MiniJavaParser.IdExprContext) {
