@@ -12,7 +12,7 @@ class BasicStatementCodeGenerator(private val codeGenerationPhase: CodeGeneratio
 
     fun generateExecution(ctx: MiniJavaParser.ExpressionStmtContext) {
         if (ctx.expr() is MiniJavaParser.CallExprContext) {
-            codeGenerationPhase.visit(ctx.expr())
+            codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
 
             if (ctx.expr().staticType != null) {
                 codeGenerationPhase.currentFunction.body.instructions.add(Instruction.drop)
@@ -23,21 +23,8 @@ class BasicStatementCodeGenerator(private val codeGenerationPhase: CodeGeneratio
     }
 
     fun generateExecution(ctx: MiniJavaParser.ReturnStmtContext) {
-        codeGenerationPhase.visit(ctx.value)
+        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.value)
         codeGenerationPhase.currentFunction.body.instructions.add(Instruction._return)
-    }
-
-    fun generateExecution(ctx: MiniJavaParser.CastExprContext) {
-        val type = ctx.type.getDataType(codeGenerationPhase.classSymbolTable) ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
-
-        codeGenerationPhase.visit(ctx.expr())
-
-        val castCode = ctx.expr().staticType?.castTypeTo(type)
-            ?: throw InconvertibleTypeException(ctx.expr().staticType, type, ctx.start)
-
-        codeGenerationPhase.currentFunction.body.instructions.addAll(castCode)
-
-        ctx.staticType = type
     }
 
     fun generateExecution(ctx: MiniJavaParser.BlockStmtContext) {

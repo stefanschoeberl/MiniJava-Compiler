@@ -31,20 +31,17 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) : MiniJavaBase
 
     var mallocAddress: Int = -1
 
-    val binaryExpressionCodeGenerator = BinaryExpressionCodeGenerator(this)
     val whileLoopCodeGenerator = WhileLoopStatementCodeGenerator(this)
     val ifElseLoopCodeGenerator = IfElseStatementCodeGenerator(this)
-    val arrayCreationExpressionCodeGenerator = ArrayCreationExpressionCodeGenerator(this)
-    val basicExpressionCodeGenerator = BasicExpressionCodeGenerator(this)
-    val callExpressionCodeGenerator = CallExpressionCodeGeneration(this)
     val methodCodeGenerator = MethodCodeGenerator(this)
     val variableDeclarationStatementCodeGenerator = VariableDeclarationStatementCodeGenerator(this)
-    val classInstanceCreationExpressionCodeGenerator = ClassInstanceCreationExpressionCodeGenerator(this)
     val arrayAccessExpressionCodeGeneration = ArrayAccessExpressionCodeGenerator(this)
     val variableAssignmentStatementCodeGenerator = VariableAssignmentStatementCodeGenerator(this)
     val basicStatementCodeGenerator = BasicStatementCodeGenerator(this)
     val memberAccessExpressionCodeGenerator = MemberExpressionCodeGenerator(this)
     val classCodeGenerator = ClassCodeGenerator(this)
+
+    val expressionCodeGenerator = ExpressionCodeGenerator(this)
 
     override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext) {
         module = Module()
@@ -140,78 +137,6 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) : MiniJavaBase
 
     override fun visitReturnStmt(ctx: MiniJavaParser.ReturnStmtContext) {
         basicStatementCodeGenerator.generateExecution(ctx)
-    }
-
-    override fun visitArrayAccessExpr(ctx: MiniJavaParser.ArrayAccessExprContext) {
-        arrayAccessExpressionCodeGeneration.generateEvaluation(ctx)
-    }
-
-    override fun visitMinusExpr(ctx: MiniJavaParser.MinusExprContext) {
-        basicExpressionCodeGenerator.generateEvaluation(ctx)
-    }
-
-    override fun visitCastExpr(ctx: MiniJavaParser.CastExprContext) {
-        basicStatementCodeGenerator.generateExecution(ctx)
-    }
-
-    override fun visitCallExpr(ctx: MiniJavaParser.CallExprContext) {
-        callExpressionCodeGenerator.generateEvaluation(ctx)
-    }
-
-    override fun visitMemberExpr(ctx: MiniJavaParser.MemberExprContext) {
-        memberAccessExpressionCodeGenerator.generateEvaluation(ctx)
-    }
-
-    override fun visitIdExpr(ctx: MiniJavaParser.IdExprContext) {
-        basicExpressionCodeGenerator.generateEvaluation(ctx)
-    }
-
-    override fun visitIntExpr(ctx: MiniJavaParser.IntExprContext) {
-        basicExpressionCodeGenerator.generateEvaluation(ctx)
-    }
-
-    override fun visitBoolExpr(ctx: MiniJavaParser.BoolExprContext) {
-        basicExpressionCodeGenerator.generateEvaluation(ctx)
-    }
-
-    override fun visitFloatExpr(ctx: MiniJavaParser.FloatExprContext) {
-        basicExpressionCodeGenerator.generateEvaluation(ctx)
-    }
-
-    override fun visitParensExpr(ctx: MiniJavaParser.ParensExprContext) {
-        basicExpressionCodeGenerator.generateEvaluation(ctx)
-    }
-
-    override fun visitClassInstanceCreationExpr(ctx: MiniJavaParser.ClassInstanceCreationExprContext) {
-        classInstanceCreationExpressionCodeGenerator.generate(ctx)
-    }
-
-    override fun visitArrayCreationExpr(ctx: MiniJavaParser.ArrayCreationExprContext) {
-        arrayCreationExpressionCodeGenerator.generateEvaluation(ctx)
-    }
-
-    override fun visitOrExpr(ctx: MiniJavaParser.OrExprContext) {
-        binaryExpressionCodeGenerator.generateEvaluation(ctx)
-    }
-
-    override fun visitAndExpr(ctx: MiniJavaParser.AndExprContext) {
-        binaryExpressionCodeGenerator.generateEvaluation(ctx)
-    }
-
-    override fun visitEqNeqExpr(ctx: MiniJavaParser.EqNeqExprContext) {
-        binaryExpressionCodeGenerator.generateEvaluation(ctx)
-    }
-
-    override fun visitRelationalExpr(ctx: MiniJavaParser.RelationalExprContext) {
-        binaryExpressionCodeGenerator.generateEvaluation(ctx)
-    }
-
-    override fun visitAddSubExpr(ctx: MiniJavaParser.AddSubExprContext) {
-        binaryExpressionCodeGenerator.generateEvaluation(ctx)
-    }
-
-    override fun visitMulDivExpr(ctx: MiniJavaParser.MulDivExprContext) {
-        binaryExpressionCodeGenerator.generateEvaluation(ctx)
     }
 
     override fun visitBlockStmt(ctx: MiniJavaParser.BlockStmtContext) {

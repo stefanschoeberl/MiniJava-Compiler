@@ -32,9 +32,9 @@ class BinaryExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerat
     }
 
     private fun visitBinaryOperatorExpression(ctx: MiniJavaParser.ExprContext, left: MiniJavaParser.ExprContext, right: MiniJavaParser.ExprContext, op: Token) {
-        codeGenerationPhase.visit(left)
+        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(left)
         val codePositionAfterLeftOperand = codeGenerationPhase.currentFunction.body.instructions.size
-        codeGenerationPhase.visit(right)
+        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(right)
 
         val binaryOperation = codeGenerationPhase.operatorTable.findBinaryOperation(left.staticType, right.staticType, op)
             ?: throw InvalidBinaryOperationException(left.staticType, right.staticType, op)

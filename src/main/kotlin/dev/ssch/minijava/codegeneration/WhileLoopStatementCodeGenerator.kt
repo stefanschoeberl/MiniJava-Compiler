@@ -10,7 +10,7 @@ class WhileLoopStatementCodeGenerator(private val codeGenerationPhase: CodeGener
             add(dev.ssch.minijava.ast.Instruction.block)
             add(dev.ssch.minijava.ast.Instruction.loop)
 
-            codeGenerationPhase.visit(ctx.condition)
+            codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.condition)
             if (ctx.condition.staticType != dev.ssch.minijava.DataType.PrimitiveType.Boolean) {
                 throw dev.ssch.minijava.exception.IncompatibleTypeException(
                     dev.ssch.minijava.DataType.PrimitiveType.Boolean,

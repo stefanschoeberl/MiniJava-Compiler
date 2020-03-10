@@ -18,7 +18,7 @@ class VariableDeclarationStatementCodeGenerator(private val codeGenerationPhase:
     }
 
     fun generate(ctx: MiniJavaParser.VardeclassignStmtContext) {
-        codeGenerationPhase.visit(ctx.expr())
+        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
 
         val (name, type) = declareVariable(ctx.name, ctx.type)
 

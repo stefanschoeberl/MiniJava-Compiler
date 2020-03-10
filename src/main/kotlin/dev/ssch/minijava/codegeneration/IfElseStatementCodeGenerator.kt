@@ -22,7 +22,7 @@ class IfElseStatementCodeGenerator(private val codeGenerationPhase: CodeGenerati
     }
 
     private fun generateIfElse(condition: MiniJavaParser.ExprContext, thenbranch: ParseTree, elsebranch: ParseTree? = null) {
-        codeGenerationPhase.visit(condition)
+        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(condition)
         if (condition.staticType != DataType.PrimitiveType.Boolean) {
             throw IncompatibleTypeException(DataType.PrimitiveType.Boolean, condition.staticType, condition.getStart())
         }

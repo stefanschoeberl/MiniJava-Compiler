@@ -23,7 +23,7 @@ class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: 
 
         when (val left = ctx.left) {
             is MiniJavaParser.IdExprContext -> {
-                codeGenerationPhase.visit(ctx.right)
+                codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
                 val name = left.IDENT().text
                 if (!codeGenerationPhase.localsVariableSymbolTable.isDeclared(name)) {
                     throw UndefinedVariableException(name, left.IDENT().symbol)
@@ -34,7 +34,7 @@ class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: 
             is MiniJavaParser.ArrayAccessExprContext -> {
                 val elementType = codeGenerationPhase.arrayAccessExpressionCodeGeneration.generateElementAddressCodeAndReturnElementType(left)
 
-                codeGenerationPhase.visit(ctx.right)
+                codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
                 checkAndConvertAssigment(elementType)
 
                 codeGenerationPhase.currentFunction.body.instructions.add(elementType.getStoreMemoryInstruction())
@@ -43,7 +43,7 @@ class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: 
             is MiniJavaParser.MemberExprContext -> {
                 val type = codeGenerationPhase.memberAccessExpressionCodeGenerator.generateMemberExprAddressAndReturnResultingType(left)
 
-                codeGenerationPhase.visit(ctx.right)
+                codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
                 checkAndConvertAssigment(type)
 
                 codeGenerationPhase.currentFunction.body.instructions.add(type.getStoreMemoryInstruction())

@@ -3,8 +3,12 @@ package dev.ssch.minijava.codegeneration
 import dev.ssch.minijava.CodeGenerationPhase
 import dev.ssch.minijava.DataType
 import dev.ssch.minijava.ast.Instruction
+import dev.ssch.minijava.castTypeTo
+import dev.ssch.minijava.exception.InconvertibleTypeException
 import dev.ssch.minijava.exception.InvalidUnaryOperationException
 import dev.ssch.minijava.exception.UndefinedVariableException
+import dev.ssch.minijava.exception.UnknownTypeException
+import dev.ssch.minijava.getDataType
 import dev.ssch.minijava.grammar.MiniJavaParser
 
 class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase) {
@@ -40,14 +44,14 @@ class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerati
     }
 
     fun generateEvaluation(ctx: MiniJavaParser.ParensExprContext) {
-        codeGenerationPhase.visit(ctx.expr())
+        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
 
         ctx.staticType = ctx.expr().staticType
     }
 
     fun generateEvaluation(ctx: MiniJavaParser.MinusExprContext) {
         val codePositionBeforeOperand = codeGenerationPhase.currentFunction.body.instructions.size
-        codeGenerationPhase.visit(ctx.expr())
+        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
 
         val type = ctx.expr().staticType
         val unaryOperation = codeGenerationPhase.operatorTable.findUnaryMinusOperation(type)
@@ -55,6 +59,19 @@ class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerati
 
         codeGenerationPhase.currentFunction.body.instructions.add(codePositionBeforeOperand, unaryOperation.operationBeforeOperand)
         codeGenerationPhase.currentFunction.body.instructions.add(unaryOperation.operationAfterOperand)
+
+        ctx.staticType = type
+    }
+
+    fun generateEvaluation(ctx: MiniJavaParser.CastExprContext) {
+        val type = ctx.type.getDataType(codeGenerationPhase.classSymbolTable) ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
+
+        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
+
+        val castCode = ctx.expr().staticType?.castTypeTo(type)
+            ?: throw InconvertibleTypeException(ctx.expr().staticType, type, ctx.start)
+
+        codeGenerationPhase.currentFunction.body.instructions.addAll(castCode)
 
         ctx.staticType = type
     }

@@ -12,9 +12,9 @@ class ArrayAccessExpressionCodeGenerator(private val codeGenerationPhase: CodeGe
 
     fun generateElementAddressCodeAndReturnElementType(ctx: MiniJavaParser.ArrayAccessExprContext): DataType {
         // address = arraystart + itemsize * index + 4
-        codeGenerationPhase.visit(ctx.array)
+        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.array)
         val arrayType = ctx.array.staticType as? DataType.Array ?: throw ExpressionIsNotAnArrayException(ctx.array.start)
-        codeGenerationPhase.visit(ctx.index)
+        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.index)
         if (ctx.index.staticType != DataType.PrimitiveType.Integer) {
             throw IncompatibleTypeException(DataType.PrimitiveType.Integer, ctx.index.staticType, ctx.index.start)
         }

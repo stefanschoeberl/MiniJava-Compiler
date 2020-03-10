@@ -10,7 +10,7 @@ class CallExpressionCodeGeneration(private val codeGenerationPhase: CodeGenerati
 
     fun generateEvaluation(ctx: MiniJavaParser.CallExprContext) {
         ctx.parameters.forEach {
-            codeGenerationPhase.visit(it)
+            codeGenerationPhase.expressionCodeGenerator.generateEvaluation(it)
         }
 
         val target = ctx.target

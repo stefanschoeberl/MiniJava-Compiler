@@ -9,7 +9,7 @@ import dev.ssch.minijava.grammar.MiniJavaParser
 class MemberExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase) {
 
     fun generateMemberExprAddressAndReturnResultingType(ctx: MiniJavaParser.MemberExprContext): DataType {
-        codeGenerationPhase.visit(ctx.expr())
+        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
         val type = ctx.expr().staticType as? DataType.ReferenceType ?: TODO()
         val fieldName = ctx.right.text
         val fieldSymbolTable = codeGenerationPhase.classSymbolTable.getFieldSymbolTable(type.name)
