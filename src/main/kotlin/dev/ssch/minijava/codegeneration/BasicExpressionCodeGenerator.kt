@@ -11,68 +11,65 @@ import dev.ssch.minijava.exception.UnknownTypeException
 import dev.ssch.minijava.getDataType
 import dev.ssch.minijava.grammar.MiniJavaParser
 
-class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase) {
+class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
 
-    fun generateEvaluation(ctx: MiniJavaParser.IdExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.IdExprContext): DataType {
         val name = ctx.IDENT().text
         if (!codeGenerationPhase.localsVariableSymbolTable.isDeclared(name)) {
             throw UndefinedVariableException(name, ctx.IDENT().symbol)
         }
         codeGenerationPhase.currentFunction.body.instructions.add(Instruction.local_get(codeGenerationPhase.localsVariableSymbolTable.addressOf(name)))
-        ctx.staticType = codeGenerationPhase.localsVariableSymbolTable.typeOf(name)
+        return codeGenerationPhase.localsVariableSymbolTable.typeOf(name)
     }
 
-    fun generateEvaluation(ctx: MiniJavaParser.IntExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.IntExprContext): DataType {
         val value = ctx.INT().text.toInt()
         codeGenerationPhase.currentFunction.body.instructions.add(Instruction.i32_const(value))
-        ctx.staticType = DataType.PrimitiveType.Integer
+        return DataType.PrimitiveType.Integer
     }
 
-    fun generateEvaluation(ctx: MiniJavaParser.BoolExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.BoolExprContext): DataType {
         if (ctx.value.type == MiniJavaParser.TRUE) {
             codeGenerationPhase.currentFunction.body.instructions.add(Instruction.i32_const(1))
         } else {
             codeGenerationPhase.currentFunction.body.instructions.add(Instruction.i32_const(0))
         }
-        ctx.staticType = DataType.PrimitiveType.Boolean
+        return DataType.PrimitiveType.Boolean
     }
 
-    fun generateEvaluation(ctx: MiniJavaParser.FloatExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.FloatExprContext): DataType {
         val value = ctx.FLOAT().text.toFloat()
         codeGenerationPhase.currentFunction.body.instructions.add(Instruction.f32_const(value))
-        ctx.staticType = DataType.PrimitiveType.Float
+        return DataType.PrimitiveType.Float
     }
 
-    fun generateEvaluation(ctx: MiniJavaParser.ParensExprContext) {
-        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
-
-        ctx.staticType = ctx.expr().staticType
+    fun generateEvaluation(ctx: MiniJavaParser.ParensExprContext): DataType? {
+        return codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
     }
 
-    fun generateEvaluation(ctx: MiniJavaParser.MinusExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.MinusExprContext): DataType? {
         val codePositionBeforeOperand = codeGenerationPhase.currentFunction.body.instructions.size
-        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
+        val type = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
 
-        val type = ctx.expr().staticType
         val unaryOperation = codeGenerationPhase.operatorTable.findUnaryMinusOperation(type)
-            ?: throw InvalidUnaryOperationException(ctx.expr().staticType, ctx.SUB().symbol)
+            ?: throw InvalidUnaryOperationException(type, ctx.SUB().symbol)
 
         codeGenerationPhase.currentFunction.body.instructions.add(codePositionBeforeOperand, unaryOperation.operationBeforeOperand)
         codeGenerationPhase.currentFunction.body.instructions.add(unaryOperation.operationAfterOperand)
 
-        ctx.staticType = type
+        return type
     }
 
-    fun generateEvaluation(ctx: MiniJavaParser.CastExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.CastExprContext): DataType {
         val type = ctx.type.getDataType(codeGenerationPhase.classSymbolTable) ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
 
-        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
+        val exprType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
 
-        val castCode = ctx.expr().staticType?.castTypeTo(type)
-            ?: throw InconvertibleTypeException(ctx.expr().staticType, type, ctx.start)
+        val castCode = exprType?.castTypeTo(type)
+            ?: throw InconvertibleTypeException(exprType, type, ctx.start)
 
         codeGenerationPhase.currentFunction.body.instructions.addAll(castCode)
 
-        ctx.staticType = type
+        return type
     }
 }

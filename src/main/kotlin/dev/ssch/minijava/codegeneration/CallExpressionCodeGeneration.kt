@@ -1,15 +1,16 @@
 package dev.ssch.minijava.codegeneration
 
 import dev.ssch.minijava.CodeGenerationPhase
+import dev.ssch.minijava.DataType
 import dev.ssch.minijava.ast.Instruction
 import dev.ssch.minijava.exception.UndefinedMethodException
 import dev.ssch.minijava.exception.VoidParameterException
 import dev.ssch.minijava.grammar.MiniJavaParser
 
-class CallExpressionCodeGeneration(private val codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase) {
+class CallExpressionCodeGeneration(private val codeGenerationPhase: CodeGenerationPhase) {
 
-    fun generateEvaluation(ctx: MiniJavaParser.CallExprContext) {
-        ctx.parameters.forEach {
+    fun generateEvaluation(ctx: MiniJavaParser.CallExprContext): DataType? {
+        val parameterTypes = ctx.parameters.map {
             codeGenerationPhase.expressionCodeGenerator.generateEvaluation(it)
         }
 
@@ -28,8 +29,8 @@ class CallExpressionCodeGeneration(private val codeGenerationPhase: CodeGenerati
             else -> TODO("currently unsupported")
         }
 
-        val parameters = ctx.parameters.map {
-            it.staticType ?: throw VoidParameterException(it.start)
+        val parameters = parameterTypes.mapIndexed { index, type ->
+            type ?: throw VoidParameterException(ctx.parameters[index].start)
         }
 
         if (!codeGenerationPhase.classSymbolTable.isDeclared(className)) {
@@ -46,6 +47,6 @@ class CallExpressionCodeGeneration(private val codeGenerationPhase: CodeGenerati
 
         codeGenerationPhase.currentFunction.body.instructions.add(Instruction.call(address))
 
-        ctx.staticType = methodSymbolTableOfTargetClass.returnTypeOf(methodName, parameters)
+        return methodSymbolTableOfTargetClass.returnTypeOf(methodName, parameters)
     }
 }

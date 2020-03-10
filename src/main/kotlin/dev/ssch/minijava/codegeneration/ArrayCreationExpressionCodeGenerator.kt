@@ -7,12 +7,12 @@ import dev.ssch.minijava.exception.IncompatibleTypeException
 import dev.ssch.minijava.getDataType
 import dev.ssch.minijava.grammar.MiniJavaParser
 
-class ArrayCreationExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase) {
+class ArrayCreationExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
 
-    fun generateEvaluation(ctx: MiniJavaParser.ArrayCreationExprContext) {
-        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.size)
-        if (ctx.size.staticType != DataType.PrimitiveType.Integer) {
-            throw IncompatibleTypeException(DataType.PrimitiveType.Integer, ctx.size.staticType, ctx.size.start)
+    fun generateEvaluation(ctx: MiniJavaParser.ArrayCreationExprContext): DataType {
+        val sizeType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.size)
+        if (sizeType != DataType.PrimitiveType.Integer) {
+            throw IncompatibleTypeException(DataType.PrimitiveType.Integer, sizeType, ctx.size.start)
         }
         val arrayType = (ctx.type as? MiniJavaParser.SimpleTypeContext)?.getDataType(codeGenerationPhase.classSymbolTable)
             ?: TODO()
@@ -53,6 +53,6 @@ class ArrayCreationExpressionCodeGenerator(private val codeGenerationPhase: Code
         // put array address on top of stack
         codeGenerationPhase.currentFunction.body.instructions.add(Instruction.local_get(arrayAddressVariable))
 
-        ctx.staticType = DataType.Array(arrayType)
+        return DataType.Array(arrayType)
     }
 }

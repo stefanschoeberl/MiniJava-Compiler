@@ -4,13 +4,13 @@ import dev.ssch.minijava.CodeGenerationPhase
 import dev.ssch.minijava.ast.Instruction
 import dev.ssch.minijava.grammar.MiniJavaParser
 
-class BasicStatementCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase) {
+class BasicStatementCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
 
     fun generateExecution(ctx: MiniJavaParser.ExpressionStmtContext) {
         if (ctx.expr() is MiniJavaParser.CallExprContext) {
-            codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
+            val exprType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
 
-            if (ctx.expr().staticType != null) {
+            if (exprType != null) {
                 codeGenerationPhase.currentFunction.body.instructions.add(Instruction.drop)
             }
         } else {

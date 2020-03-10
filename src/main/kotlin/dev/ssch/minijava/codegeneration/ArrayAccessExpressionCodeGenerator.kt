@@ -8,15 +8,15 @@ import dev.ssch.minijava.exception.IncompatibleTypeException
 import dev.ssch.minijava.getLoadMemoryInstruction
 import dev.ssch.minijava.grammar.MiniJavaParser
 
-class ArrayAccessExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase) {
+class ArrayAccessExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
 
     fun generateElementAddressCodeAndReturnElementType(ctx: MiniJavaParser.ArrayAccessExprContext): DataType {
         // address = arraystart + itemsize * index + 4
-        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.array)
-        val arrayType = ctx.array.staticType as? DataType.Array ?: throw ExpressionIsNotAnArrayException(ctx.array.start)
-        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.index)
-        if (ctx.index.staticType != DataType.PrimitiveType.Integer) {
-            throw IncompatibleTypeException(DataType.PrimitiveType.Integer, ctx.index.staticType, ctx.index.start)
+        val arrayType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.array)
+             as? DataType.Array ?: throw ExpressionIsNotAnArrayException(ctx.array.start)
+        val indexType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.index)
+        if (indexType != DataType.PrimitiveType.Integer) {
+            throw IncompatibleTypeException(DataType.PrimitiveType.Integer, indexType, ctx.index.start)
         }
         codeGenerationPhase.currentFunction.body.instructions.add(Instruction.i32_const(arrayType.elementType.sizeInBytes()))
 
@@ -30,9 +30,9 @@ class ArrayAccessExpressionCodeGenerator(private val codeGenerationPhase: CodeGe
         return arrayType.elementType
     }
 
-    fun generateEvaluation(ctx: MiniJavaParser.ArrayAccessExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.ArrayAccessExprContext): DataType {
         val elementType = generateElementAddressCodeAndReturnElementType(ctx)
         codeGenerationPhase.currentFunction.body.instructions.add(elementType.getLoadMemoryInstruction())
-        ctx.staticType = elementType
+        return elementType
     }
 }

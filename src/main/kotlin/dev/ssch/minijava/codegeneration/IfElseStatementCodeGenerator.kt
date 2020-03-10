@@ -6,7 +6,7 @@ import dev.ssch.minijava.ast.Instruction
 import dev.ssch.minijava.exception.IncompatibleTypeException
 import dev.ssch.minijava.grammar.MiniJavaParser
 
-class IfElseStatementCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase) {
+class IfElseStatementCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
 
     fun generateExecution(ctx: MiniJavaParser.CompleteIfElseStmtContext) {
         generateIfElse(ctx.condition, {
@@ -31,9 +31,9 @@ class IfElseStatementCodeGenerator(private val codeGenerationPhase: CodeGenerati
     }
 
     private fun generateIfElse(condition: MiniJavaParser.ExprContext, thenbranch: () -> Unit, elsebranch: (() -> Unit)? = null) {
-        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(condition)
-        if (condition.staticType != DataType.PrimitiveType.Boolean) {
-            throw IncompatibleTypeException(DataType.PrimitiveType.Boolean, condition.staticType, condition.getStart())
+        val conditionType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(condition)
+        if (conditionType != DataType.PrimitiveType.Boolean) {
+            throw IncompatibleTypeException(DataType.PrimitiveType.Boolean, conditionType, condition.getStart())
         }
         codeGenerationPhase.currentFunction.body.instructions.add(Instruction._if)
         thenbranch()

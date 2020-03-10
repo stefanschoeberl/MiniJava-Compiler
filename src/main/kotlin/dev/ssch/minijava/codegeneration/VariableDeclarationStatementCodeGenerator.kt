@@ -11,23 +11,23 @@ import dev.ssch.minijava.getDataType
 import dev.ssch.minijava.grammar.MiniJavaParser
 import org.antlr.v4.runtime.Token
 
-class VariableDeclarationStatementCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase) {
+class VariableDeclarationStatementCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
 
     fun generate(ctx: MiniJavaParser.VardeclStmtContext) {
         declareVariable(ctx.name, ctx.type)
     }
 
     fun generate(ctx: MiniJavaParser.VardeclassignStmtContext) {
-        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
+        val exprType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
 
-        val (name, type) = declareVariable(ctx.name, ctx.type)
+        val (variableName, variableType) = declareVariable(ctx.name, ctx.type)
 
-        val conversionCode = ctx.expr().staticType!!.assignTypeTo(type)
-            ?: throw IncompatibleAssignmentException(type, ctx.expr().staticType, ctx.name)
+        val conversionCode = exprType?.assignTypeTo(variableType)
+            ?: throw IncompatibleAssignmentException(variableType, exprType, ctx.name)
 
         codeGenerationPhase.currentFunction.body.instructions.addAll(conversionCode)
 
-        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.local_set(codeGenerationPhase.localsVariableSymbolTable.addressOf(name)))
+        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.local_set(codeGenerationPhase.localsVariableSymbolTable.addressOf(variableName)))
     }
 
     private fun declareVariable(nameToken: Token, typeContext: MiniJavaParser.TypeDefinitionContext): Pair<String, DataType> {

@@ -6,9 +6,9 @@ import dev.ssch.minijava.ast.Instruction
 import dev.ssch.minijava.getDataType
 import dev.ssch.minijava.grammar.MiniJavaParser
 
-class ClassInstanceCreationExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase) {
+class ClassInstanceCreationExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
 
-    fun generate(ctx: MiniJavaParser.ClassInstanceCreationExprContext) {
+    fun generate(ctx: MiniJavaParser.ClassInstanceCreationExprContext): DataType {
         val type = (ctx.type as? MiniJavaParser.SimpleTypeContext)?.getDataType(codeGenerationPhase.classSymbolTable)
                 as? DataType.ReferenceType // TODO
             ?: TODO()
@@ -19,6 +19,6 @@ class ClassInstanceCreationExpressionCodeGenerator(private val codeGenerationPha
         // allocate memory
         codeGenerationPhase.currentFunction.body.instructions.add(Instruction.call(codeGenerationPhase.mallocAddress))
 
-        ctx.staticType = type
+        return type
     }
 }

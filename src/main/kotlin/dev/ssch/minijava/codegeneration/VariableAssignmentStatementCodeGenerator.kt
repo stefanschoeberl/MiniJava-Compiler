@@ -10,43 +10,43 @@ import dev.ssch.minijava.exception.UndefinedVariableException
 import dev.ssch.minijava.getStoreMemoryInstruction
 import dev.ssch.minijava.grammar.MiniJavaParser
 
-class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase) {
+class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
 
     fun generateExecution(ctx: MiniJavaParser.VarassignStmtContext) {
-        fun checkAndConvertAssigment(leftType: DataType?) {
+        fun checkAndConvertAssigment(leftType: DataType?, rightType: DataType?) {
             val conversionCode = leftType?.let {
-                ctx.right.staticType?.assignTypeTo(it)
-            } ?: throw IncompatibleAssignmentException(leftType, ctx.right.staticType, ctx.left.start)
+                rightType?.assignTypeTo(it)
+            } ?: throw IncompatibleAssignmentException(leftType, rightType, ctx.left.start)
 
             codeGenerationPhase.currentFunction.body.instructions.addAll(conversionCode)
         }
 
         when (val left = ctx.left) {
             is MiniJavaParser.IdExprContext -> {
-                codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
+                val rightType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
                 val name = left.IDENT().text
                 if (!codeGenerationPhase.localsVariableSymbolTable.isDeclared(name)) {
                     throw UndefinedVariableException(name, left.IDENT().symbol)
                 }
-                checkAndConvertAssigment(codeGenerationPhase.localsVariableSymbolTable.typeOf(name))
+                checkAndConvertAssigment(codeGenerationPhase.localsVariableSymbolTable.typeOf(name), rightType)
                 codeGenerationPhase.currentFunction.body.instructions.add(Instruction.local_set(codeGenerationPhase.localsVariableSymbolTable.addressOf(name)))
             }
             is MiniJavaParser.ArrayAccessExprContext -> {
                 val elementType = codeGenerationPhase.arrayAccessExpressionCodeGeneration.generateElementAddressCodeAndReturnElementType(left)
 
-                codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
-                checkAndConvertAssigment(elementType)
+                val rightType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
+                checkAndConvertAssigment(elementType, rightType)
 
                 codeGenerationPhase.currentFunction.body.instructions.add(elementType.getStoreMemoryInstruction())
 
             }
             is MiniJavaParser.MemberExprContext -> {
-                val type = codeGenerationPhase.memberAccessExpressionCodeGenerator.generateMemberExprAddressAndReturnResultingType(left)
+                val resultingType = codeGenerationPhase.memberAccessExpressionCodeGenerator.generateMemberExprAddressAndReturnResultingType(left)
 
-                codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
-                checkAndConvertAssigment(type)
+                val rightType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
+                checkAndConvertAssigment(resultingType, rightType)
 
-                codeGenerationPhase.currentFunction.body.instructions.add(type.getStoreMemoryInstruction())
+                codeGenerationPhase.currentFunction.body.instructions.add(resultingType.getStoreMemoryInstruction())
 
             }
             else -> throw InvalidAssignmentException(left.start)

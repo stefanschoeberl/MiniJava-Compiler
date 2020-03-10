@@ -4,7 +4,7 @@ import dev.ssch.minijava.CodeGenerationPhase
 import dev.ssch.minijava.grammar.MiniJavaBaseVisitor
 import dev.ssch.minijava.grammar.MiniJavaParser
 
-class StatementCodeGenerator(codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase) {
+class StatementCodeGenerator(codeGenerationPhase: CodeGenerationPhase) {
 
     val whileLoopCodeGenerator = WhileLoopStatementCodeGenerator(codeGenerationPhase)
     val ifElseLoopCodeGenerator = IfElseStatementCodeGenerator(codeGenerationPhase)

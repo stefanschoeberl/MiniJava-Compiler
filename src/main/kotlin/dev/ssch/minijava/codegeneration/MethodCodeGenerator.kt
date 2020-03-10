@@ -8,7 +8,7 @@ import dev.ssch.minijava.symboltable.LocalVariableSymbolTable
 import dev.ssch.minijava.symboltable.MethodSymbolTable
 import dev.ssch.minijava.toWebAssemblyType
 
-class MethodCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase) {
+class MethodCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
 
     fun generate(ctx: MiniJavaParser.MethodContext) {
         if (ctx.nativemodifier.isNotEmpty()) {

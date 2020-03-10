@@ -19,18 +19,12 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) : MiniJavaBase
 
     lateinit var localsVariableSymbolTable: LocalVariableSymbolTable
     lateinit var methodSymbolTable: MethodSymbolTable
-    lateinit var staticTypes: ParseTreeProperty<DataType>
 
     lateinit var functions: MutableMap<Pair<String, MethodSymbolTable.MethodSignature>, Function>
-
-    var ParseTree.staticType: DataType?
-        get() = staticTypes.get(this)
-        set(type) = staticTypes.put(this, type)
 
     val operatorTable = OperatorTable()
 
     var mallocAddress: Int = -1
-
 
     val classCodeGenerator = ClassCodeGenerator(this)
     val methodCodeGenerator = MethodCodeGenerator(this)
@@ -43,7 +37,6 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) : MiniJavaBase
 
     override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext) {
         module = Module()
-        staticTypes = ParseTreeProperty()
         functions = mutableMapOf()
 
         fun declareFunctionType(signature: MethodSymbolTable.MethodSignature, information: MethodSymbolTable.MethodInformation): Int {
