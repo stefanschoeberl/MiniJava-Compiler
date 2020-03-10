@@ -7,27 +7,27 @@ import org.antlr.v4.runtime.Token
 
 class BinaryExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase)  {
 
-    fun generateOrExpr(ctx: MiniJavaParser.OrExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.OrExprContext) {
         visitBinaryOperatorExpression(ctx, ctx.left, ctx.right, ctx.op)
     }
 
-    fun generateAndExpr(ctx: MiniJavaParser.AndExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.AndExprContext) {
         visitBinaryOperatorExpression(ctx, ctx.left, ctx.right, ctx.op)
     }
 
-    fun generateEqNeqExpr(ctx: MiniJavaParser.EqNeqExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.EqNeqExprContext) {
         visitBinaryOperatorExpression(ctx, ctx.left, ctx.right, ctx.op)
     }
 
-    fun generateRelationalExpr(ctx: MiniJavaParser.RelationalExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.RelationalExprContext) {
         visitBinaryOperatorExpression(ctx, ctx.left, ctx.right, ctx.op)
     }
 
-    fun generateAddSubExpr(ctx: MiniJavaParser.AddSubExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.AddSubExprContext) {
         visitBinaryOperatorExpression(ctx, ctx.left, ctx.right, ctx.op)
     }
 
-    fun generateMulDivExpr(ctx: MiniJavaParser.MulDivExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.MulDivExprContext) {
         visitBinaryOperatorExpression(ctx, ctx.left, ctx.right, ctx.op)
     }
 

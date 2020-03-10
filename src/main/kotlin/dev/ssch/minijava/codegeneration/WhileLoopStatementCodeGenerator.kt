@@ -5,7 +5,7 @@ import dev.ssch.minijava.grammar.MiniJavaParser
 
 class WhileLoopStatementCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase) {
 
-    fun generate(ctx: MiniJavaParser.WhileLoopStmtContext) {
+    fun generateExecution(ctx: MiniJavaParser.WhileLoopStmtContext) {
         with(codeGenerationPhase.currentFunction.body.instructions) {
             add(dev.ssch.minijava.ast.Instruction.block)
             add(dev.ssch.minijava.ast.Instruction.loop)

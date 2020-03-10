@@ -9,15 +9,15 @@ import org.antlr.v4.runtime.tree.ParseTree
 
 class IfElseStatementCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase) {
 
-    fun generate(ctx: MiniJavaParser.CompleteIfElseStmtContext) {
+    fun generateExecution(ctx: MiniJavaParser.CompleteIfElseStmtContext) {
         generateIfElse(ctx.condition, ctx.thenbranch, ctx.elsebranch)
     }
 
-    fun generate(ctx: MiniJavaParser.IncompleteIfStmtContext) {
+    fun generateExecution(ctx: MiniJavaParser.IncompleteIfStmtContext) {
         generateIfElse(ctx.condition, ctx.thenbranch)
     }
 
-    fun generate(ctx: MiniJavaParser.IncompleteIfElseStmtContext) {
+    fun generateExecution(ctx: MiniJavaParser.IncompleteIfElseStmtContext) {
         generateIfElse(ctx.condition, ctx.thenbranch, ctx.thenbranch)
     }
 

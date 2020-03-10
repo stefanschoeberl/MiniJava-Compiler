@@ -8,7 +8,7 @@ import dev.ssch.minijava.grammar.MiniJavaParser
 
 class CallExpressionCodeGeneration(private val codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase) {
 
-    fun generate(ctx: MiniJavaParser.CallExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.CallExprContext) {
         ctx.parameters.forEach {
             codeGenerationPhase.visit(it)
         }

@@ -9,7 +9,7 @@ import dev.ssch.minijava.grammar.MiniJavaParser
 
 class ArrayCreationExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase) {
 
-    fun generate(ctx: MiniJavaParser.ArrayCreationExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.ArrayCreationExprContext) {
         codeGenerationPhase.visit(ctx.size)
         if (ctx.size.staticType != DataType.PrimitiveType.Integer) {
             throw IncompatibleTypeException(DataType.PrimitiveType.Integer, ctx.size.staticType, ctx.size.start)

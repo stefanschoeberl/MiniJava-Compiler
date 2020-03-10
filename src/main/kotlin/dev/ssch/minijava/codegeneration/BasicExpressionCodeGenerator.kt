@@ -9,7 +9,7 @@ import dev.ssch.minijava.grammar.MiniJavaParser
 
 class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase) {
 
-    fun generate(ctx: MiniJavaParser.IdExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.IdExprContext) {
         val name = ctx.IDENT().text
         if (!codeGenerationPhase.localsVariableSymbolTable.isDeclared(name)) {
             throw UndefinedVariableException(name, ctx.IDENT().symbol)
@@ -18,13 +18,13 @@ class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerati
         ctx.staticType = codeGenerationPhase.localsVariableSymbolTable.typeOf(name)
     }
 
-    fun generate(ctx: MiniJavaParser.IntExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.IntExprContext) {
         val value = ctx.INT().text.toInt()
         codeGenerationPhase.currentFunction.body.instructions.add(Instruction.i32_const(value))
         ctx.staticType = DataType.PrimitiveType.Integer
     }
 
-    fun generate(ctx: MiniJavaParser.BoolExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.BoolExprContext) {
         if (ctx.value.type == MiniJavaParser.TRUE) {
             codeGenerationPhase.currentFunction.body.instructions.add(Instruction.i32_const(1))
         } else {
@@ -33,19 +33,19 @@ class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerati
         ctx.staticType = DataType.PrimitiveType.Boolean
     }
 
-    fun generate(ctx: MiniJavaParser.FloatExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.FloatExprContext) {
         val value = ctx.FLOAT().text.toFloat()
         codeGenerationPhase.currentFunction.body.instructions.add(Instruction.f32_const(value))
         ctx.staticType = DataType.PrimitiveType.Float
     }
 
-    fun generate(ctx: MiniJavaParser.ParensExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.ParensExprContext) {
         codeGenerationPhase.visit(ctx.expr())
 
         ctx.staticType = ctx.expr().staticType
     }
 
-    fun generate(ctx: MiniJavaParser.MinusExprContext) {
+    fun generateEvaluation(ctx: MiniJavaParser.MinusExprContext) {
         val codePositionBeforeOperand = codeGenerationPhase.currentFunction.body.instructions.size
         codeGenerationPhase.visit(ctx.expr())
 
