@@ -2,35 +2,48 @@ package dev.ssch.minijava
 
 import dev.ssch.minijava.ast.*
 import dev.ssch.minijava.ast.Function
+import dev.ssch.minijava.codegeneration.*
 import dev.ssch.minijava.exception.*
 import dev.ssch.minijava.grammar.MiniJavaBaseVisitor
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.symboltable.ClassSymbolTable
 import dev.ssch.minijava.symboltable.MethodSymbolTable
 import dev.ssch.minijava.symboltable.LocalVariableSymbolTable
-import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.ParseTreeProperty
 
-class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : MiniJavaBaseVisitor<Unit>() {
+class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) : MiniJavaBaseVisitor<Unit>() {
 
     lateinit var module: Module
-    private lateinit var currentClass: String
-    private lateinit var currentFunction: Function
+    lateinit var currentClass: String
+    lateinit var currentFunction: Function
 
-    private lateinit var localsVariableSymbolTable: LocalVariableSymbolTable
-    private lateinit var methodSymbolTable: MethodSymbolTable
-    private lateinit var staticTypes: ParseTreeProperty<DataType>
+    lateinit var localsVariableSymbolTable: LocalVariableSymbolTable
+    lateinit var methodSymbolTable: MethodSymbolTable
+    lateinit var staticTypes: ParseTreeProperty<DataType>
 
-    private lateinit var functions: MutableMap<Pair<String, MethodSymbolTable.MethodSignature>, Function>
+    lateinit var functions: MutableMap<Pair<String, MethodSymbolTable.MethodSignature>, Function>
 
-    private var ParseTree.staticType: DataType?
+    var ParseTree.staticType: DataType?
         get() = staticTypes.get(this)
         set(type) = staticTypes.put(this, type)
 
-    private val operatorTable = OperatorTable()
+    val operatorTable = OperatorTable()
 
-    private var mallocAddress: Int = -1
+    var mallocAddress: Int = -1
+
+    // ----------
+
+    val binaryExpressionCodeGenerator = BinaryExpressionCodeGenerator(this)
+    val whileLoopCodeGenerator = WhileLoopStatementCodeGenerator(this)
+    val ifElseLoopCodeGenerator = IfElseStatementCodeGenerator(this)
+    val arrayCreationExpressionCodeGenerator = ArrayCreationExpressionCodeGenerator(this)
+    val basicExpressionCodeGenerator = BasicExpressionCodeGenerator(this)
+    val callExpressionCodeGenerator = CallExpressionCodeGeneration(this)
+    val methodCodeGenerator = MethodCodeGenerator(this)
+    val variableDeclarationStatementCodeGenerator = VariableDeclarationStatementCodeGenerator(this)
+
+    // ----------
 
     override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext) {
         module = Module()
@@ -107,63 +120,15 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
     }
 
     override fun visitMethod(ctx: MiniJavaParser.MethodContext) {
-        if (ctx.nativemodifier.isNotEmpty()) {
-            return
-        }
-
-        // reset scope
-        localsVariableSymbolTable = LocalVariableSymbolTable()
-
-        val parameters = ctx.parameters.map { Pair(it.name.text, it.type.getDataType(classSymbolTable)!!) }
-        val parameterTypes = parameters.map { it.second }
-        currentFunction = functions[Pair(currentClass, MethodSymbolTable.MethodSignature(ctx.name.text, parameterTypes))]!!
-
-        parameters.forEach {
-            localsVariableSymbolTable.declareParameter(it.first, it.second)
-        }
-
-        ctx.statements.forEach {
-            visit(it)
-        }
-
-        // "workaround" idea from https://github.com/WebAssembly/wabt/issues/1075
-        if (methodSymbolTable.returnTypeOf(ctx.name.text, parameters.map { it.second }) != null) {
-            currentFunction.body.instructions.add(Instruction.unreachable)
-        }
-
-        localsVariableSymbolTable.allLocalVariables.forEach {
-            currentFunction.locals.add(it.toWebAssemblyType())
-        }
+        methodCodeGenerator.generate(ctx)
     }
 
     override fun visitVardeclassignStmt(ctx: MiniJavaParser.VardeclassignStmtContext) {
-        visit(ctx.expr())
-
-        val name = ctx.name.text
-
-        val type = ctx.type.getDataType(classSymbolTable)
-            ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
-
-        if (localsVariableSymbolTable.isDeclared(name)) {
-            throw RedefinedVariableException(name, ctx.name)
-        }
-        localsVariableSymbolTable.declareVariable(name, type)
-
-        val conversionCode = ctx.expr().staticType!!.assignTypeTo(type)
-            ?: throw IncompatibleAssignmentException(type, ctx.expr().staticType, ctx.name)
-
-        currentFunction.body.instructions.addAll(conversionCode)
-
-        currentFunction.body.instructions.add(Instruction.local_set(localsVariableSymbolTable.addressOf(name)))
+        variableDeclarationStatementCodeGenerator.generate(ctx)
     }
 
     override fun visitVardeclStmt(ctx: MiniJavaParser.VardeclStmtContext) {
-        val name = ctx.name.text
-        val type = ctx.type.getDataType(classSymbolTable) ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
-        if (localsVariableSymbolTable.isDeclared(name)) {
-            throw RedefinedVariableException(name, ctx.name)
-        }
-        localsVariableSymbolTable.declareVariable(name, type)
+        variableDeclarationStatementCodeGenerator.generate(ctx)
     }
 
     fun generateArrayAddressCodeAndReturnElementType(ctx: MiniJavaParser.ArrayAccessExprContext): DataType {
@@ -267,17 +232,7 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
     }
 
     override fun visitMinusExpr(ctx: MiniJavaParser.MinusExprContext) {
-        val codePositionBeforeOperand = currentFunction.body.instructions.size
-        visit(ctx.expr())
-
-        val type = ctx.expr().staticType
-        val unaryOperation = operatorTable.findUnaryMinusOperation(type)
-            ?: throw InvalidUnaryOperationException(ctx.expr().staticType, ctx.SUB().symbol)
-
-        currentFunction.body.instructions.add(codePositionBeforeOperand, unaryOperation.operationBeforeOperand)
-        currentFunction.body.instructions.add(unaryOperation.operationAfterOperand)
-
-        ctx.staticType = type
+        basicExpressionCodeGenerator.generate(ctx)
     }
 
     override fun visitCastExpr(ctx: MiniJavaParser.CastExprContext) {
@@ -294,44 +249,7 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
     }
 
     override fun visitCallExpr(ctx: MiniJavaParser.CallExprContext) {
-        ctx.parameters.forEach {
-            visit(it)
-        }
-
-        val target = ctx.target
-
-        val (className, methodName) = when (target) {
-            is MiniJavaParser.IdExprContext -> Pair(currentClass, target.IDENT().text)
-            is MiniJavaParser.MemberExprContext -> {
-                val left = target.left
-                if (left is MiniJavaParser.IdExprContext) {
-                    Pair(left.IDENT().text, target.right.text)
-                } else {
-                    TODO("currently unsupported")
-                }
-            }
-            else -> TODO("currently unsupported")
-        }
-
-        val parameters = ctx.parameters.map {
-            it.staticType ?: throw VoidParameterException(it.start)
-        }
-
-        if (!classSymbolTable.isDeclared(className)) {
-            throw UndefinedMethodException("$className.$methodName", ctx.target.start)
-        }
-
-        val methodSymbolTableOfTargetClass = classSymbolTable.getMethodSymbolTable(className)
-
-        if (!methodSymbolTableOfTargetClass.isDeclared(methodName, parameters)) {
-            throw UndefinedMethodException("$className.$methodName", ctx.target.start)
-        }
-
-        val address = methodSymbolTableOfTargetClass.addressOf(methodName, parameters)
-
-        currentFunction.body.instructions.add(Instruction.call(address))
-
-        ctx.staticType = methodSymbolTableOfTargetClass.returnTypeOf(methodName, parameters)
+        callExpressionCodeGenerator.generate(ctx)
     }
 
     override fun visitMemberExpr(ctx: MiniJavaParser.MemberExprContext) {
@@ -341,39 +259,23 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
     }
 
     override fun visitIdExpr(ctx: MiniJavaParser.IdExprContext) {
-        val name = ctx.IDENT().text
-        if (!localsVariableSymbolTable.isDeclared(name)) {
-            throw UndefinedVariableException(name, ctx.IDENT().symbol)
-        }
-        currentFunction.body.instructions.add(Instruction.local_get(localsVariableSymbolTable.addressOf(name)))
-        ctx.staticType = localsVariableSymbolTable.typeOf(name)
+        basicExpressionCodeGenerator.generate(ctx)
     }
 
     override fun visitIntExpr(ctx: MiniJavaParser.IntExprContext) {
-        val value = ctx.INT().text.toInt()
-        currentFunction.body.instructions.add(Instruction.i32_const(value))
-        ctx.staticType = DataType.PrimitiveType.Integer
+        basicExpressionCodeGenerator.generate(ctx)
     }
 
     override fun visitBoolExpr(ctx: MiniJavaParser.BoolExprContext) {
-        if (ctx.value.type == MiniJavaParser.TRUE) {
-            currentFunction.body.instructions.add(Instruction.i32_const(1))
-        } else {
-            currentFunction.body.instructions.add(Instruction.i32_const(0))
-        }
-        ctx.staticType = DataType.PrimitiveType.Boolean
+        basicExpressionCodeGenerator.generate(ctx)
     }
 
     override fun visitFloatExpr(ctx: MiniJavaParser.FloatExprContext) {
-        val value = ctx.FLOAT().text.toFloat()
-        currentFunction.body.instructions.add(Instruction.f32_const(value))
-        ctx.staticType = DataType.PrimitiveType.Float
+        basicExpressionCodeGenerator.generate(ctx)
     }
 
     override fun visitParensExpr(ctx: MiniJavaParser.ParensExprContext) {
-        visit(ctx.expr())
-
-        ctx.staticType = ctx.expr().staticType
+        basicExpressionCodeGenerator.generate(ctx)
     }
 
     override fun visitClassInstanceCreationExpr(ctx: MiniJavaParser.ClassInstanceCreationExprContext) {
@@ -391,90 +293,31 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
     }
 
     override fun visitArrayCreationExpr(ctx: MiniJavaParser.ArrayCreationExprContext) {
-        visit(ctx.size)
-        if (ctx.size.staticType != DataType.PrimitiveType.Integer) {
-            throw IncompatibleTypeException(DataType.PrimitiveType.Integer, ctx.size.staticType, ctx.size.start)
-        }
-        val arrayType = (ctx.type as? MiniJavaParser.SimpleTypeContext)?.getDataType(classSymbolTable)
-            ?: TODO()
-
-        val sizeVariable = if (localsVariableSymbolTable.isDeclared("#size")) {
-            localsVariableSymbolTable.addressOf("#size")
-        } else {
-            localsVariableSymbolTable.declareVariable("#size", DataType.PrimitiveType.Integer)
-        }
-
-        // store array size in #size (no dup)
-        // https://github.com/WebAssembly/design/issues/1102
-        currentFunction.body.instructions.add(Instruction.local_tee(sizeVariable))
-
-        currentFunction.body.instructions.add(Instruction.i32_const(arrayType.sizeInBytes()))
-        currentFunction.body.instructions.add(Instruction.i32_mul)
-
-        // 4 extra bytes for array size
-        currentFunction.body.instructions.add(Instruction.i32_const(4))
-        currentFunction.body.instructions.add(Instruction.i32_add)
-
-        // allocate memory
-        currentFunction.body.instructions.add(Instruction.call(mallocAddress))
-
-        val arrayAddressVariable = if (localsVariableSymbolTable.isDeclared("#array")) {
-            localsVariableSymbolTable.addressOf("#array")
-        } else {
-            localsVariableSymbolTable.declareVariable("#array", DataType.PrimitiveType.Integer)
-        }
-
-        // store array address in #array
-        currentFunction.body.instructions.add(Instruction.local_tee(arrayAddressVariable))
-
-        // store array size in first 4 bytes
-        currentFunction.body.instructions.add(Instruction.local_get(sizeVariable))
-        currentFunction.body.instructions.add(Instruction.i32_store)
-
-        // put array address on top of stack
-        currentFunction.body.instructions.add(Instruction.local_get(arrayAddressVariable))
-
-        ctx.staticType = DataType.Array(arrayType)
-    }
-
-    private fun visitBinaryOperatorExpression(ctx: MiniJavaParser.ExprContext, left: MiniJavaParser.ExprContext, right: MiniJavaParser.ExprContext, op: Token) {
-        visit(left)
-        val codePositionAfterLeftOperand = currentFunction.body.instructions.size
-        visit(right)
-
-        val binaryOperation = operatorTable.findBinaryOperation(left.staticType, right.staticType, op)
-            ?: throw InvalidBinaryOperationException(left.staticType, right.staticType, op)
-
-        binaryOperation.leftPromotion?.let { currentFunction.body.instructions.add(codePositionAfterLeftOperand, it) }
-        binaryOperation.rightPromotion?.let { currentFunction.body.instructions.add(it) }
-
-        currentFunction.body.instructions.add(binaryOperation.operation)
-
-        ctx.staticType = binaryOperation.resultingType
+        arrayCreationExpressionCodeGenerator.generate(ctx)
     }
 
     override fun visitOrExpr(ctx: MiniJavaParser.OrExprContext) {
-        visitBinaryOperatorExpression(ctx, ctx.left, ctx.right, ctx.op)
+        binaryExpressionCodeGenerator.generateOrExpr(ctx)
     }
 
     override fun visitAndExpr(ctx: MiniJavaParser.AndExprContext) {
-        visitBinaryOperatorExpression(ctx, ctx.left, ctx.right, ctx.op)
+        binaryExpressionCodeGenerator.generateAndExpr(ctx)
     }
 
     override fun visitEqNeqExpr(ctx: MiniJavaParser.EqNeqExprContext) {
-        visitBinaryOperatorExpression(ctx, ctx.left, ctx.right, ctx.op)
+        binaryExpressionCodeGenerator.generateEqNeqExpr(ctx)
     }
 
     override fun visitRelationalExpr(ctx: MiniJavaParser.RelationalExprContext) {
-        visitBinaryOperatorExpression(ctx, ctx.left, ctx.right, ctx.op)
+        binaryExpressionCodeGenerator.generateRelationalExpr(ctx)
     }
 
     override fun visitAddSubExpr(ctx: MiniJavaParser.AddSubExprContext) {
-        visitBinaryOperatorExpression(ctx, ctx.left, ctx.right, ctx.op)
+        binaryExpressionCodeGenerator.generateAddSubExpr(ctx)
     }
 
     override fun visitMulDivExpr(ctx: MiniJavaParser.MulDivExprContext) {
-        visitBinaryOperatorExpression(ctx, ctx.left, ctx.right, ctx.op)
+        binaryExpressionCodeGenerator.generateMulDivExpr(ctx)
     }
 
     override fun visitBlockStmt(ctx: MiniJavaParser.BlockStmtContext) {
@@ -484,49 +327,18 @@ class CodeGenerationPhase(private val classSymbolTable: ClassSymbolTable) : Mini
     }
 
     override fun visitCompleteIfElseStmt(ctx: MiniJavaParser.CompleteIfElseStmtContext) {
-        visitIfElse(ctx.condition, ctx.thenbranch, ctx.elsebranch)
+        ifElseLoopCodeGenerator.generate(ctx)
     }
 
     override fun visitIncompleteIfStmt(ctx: MiniJavaParser.IncompleteIfStmtContext) {
-        visitIfElse(ctx.condition, ctx.thenbranch)
+        ifElseLoopCodeGenerator.generate(ctx)
     }
 
     override fun visitIncompleteIfElseStmt(ctx: MiniJavaParser.IncompleteIfElseStmtContext) {
-        visitIfElse(ctx.condition, ctx.thenbranch, ctx.thenbranch)
-    }
-
-    fun visitIfElse(condition: MiniJavaParser.ExprContext, thenbranch: ParseTree, elsebranch: ParseTree? = null) {
-        visit(condition)
-        if (condition.staticType != DataType.PrimitiveType.Boolean) {
-            throw IncompatibleTypeException(DataType.PrimitiveType.Boolean, condition.staticType, condition.getStart())
-        }
-        currentFunction.body.instructions.add(Instruction._if)
-        visit(thenbranch)
-        if (elsebranch != null) {
-            currentFunction.body.instructions.add(Instruction._else)
-            visit(elsebranch)
-        }
-        currentFunction.body.instructions.add(Instruction.end)
+        ifElseLoopCodeGenerator.generate(ctx)
     }
 
     override fun visitWhileLoopStmt(ctx: MiniJavaParser.WhileLoopStmtContext) {
-        with(currentFunction.body.instructions) {
-            add(Instruction.block)
-            add(Instruction.loop)
-
-            visit(ctx.condition)
-            if (ctx.condition.staticType != DataType.PrimitiveType.Boolean) {
-                throw IncompatibleTypeException(DataType.PrimitiveType.Boolean, ctx.condition.staticType, ctx.condition.getStart())
-            }
-            add(Instruction.i32_eqz)
-            add(Instruction.br_if(1))
-
-            visit(ctx.body)
-
-            add(Instruction.br(0))
-
-            add(Instruction.end)
-            add(Instruction.end)
-        }
+        whileLoopCodeGenerator.generate(ctx)
     }
 }
