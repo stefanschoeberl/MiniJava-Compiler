@@ -26,9 +26,7 @@ class MethodCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase):
             codeGenerationPhase.localsVariableSymbolTable.declareParameter(it.first, it.second)
         }
 
-        ctx.statements.forEach {
-            codeGenerationPhase.visit(it)
-        }
+        ctx.statements.forEach(codeGenerationPhase.statementCodeGenerator::generateExecution)
 
         // "workaround" idea from https://github.com/WebAssembly/wabt/issues/1075
         if (codeGenerationPhase.methodSymbolTable.returnTypeOf(ctx.name.text, parameters.map { it.second }) != null) {

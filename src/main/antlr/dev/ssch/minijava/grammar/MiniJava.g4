@@ -24,7 +24,7 @@ statement: completeStatement
 
 completeStatement: 'if' '(' condition=expr ')' thenbranch=completeStatement 'else' elsebranch=completeStatement # CompleteIfElseStmt
                  | 'while' '(' condition=expr ')' body=statement                                                # WhileLoopStmt
-                 | '{' (statement)* '}'                                                                         # BlockStmt
+                 | '{' (statements+=statement)* '}'                                                             # BlockStmt
                  | type=typeDefinition name=IDENT '=' expr ';'                                                  # VardeclassignStmt
                  | type=typeDefinition name=IDENT ';'                                                           # VardeclStmt
                  | left=expr '=' right=expr ';'                                                                 # VarassignStmt

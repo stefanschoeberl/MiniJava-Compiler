@@ -31,17 +31,15 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) : MiniJavaBase
 
     var mallocAddress: Int = -1
 
-    val whileLoopCodeGenerator = WhileLoopStatementCodeGenerator(this)
-    val ifElseLoopCodeGenerator = IfElseStatementCodeGenerator(this)
-    val methodCodeGenerator = MethodCodeGenerator(this)
-    val variableDeclarationStatementCodeGenerator = VariableDeclarationStatementCodeGenerator(this)
-    val arrayAccessExpressionCodeGeneration = ArrayAccessExpressionCodeGenerator(this)
-    val variableAssignmentStatementCodeGenerator = VariableAssignmentStatementCodeGenerator(this)
-    val basicStatementCodeGenerator = BasicStatementCodeGenerator(this)
-    val memberAccessExpressionCodeGenerator = MemberExpressionCodeGenerator(this)
+
     val classCodeGenerator = ClassCodeGenerator(this)
+    val methodCodeGenerator = MethodCodeGenerator(this)
+
+    val arrayAccessExpressionCodeGeneration = ArrayAccessExpressionCodeGenerator(this)
+    val memberAccessExpressionCodeGenerator = MemberExpressionCodeGenerator(this)
 
     val expressionCodeGenerator = ExpressionCodeGenerator(this)
+    val statementCodeGenerator = StatementCodeGenerator(this)
 
     override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext) {
         module = Module()
@@ -117,45 +115,5 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) : MiniJavaBase
 
     override fun visitMethod(ctx: MiniJavaParser.MethodContext) {
         methodCodeGenerator.generate(ctx)
-    }
-
-    override fun visitVardeclassignStmt(ctx: MiniJavaParser.VardeclassignStmtContext) {
-        variableDeclarationStatementCodeGenerator.generate(ctx)
-    }
-
-    override fun visitVardeclStmt(ctx: MiniJavaParser.VardeclStmtContext) {
-        variableDeclarationStatementCodeGenerator.generate(ctx)
-    }
-
-    override fun visitVarassignStmt(ctx: MiniJavaParser.VarassignStmtContext) {
-        variableAssignmentStatementCodeGenerator.generateExecution(ctx)
-    }
-
-    override fun visitExpressionStmt(ctx: MiniJavaParser.ExpressionStmtContext) {
-        basicStatementCodeGenerator.generateExecution(ctx)
-    }
-
-    override fun visitReturnStmt(ctx: MiniJavaParser.ReturnStmtContext) {
-        basicStatementCodeGenerator.generateExecution(ctx)
-    }
-
-    override fun visitBlockStmt(ctx: MiniJavaParser.BlockStmtContext) {
-        basicStatementCodeGenerator.generateExecution(ctx)
-    }
-
-    override fun visitCompleteIfElseStmt(ctx: MiniJavaParser.CompleteIfElseStmtContext) {
-        ifElseLoopCodeGenerator.generateExecution(ctx)
-    }
-
-    override fun visitIncompleteIfStmt(ctx: MiniJavaParser.IncompleteIfStmtContext) {
-        ifElseLoopCodeGenerator.generateExecution(ctx)
-    }
-
-    override fun visitIncompleteIfElseStmt(ctx: MiniJavaParser.IncompleteIfElseStmtContext) {
-        ifElseLoopCodeGenerator.generateExecution(ctx)
-    }
-
-    override fun visitWhileLoopStmt(ctx: MiniJavaParser.WhileLoopStmtContext) {
-        whileLoopCodeGenerator.generateExecution(ctx)
     }
 }

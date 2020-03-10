@@ -21,7 +21,7 @@ class WhileLoopStatementCodeGenerator(private val codeGenerationPhase: CodeGener
             add(dev.ssch.minijava.ast.Instruction.i32_eqz)
             add(dev.ssch.minijava.ast.Instruction.br_if(1))
 
-            codeGenerationPhase.visit(ctx.body)
+            codeGenerationPhase.statementCodeGenerator.generateExecution(ctx.body)
 
             add(dev.ssch.minijava.ast.Instruction.br(0))
 

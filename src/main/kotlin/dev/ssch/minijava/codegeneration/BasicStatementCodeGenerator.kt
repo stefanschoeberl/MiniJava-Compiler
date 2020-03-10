@@ -2,10 +2,6 @@ package dev.ssch.minijava.codegeneration
 
 import dev.ssch.minijava.CodeGenerationPhase
 import dev.ssch.minijava.ast.Instruction
-import dev.ssch.minijava.castTypeTo
-import dev.ssch.minijava.exception.InconvertibleTypeException
-import dev.ssch.minijava.exception.UnknownTypeException
-import dev.ssch.minijava.getDataType
 import dev.ssch.minijava.grammar.MiniJavaParser
 
 class BasicStatementCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase): CodeGenerator(codeGenerationPhase) {
@@ -29,6 +25,7 @@ class BasicStatementCodeGenerator(private val codeGenerationPhase: CodeGeneratio
 
     fun generateExecution(ctx: MiniJavaParser.BlockStmtContext) {
         codeGenerationPhase.localsVariableSymbolTable.pushScope()
+        ctx.statements.forEach(codeGenerationPhase.statementCodeGenerator::generateExecution)
         codeGenerationPhase.visitChildren(ctx)
         codeGenerationPhase.localsVariableSymbolTable.popScope()
     }
