@@ -32,7 +32,7 @@ class ClassTest : CompilerTest() {
             class A {}
             class A {}
         """.compileAndRunMainFunction()
-        }
+        } // TODO
     }
 
     @Test
@@ -236,4 +236,24 @@ class ClassTest : CompilerTest() {
         """.compileAndRunMainFunction()
         assertThat(output.lines()).containsExactly("10", "20", "")
     }
+
+    @Test
+    fun `declare constructor without parameters`() {
+        val output = """
+            class Main {
+                public static void main() {
+                    Console.println(123);
+                }
+            }
+            
+            class Point {
+                int x;
+                int y;
+                
+                Point() {}
+            }
+        """.compileAndRunMainFunction()
+        assertThat(output.lines()).containsExactly("123", "")
+    }
+
 }

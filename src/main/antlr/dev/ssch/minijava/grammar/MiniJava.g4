@@ -8,13 +8,17 @@ package dev.ssch.minijava.grammar;
 
 minijava: (javaclass)*;
 
-javaclass: 'class' name=IDENT '{' (fields+=field | methods+=method)* '}';
+javaclass: 'class' name=IDENT '{' (fields+=field | methods+=method | constructors+=constructor)* '}';
 
 field: type=typeDefinition name=IDENT ';';
 
 method: (publicmodifier+='public' | nativemodifier+='native' | staticmodifier+='static')* returntype=typeDefinition name=IDENT
         '(' (parameters+=formalParameter (',' parameters+=formalParameter)*)? ')'
         (block='{' (statements+=statement)* '}' | semicolon=';');
+
+constructor: (publicmodifier+='public' | nativemodifier+='native')* name=IDENT
+           '(' (parameters+=formalParameter (',' parameters+=formalParameter)*)? ')'
+            (block='{' (statements+=statement)* '}' | semicolon=';');
 
 formalParameter: type=typeDefinition name=IDENT;
 
