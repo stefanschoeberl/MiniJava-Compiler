@@ -276,4 +276,26 @@ class ClassTest : CompilerTest() {
         """.compileAndRunMainFunction()
         assertThat(output.lines()).containsExactly("123", "")
     }
+
+    @Test
+    fun `call constructor with parameters`() {
+        val output = """
+            class Main {
+                public static void main() {
+                    Point p = new Point(123, 456);
+                }
+            }
+            
+            class Point {
+                int x;
+                int y;
+                
+                Point(int a, int b) {
+                    Console.println(a);
+                    Console.println(b);
+                }
+            }
+        """.compileAndRunMainFunction()
+        assertThat(output.lines()).containsExactly("123", "456", "")
+    }
 }

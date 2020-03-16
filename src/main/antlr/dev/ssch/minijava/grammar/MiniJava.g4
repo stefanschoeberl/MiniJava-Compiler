@@ -44,24 +44,24 @@ typeDefinition: IDENT         # SimpleType
 
 // https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html
 
-expr: array=expr '[' index=expr ']'                                   # ArrayAccessExpr
-    | left=expr '.' right=IDENT                                       # MemberExpr
-    | target=expr '(' (parameters+=expr (',' parameters+=expr)*)? ')' # CallExpr
-    | '-' expr                                                        # MinusExpr
-    | '(' type=typeDefinition ')' expr                                # CastExpr
-    | left=expr op=(MUL|DIV) right=expr                               # MulDivExpr
-    | left=expr op=(ADD|SUB) right=expr                               # AddSubExpr
-    | left=expr op=(LT|LE|GT|GE) right=expr                           # RelationalExpr
-    | left=expr op=(EQ|NEQ) right=expr                                # EqNeqExpr
-    | left=expr op=AND right=expr                                     # AndExpr
-    | left=expr op=OR right=expr                                      # OrExpr
-    | IDENT                                                           # IdExpr
-    | INT                                                             # IntExpr
-    | FLOAT                                                           # FloatExpr
-    | value=(TRUE|FALSE)                                              # BoolExpr
-    | '(' expr ')'                                                    # ParensExpr
-    | 'new' type=typeDefinition '(' ')'                               # ClassInstanceCreationExpr
-    | 'new' type=typeDefinition '[' size=expr ']'                     # ArrayCreationExpr
+expr: array=expr '[' index=expr ']'                                                 # ArrayAccessExpr
+    | left=expr '.' right=IDENT                                                     # MemberExpr
+    | target=expr '(' (parameters+=expr (',' parameters+=expr)*)? ')'               # CallExpr
+    | '-' expr                                                                      # MinusExpr
+    | '(' type=typeDefinition ')' expr                                              # CastExpr
+    | left=expr op=(MUL|DIV) right=expr                                             # MulDivExpr
+    | left=expr op=(ADD|SUB) right=expr                                             # AddSubExpr
+    | left=expr op=(LT|LE|GT|GE) right=expr                                         # RelationalExpr
+    | left=expr op=(EQ|NEQ) right=expr                                              # EqNeqExpr
+    | left=expr op=AND right=expr                                                   # AndExpr
+    | left=expr op=OR right=expr                                                    # OrExpr
+    | IDENT                                                                         # IdExpr
+    | INT                                                                           # IntExpr
+    | FLOAT                                                                         # FloatExpr
+    | value=(TRUE|FALSE)                                                            # BoolExpr
+    | '(' expr ')'                                                                  # ParensExpr
+    | 'new' type=typeDefinition '(' (parameters+=expr (',' parameters+=expr)*)? ')' # ClassInstanceCreationExpr
+    | 'new' type=typeDefinition '[' size=expr ']'                                   # ArrayCreationExpr
     ;
 
 EQ:  '==';
