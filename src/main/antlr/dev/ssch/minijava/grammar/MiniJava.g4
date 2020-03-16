@@ -16,9 +16,8 @@ method: (publicmodifier+='public' | nativemodifier+='native' | staticmodifier+='
         '(' (parameters+=formalParameter (',' parameters+=formalParameter)*)? ')'
         (block='{' (statements+=statement)* '}' | semicolon=';');
 
-constructor: (publicmodifier+='public' | nativemodifier+='native')* name=IDENT
-           '(' (parameters+=formalParameter (',' parameters+=formalParameter)*)? ')'
-            (block='{' (statements+=statement)* '}' | semicolon=';');
+constructor: name=IDENT '(' (parameters+=formalParameter (',' parameters+=formalParameter)*)? ')'
+             block='{' (statements+=statement)* '}';
 
 formalParameter: type=typeDefinition name=IDENT;
 

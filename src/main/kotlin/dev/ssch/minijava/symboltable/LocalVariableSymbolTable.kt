@@ -17,6 +17,8 @@ class LocalVariableSymbolTable {
     private val localVariables = mutableListOf<DataType>()
     private val unusedVariables = mutableMapOf<DataType, MutableList<Int>>()
 
+    private var thisAddress: Int? = null
+
     private fun allocateNewAddressForParameter(): Int {
         return parameterCount++
     }
@@ -47,10 +49,20 @@ class LocalVariableSymbolTable {
         return addr
     }
 
+    fun declareThisParameter(): Int {
+        return allocateNewAddressForParameter().also {
+            thisAddress = it
+        }
+    }
+
     fun isDeclared(name: String): Boolean = symbols.containsKey(name)
 
     fun addressOf(name: String): Int = symbols[name]!!.address
     fun typeOf(name: String): DataType = symbols[name]!!.type
+
+    fun addressOfThis(): Int {
+        return thisAddress!!
+    }
 
     fun pushScope() {
         scopes.add(0, mutableSetOf())

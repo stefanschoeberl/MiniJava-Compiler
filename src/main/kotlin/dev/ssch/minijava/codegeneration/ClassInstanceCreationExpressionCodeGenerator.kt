@@ -19,6 +19,13 @@ class ClassInstanceCreationExpressionCodeGenerator(private val codeGenerationPha
         // allocate memory
         codeGenerationPhase.currentFunction.body.instructions.add(Instruction.call(codeGenerationPhase.mallocAddress))
 
+        val constructors = codeGenerationPhase.classSymbolTable.getConstructorSymbolTable(type.name)
+        if (constructors.isDeclared(listOf())) {
+            // call no-arg constructor only if it exists
+            val constructorAddress = constructors.addressOf(listOf())
+            codeGenerationPhase.currentFunction.body.instructions.add(Instruction.call(constructorAddress))
+        }
+
         return type
     }
 }

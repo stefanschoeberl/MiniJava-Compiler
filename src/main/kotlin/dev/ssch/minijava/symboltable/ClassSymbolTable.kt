@@ -4,7 +4,8 @@ class ClassSymbolTable {
 
     class ClassInformation(
         val methodSymbolTable: MethodSymbolTable,
-        val fieldSymbolTable: FieldSymbolTable
+        val fieldSymbolTable: FieldSymbolTable,
+        val constructorSymbolTable: ConstructorSymbolTable
     )
 
     val classes = mutableMapOf<String, ClassInformation>()
@@ -16,7 +17,8 @@ class ClassSymbolTable {
     fun declareClass(className: String): ClassInformation {
         val classInformation = ClassInformation(
             MethodSymbolTable(),
-            FieldSymbolTable()
+            FieldSymbolTable(),
+            ConstructorSymbolTable()
         )
         classes[className] = classInformation
         return classInformation
@@ -28,5 +30,9 @@ class ClassSymbolTable {
 
     fun getFieldSymbolTable(className: String): FieldSymbolTable {
         return classes[className]!!.fieldSymbolTable
+    }
+
+    fun getConstructorSymbolTable(className: String): ConstructorSymbolTable {
+        return classes[className]!!.constructorSymbolTable
     }
 }

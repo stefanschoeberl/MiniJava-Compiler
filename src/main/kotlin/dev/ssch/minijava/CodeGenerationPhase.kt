@@ -6,10 +6,9 @@ import dev.ssch.minijava.codegeneration.*
 import dev.ssch.minijava.grammar.MiniJavaBaseVisitor
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.symboltable.ClassSymbolTable
+import dev.ssch.minijava.symboltable.ConstructorSymbolTable
 import dev.ssch.minijava.symboltable.MethodSymbolTable
 import dev.ssch.minijava.symboltable.LocalVariableSymbolTable
-import org.antlr.v4.runtime.tree.ParseTree
-import org.antlr.v4.runtime.tree.ParseTreeProperty
 
 class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) : MiniJavaBaseVisitor<Unit>() {
 
@@ -21,6 +20,7 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) : MiniJavaBase
     lateinit var methodSymbolTable: MethodSymbolTable
 
     lateinit var functions: MutableMap<Pair<String, MethodSymbolTable.MethodSignature>, Function>
+    lateinit var constructors: MutableMap<Pair<String, ConstructorSymbolTable.ConstructorSignature>, Function>
 
     val operatorTable = OperatorTable()
 
@@ -38,6 +38,7 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) : MiniJavaBase
     override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext) {
         module = Module()
         functions = mutableMapOf()
+        constructors = mutableMapOf()
 
         fun declareFunctionType(signature: MethodSymbolTable.MethodSignature, information: MethodSymbolTable.MethodInformation): Int {
             if (information.isStatic) {
@@ -49,6 +50,13 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) : MiniJavaBase
             } else {
                 TODO()
             }
+        }
+
+        fun declareFunctionType(signature: ConstructorSymbolTable.ConstructorSignature, information: ConstructorSymbolTable.ConstructorInformation): Int {
+            val parameters = signature.parameterTypes.map { type -> type.toWebAssemblyType() }.toMutableList()
+            parameters.add(0, ValueType.I32)
+            val returnType = ValueType.I32
+            return module.declareType(FuncType(parameters, mutableListOf(returnType)))
         }
 
         mallocAddress = module.importFunction(Import("internal", "malloc",
@@ -97,6 +105,21 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) : MiniJavaBase
                 }
             }
 
+        classSymbolTable.classes
+            .flatMap { classEntry ->
+                classEntry.value.constructorSymbolTable.constructors.entries.map { Pair(classEntry.key, it)}
+            }
+            .sortedBy { it.second.value.address }
+            .forEach {
+                val className = it.first
+                val constructorSignature = it.second.key
+                val constructorInfo = it.second.value
+                val functionType = declareFunctionType(constructorSignature, constructorInfo)
+                val function = Function(functionType, mutableListOf(), Expr(mutableListOf()))
+                module.declareFunction(function)
+                constructors[Pair(className, constructorSignature)] = function
+            }
+
         visitChildren(ctx)
 
         module.imports.add(Import("internal", "memory", ImportDesc.Memory(MemType(1))))
@@ -104,9 +127,5 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) : MiniJavaBase
 
     override fun visitJavaclass(ctx: MiniJavaParser.JavaclassContext) {
         classCodeGenerator.generate(ctx)
-    }
-
-    override fun visitMethod(ctx: MiniJavaParser.MethodContext) {
-        methodCodeGenerator.generate(ctx)
     }
 }

@@ -4,6 +4,7 @@ import dev.ssch.minijava.exception.*
 import dev.ssch.minijava.grammar.MiniJavaBaseVisitor
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.symboltable.ClassSymbolTable
+import dev.ssch.minijava.symboltable.ConstructorSymbolTable
 import dev.ssch.minijava.symboltable.FieldSymbolTable
 import dev.ssch.minijava.symboltable.MethodSymbolTable
 
@@ -12,9 +13,11 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
     val classSymbolTable = ClassSymbolTable()
     private lateinit var methodSymbolTable: MethodSymbolTable
     private lateinit var fieldSymbolTable: FieldSymbolTable
+    private lateinit var constructorSymbolTable: ConstructorSymbolTable
 
     private var currentNativeMethodAddress = 1 // malloc
     private var currentMethodAddress = 0
+    private var currentConstructorAddress = 0
 
     var declareOnly = true
 
@@ -31,6 +34,10 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
         classSymbolTable.classes
             .flatMap { it.value.methodSymbolTable.methods.values }
             .forEach { it.address += currentNativeMethodAddress }
+
+        classSymbolTable.classes
+            .flatMap { it.value.constructorSymbolTable.constructors.values }
+            .forEach { it.address += currentMethodAddress + currentNativeMethodAddress }
     }
 
     override fun visitJavaclass(ctx: MiniJavaParser.JavaclassContext) {
@@ -44,6 +51,7 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
         } else {
             methodSymbolTable = classSymbolTable.getMethodSymbolTable(className)
             fieldSymbolTable = classSymbolTable.getFieldSymbolTable(className)
+            constructorSymbolTable = classSymbolTable.getConstructorSymbolTable(className)
             visitChildren(ctx)
         }
     }
@@ -100,5 +108,17 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
                 isStatic = ctx.staticmodifier.size == 1
             )
         }
+    }
+
+    override fun visitConstructor(ctx: MiniJavaParser.ConstructorContext) {
+        val parameters = ctx.parameters.map {
+            it.type.getDataType(classSymbolTable) ?: throw UnknownTypeException(it.type.text, it.type.start)
+        }
+
+        if (constructorSymbolTable.isDeclared(parameters)) {
+            TODO()
+        }
+
+        constructorSymbolTable.declareConstructor(currentConstructorAddress++, parameters)
     }
 }
