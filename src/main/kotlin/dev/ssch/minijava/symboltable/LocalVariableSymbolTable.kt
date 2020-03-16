@@ -55,6 +55,10 @@ class LocalVariableSymbolTable {
         }
     }
 
+    fun doesThisParameterExist(): Boolean {
+        return thisAddress != null
+    }
+
     fun isDeclared(name: String): Boolean = symbols.containsKey(name)
 
     fun addressOf(name: String): Int = symbols[name]!!.address

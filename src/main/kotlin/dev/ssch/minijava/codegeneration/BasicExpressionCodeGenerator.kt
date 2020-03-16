@@ -15,11 +15,21 @@ class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerati
 
     fun generateEvaluation(ctx: MiniJavaParser.IdExprContext): DataType {
         val name = ctx.IDENT().text
-        if (!codeGenerationPhase.localsVariableSymbolTable.isDeclared(name)) {
+
+        val instructions = codeGenerationPhase.currentFunction.body.instructions
+        val localsVariableSymbolTable = codeGenerationPhase.localsVariableSymbolTable
+
+        if (localsVariableSymbolTable.isDeclared(name)) {
+            instructions.add(Instruction.local_get(localsVariableSymbolTable.addressOf(name)))
+            return localsVariableSymbolTable.typeOf(name)
+        } else if (localsVariableSymbolTable.doesThisParameterExist()) {
+            return codeGenerationPhase.memberAccessExpressionCodeGenerator.generateEvaluation(name) {
+                instructions.add(Instruction.local_get(localsVariableSymbolTable.addressOfThis()))
+                DataType.ReferenceType(codeGenerationPhase.currentClass)
+            }
+        } else {
             throw UndefinedVariableException(name, ctx.IDENT().symbol)
         }
-        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.local_get(codeGenerationPhase.localsVariableSymbolTable.addressOf(name)))
-        return codeGenerationPhase.localsVariableSymbolTable.typeOf(name)
     }
 
     fun generateEvaluation(ctx: MiniJavaParser.IntExprContext): DataType {

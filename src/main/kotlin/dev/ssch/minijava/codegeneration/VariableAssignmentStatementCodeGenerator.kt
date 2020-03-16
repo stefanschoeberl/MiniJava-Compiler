@@ -23,13 +23,28 @@ class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: 
 
         when (val left = ctx.left) {
             is MiniJavaParser.IdExprContext -> {
-                val rightType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
                 val name = left.IDENT().text
-                if (!codeGenerationPhase.localsVariableSymbolTable.isDeclared(name)) {
+
+                val instructions = codeGenerationPhase.currentFunction.body.instructions
+                val localsVariableSymbolTable = codeGenerationPhase.localsVariableSymbolTable
+
+                if (localsVariableSymbolTable.isDeclared(name)) {
+                    val rightType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
+                    checkAndConvertAssigment(codeGenerationPhase.localsVariableSymbolTable.typeOf(name), rightType)
+                    codeGenerationPhase.currentFunction.body.instructions.add(Instruction.local_set(codeGenerationPhase.localsVariableSymbolTable.addressOf(name)))
+                } else if (localsVariableSymbolTable.doesThisParameterExist()) {
+                    val resultingType = codeGenerationPhase.memberAccessExpressionCodeGenerator.generateMemberExprAddressAndReturnResultingType(name) {
+                        instructions.add(Instruction.local_get(localsVariableSymbolTable.addressOfThis()))
+                        DataType.ReferenceType(codeGenerationPhase.currentClass)
+                    }
+
+                    val rightType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
+                    checkAndConvertAssigment(resultingType, rightType)
+
+                    codeGenerationPhase.currentFunction.body.instructions.add(resultingType.getStoreMemoryInstruction())
+                } else {
                     throw UndefinedVariableException(name, left.IDENT().symbol)
                 }
-                checkAndConvertAssigment(codeGenerationPhase.localsVariableSymbolTable.typeOf(name), rightType)
-                codeGenerationPhase.currentFunction.body.instructions.add(Instruction.local_set(codeGenerationPhase.localsVariableSymbolTable.addressOf(name)))
             }
             is MiniJavaParser.ArrayAccessExprContext -> {
                 val elementType = codeGenerationPhase.arrayAccessExpressionCodeGeneration.generateElementAddressCodeAndReturnElementType(left)
