@@ -10,9 +10,9 @@ import dev.ssch.minijava.symboltable.ConstructorSymbolTable
 import dev.ssch.minijava.symboltable.MethodSymbolTable
 import dev.ssch.minijava.symboltable.LocalVariableSymbolTable
 
-class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) : MiniJavaBaseVisitor<Unit>() {
+class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
 
-    lateinit var module: Module
+    private lateinit var module: Module
     lateinit var currentClass: String
     lateinit var currentFunction: Function
 
@@ -35,97 +35,125 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) : MiniJavaBase
     val expressionCodeGenerator = ExpressionCodeGenerator(this)
     val statementCodeGenerator = StatementCodeGenerator(this)
 
-    override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext) {
-        module = Module()
-        functions = mutableMapOf()
-        constructors = mutableMapOf()
+    private val visitor = Visitor()
 
-        fun declareFunctionType(signature: MethodSymbolTable.MethodSignature, information: MethodSymbolTable.MethodInformation): Int {
-            if (information.isStatic) {
+    fun generateModule(ctx: MiniJavaParser.MinijavaContext): Module {
+        visitor.visit(ctx)
+        return module
+    }
+
+    inner class Visitor : MiniJavaBaseVisitor<Unit>() {
+        override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext) {
+            module = Module()
+            functions = mutableMapOf()
+            constructors = mutableMapOf()
+
+            fun declareFunctionType(
+                signature: MethodSymbolTable.MethodSignature,
+                information: MethodSymbolTable.MethodInformation
+            ): Int {
+                if (information.isStatic) {
+                    val parameters = signature.parameterTypes.map { type -> type.toWebAssemblyType() }.toMutableList()
+                    val returnType = information.returnType
+                        ?.let { type -> mutableListOf(type.toWebAssemblyType()) }
+                        ?: mutableListOf()
+                    return module.declareType(FuncType(parameters, returnType))
+                } else {
+                    TODO()
+                }
+            }
+
+            fun declareFunctionType(
+                signature: ConstructorSymbolTable.ConstructorSignature,
+                information: ConstructorSymbolTable.ConstructorInformation
+            ): Int {
                 val parameters = signature.parameterTypes.map { type -> type.toWebAssemblyType() }.toMutableList()
-                val returnType = information.returnType
-                    ?.let { type -> mutableListOf(type.toWebAssemblyType()) }
-                    ?: mutableListOf()
-                return module.declareType(FuncType(parameters, returnType))
-            } else {
-                TODO()
+                parameters.add(0, ValueType.I32)
+                val returnType = ValueType.I32
+                return module.declareType(FuncType(parameters, mutableListOf(returnType)))
             }
-        }
 
-        fun declareFunctionType(signature: ConstructorSymbolTable.ConstructorSignature, information: ConstructorSymbolTable.ConstructorInformation): Int {
-            val parameters = signature.parameterTypes.map { type -> type.toWebAssemblyType() }.toMutableList()
-            parameters.add(0, ValueType.I32)
-            val returnType = ValueType.I32
-            return module.declareType(FuncType(parameters, mutableListOf(returnType)))
-        }
-
-        mallocAddress = module.importFunction(Import("internal", "malloc",
-            ImportDesc.Func(declareFunctionType(
-                MethodSymbolTable.MethodSignature("malloc", listOf(DataType.PrimitiveType.Integer)),
-                MethodSymbolTable.MethodInformation(-1, DataType.PrimitiveType.Integer,
-                    isPublic = false,
-                    isStatic = true
+            mallocAddress = module.importFunction(
+                Import(
+                    "internal", "malloc",
+                    ImportDesc.Func(
+                        declareFunctionType(
+                            MethodSymbolTable.MethodSignature("malloc", listOf(DataType.PrimitiveType.Integer)),
+                            MethodSymbolTable.MethodInformation(
+                                -1, DataType.PrimitiveType.Integer,
+                                isPublic = false,
+                                isStatic = true
+                            )
+                        )
+                    )
                 )
-            ))))
+            )
 
-        classSymbolTable.classes.flatMap { classEntry ->
-            classEntry.value.methodSymbolTable.nativeMethods.map {
-                Pair(classEntry.key, it)
-            }
-        }.sortedBy { it.second.value.address }.forEach {
-            val className = it.first
-            val methodSignature = it.second.key
-            val methodInfo = it.second.value
-
-            val functionType = declareFunctionType(methodSignature, methodInfo)
-            module.importFunction(Import(
-                "imports",
-                "$className.${methodSignature.externalName()}",
-                ImportDesc.Func(functionType)))
-        }
-
-        classSymbolTable.classes
-            .flatMap { classEntry ->
-                classEntry.value.methodSymbolTable.methods.entries.map { Pair(classEntry.key, it) }
-            }
-            .sortedBy { it.second.value.address }
-            .forEach {
+            classSymbolTable.classes.flatMap { classEntry ->
+                classEntry.value.methodSymbolTable.nativeMethods.map {
+                    Pair(classEntry.key, it)
+                }
+            }.sortedBy { it.second.value.address }.forEach {
                 val className = it.first
                 val methodSignature = it.second.key
                 val methodInfo = it.second.value
 
                 val functionType = declareFunctionType(methodSignature, methodInfo)
-                val function = Function(functionType, mutableListOf(), Expr(mutableListOf()))
-                module.declareFunction(function)
-                functions[Pair(className, methodSignature)] = function
-                if (methodInfo.isPublic) {
-                    module.exports.add(Export(
+                module.importFunction(
+                    Import(
+                        "imports",
                         "$className.${methodSignature.externalName()}",
-                        ExportDesc.Func(methodInfo.address)))
+                        ImportDesc.Func(functionType)
+                    )
+                )
+            }
+
+            classSymbolTable.classes
+                .flatMap { classEntry ->
+                    classEntry.value.methodSymbolTable.methods.entries.map { Pair(classEntry.key, it) }
                 }
-            }
+                .sortedBy { it.second.value.address }
+                .forEach {
+                    val className = it.first
+                    val methodSignature = it.second.key
+                    val methodInfo = it.second.value
 
-        classSymbolTable.classes
-            .flatMap { classEntry ->
-                classEntry.value.constructorSymbolTable.constructors.entries.map { Pair(classEntry.key, it)}
-            }
-            .sortedBy { it.second.value.address }
-            .forEach {
-                val className = it.first
-                val constructorSignature = it.second.key
-                val constructorInfo = it.second.value
-                val functionType = declareFunctionType(constructorSignature, constructorInfo)
-                val function = Function(functionType, mutableListOf(), Expr(mutableListOf()))
-                module.declareFunction(function)
-                constructors[Pair(className, constructorSignature)] = function
-            }
+                    val functionType = declareFunctionType(methodSignature, methodInfo)
+                    val function = Function(functionType, mutableListOf(), Expr(mutableListOf()))
+                    module.declareFunction(function)
+                    functions[Pair(className, methodSignature)] = function
+                    if (methodInfo.isPublic) {
+                        module.exports.add(
+                            Export(
+                                "$className.${methodSignature.externalName()}",
+                                ExportDesc.Func(methodInfo.address)
+                            )
+                        )
+                    }
+                }
 
-        visitChildren(ctx)
+            classSymbolTable.classes
+                .flatMap { classEntry ->
+                    classEntry.value.constructorSymbolTable.constructors.entries.map { Pair(classEntry.key, it) }
+                }
+                .sortedBy { it.second.value.address }
+                .forEach {
+                    val className = it.first
+                    val constructorSignature = it.second.key
+                    val constructorInfo = it.second.value
+                    val functionType = declareFunctionType(constructorSignature, constructorInfo)
+                    val function = Function(functionType, mutableListOf(), Expr(mutableListOf()))
+                    module.declareFunction(function)
+                    constructors[Pair(className, constructorSignature)] = function
+                }
 
-        module.imports.add(Import("internal", "memory", ImportDesc.Memory(MemType(1))))
-    }
+            visitChildren(ctx)
 
-    override fun visitJavaclass(ctx: MiniJavaParser.JavaclassContext) {
-        classCodeGenerator.generate(ctx)
+            module.imports.add(Import("internal", "memory", ImportDesc.Memory(MemType(1))))
+        }
+
+        override fun visitJavaclass(ctx: MiniJavaParser.JavaclassContext) {
+            classCodeGenerator.generate(ctx)
+        }
     }
 }

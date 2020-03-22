@@ -26,7 +26,6 @@ class BasicStatementCodeGenerator(private val codeGenerationPhase: CodeGeneratio
     fun generateExecution(ctx: MiniJavaParser.BlockStmtContext) {
         codeGenerationPhase.localsVariableSymbolTable.pushScope()
         ctx.statements.forEach(codeGenerationPhase.statementCodeGenerator::generateExecution)
-        codeGenerationPhase.visitChildren(ctx)
         codeGenerationPhase.localsVariableSymbolTable.popScope()
     }
 }

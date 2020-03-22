@@ -21,9 +21,7 @@ class Compiler {
         declarationPhase.visit(tree)
 
         val codeGenerationPhase = CodeGenerationPhase(declarationPhase.classSymbolTable)
-        codeGenerationPhase.visit(tree)
-
-        return codeGenerationPhase.module
+        return codeGenerationPhase.generateModule(tree)
     }
 
 }
