@@ -31,6 +31,7 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
     val arrayAccessExpressionCodeGeneration = ArrayAccessExpressionCodeGenerator(this)
     val memberAccessExpressionCodeGenerator = MemberExpressionCodeGenerator(this)
 
+    val variableAssignmentStatementCodeGenerator = VariableAssignmentStatementCodeGenerator(this)
     val expressionCodeGenerator = ExpressionCodeGenerator(this)
     val statementCodeGenerator = StatementCodeGenerator(this)
 

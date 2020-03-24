@@ -31,8 +31,8 @@ async function runModule(folder) {
                 return address;
             }
         },
-        wasmDeref: (ref) => {
-            return references[ref];
+        wasmDeref: (address) => {
+            return references[address];
         }
     };
 
@@ -40,7 +40,9 @@ async function runModule(folder) {
     for (let script of scripts) {
         const imports = script(runtime);
         for (let name in imports) {
-            nativeMethods[name] = imports[name];
+            if (imports.hasOwnProperty(name)) {
+                nativeMethods[name] = imports[name];
+            }
         }
     }
 

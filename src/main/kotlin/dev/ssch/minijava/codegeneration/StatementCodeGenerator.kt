@@ -9,7 +9,7 @@ class StatementCodeGenerator(codeGenerationPhase: CodeGenerationPhase) {
     val whileLoopCodeGenerator = WhileLoopStatementCodeGenerator(codeGenerationPhase)
     val ifElseLoopCodeGenerator = IfElseStatementCodeGenerator(codeGenerationPhase)
     val variableDeclarationStatementCodeGenerator = VariableDeclarationStatementCodeGenerator(codeGenerationPhase)
-    val variableAssignmentStatementCodeGenerator = VariableAssignmentStatementCodeGenerator(codeGenerationPhase)
+    val variableAssignmentStatementCodeGenerator = codeGenerationPhase.variableAssignmentStatementCodeGenerator
     val basicStatementCodeGenerator = BasicStatementCodeGenerator(codeGenerationPhase)
 
     private val visitor = Visitor()

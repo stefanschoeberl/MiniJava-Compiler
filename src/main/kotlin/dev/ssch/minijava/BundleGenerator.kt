@@ -41,7 +41,7 @@ class BundleGenerator {
             val fields = it.value.fieldSymbolTable.fields.keys
             val initObject = fields.joinToString(",") { "\"$it\":0" }
             val constructor = externalConstructorName(className)
-            functions.add("\"$constructor\": function() { runtime.wasmRef({$initObject}); }")
+            functions.add("\"$constructor\": function() { return runtime.wasmRef({$initObject}); }")
             fields.forEach { fieldName ->
                 val getter = externalGetterName(className, fieldName)
                 val setter = externalSetterName(className, fieldName)

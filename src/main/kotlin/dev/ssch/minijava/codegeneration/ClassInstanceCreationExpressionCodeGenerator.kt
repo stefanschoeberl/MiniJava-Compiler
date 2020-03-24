@@ -14,11 +14,8 @@ class ClassInstanceCreationExpressionCodeGenerator(private val codeGenerationPha
                 as? DataType.ReferenceType // TODO
             ?: TODO()
 
-        val size = codeGenerationPhase.classSymbolTable.getFieldSymbolTable(type.name).getSize()
-        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.i32_const(size))
-
-        // allocate memory
-        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.call(codeGenerationPhase.mallocAddress))
+        val constructorAddress = codeGenerationPhase.classSymbolTable.getConstructorAddress(type.name)
+        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.call(constructorAddress))
 
         // evaluate initializer parameters
         val parameterTypes = ctx.parameters.map(codeGenerationPhase.expressionCodeGenerator::generateEvaluation)

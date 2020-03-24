@@ -9,18 +9,19 @@ import dev.ssch.minijava.exception.InvalidAssignmentException
 import dev.ssch.minijava.exception.UndefinedVariableException
 import dev.ssch.minijava.getStoreMemoryInstruction
 import dev.ssch.minijava.grammar.MiniJavaParser
+import org.antlr.v4.runtime.Token
 
 class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
 
+    fun checkAndConvertAssigment(leftType: DataType?, rightType: DataType?, token: Token) {
+        val conversionCode = leftType?.let {
+            rightType?.assignTypeTo(it)
+        } ?: throw IncompatibleAssignmentException(leftType, rightType, token)
+
+        codeGenerationPhase.currentFunction.body.instructions.addAll(conversionCode)
+    }
+
     fun generateExecution(ctx: MiniJavaParser.VarassignStmtContext) {
-        fun checkAndConvertAssigment(leftType: DataType?, rightType: DataType?) {
-            val conversionCode = leftType?.let {
-                rightType?.assignTypeTo(it)
-            } ?: throw IncompatibleAssignmentException(leftType, rightType, ctx.left.start)
-
-            codeGenerationPhase.currentFunction.body.instructions.addAll(conversionCode)
-        }
-
         when (val left = ctx.left) {
             is MiniJavaParser.IdExprContext -> {
                 val name = left.IDENT().text
@@ -30,18 +31,13 @@ class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: 
 
                 if (localsVariableSymbolTable.isDeclared(name)) {
                     val rightType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
-                    checkAndConvertAssigment(codeGenerationPhase.localsVariableSymbolTable.typeOf(name), rightType)
+                    checkAndConvertAssigment(codeGenerationPhase.localsVariableSymbolTable.typeOf(name), rightType, ctx.left.start)
                     codeGenerationPhase.currentFunction.body.instructions.add(Instruction.local_set(codeGenerationPhase.localsVariableSymbolTable.addressOf(name)))
                 } else if (localsVariableSymbolTable.doesThisParameterExist()) {
-                    val resultingType = codeGenerationPhase.memberAccessExpressionCodeGenerator.generateMemberExprAddressAndReturnResultingType(name) {
+                    codeGenerationPhase.memberAccessExpressionCodeGenerator.generateWrite(name, ctx.right, ctx.left.start) {
                         instructions.add(Instruction.local_get(localsVariableSymbolTable.addressOfThis()))
                         DataType.ReferenceType(codeGenerationPhase.currentClass)
                     }
-
-                    val rightType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
-                    checkAndConvertAssigment(resultingType, rightType)
-
-                    codeGenerationPhase.currentFunction.body.instructions.add(resultingType.getStoreMemoryInstruction())
                 } else {
                     throw UndefinedVariableException(name, left.IDENT().symbol)
                 }
@@ -50,19 +46,13 @@ class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: 
                 val elementType = codeGenerationPhase.arrayAccessExpressionCodeGeneration.generateElementAddressCodeAndReturnElementType(left)
 
                 val rightType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
-                checkAndConvertAssigment(elementType, rightType)
+                checkAndConvertAssigment(elementType, rightType, ctx.left.start)
 
                 codeGenerationPhase.currentFunction.body.instructions.add(elementType.getStoreMemoryInstruction())
 
             }
             is MiniJavaParser.MemberExprContext -> {
-                val resultingType = codeGenerationPhase.memberAccessExpressionCodeGenerator.generateMemberExprAddressAndReturnResultingType(left)
-
-                val rightType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
-                checkAndConvertAssigment(resultingType, rightType)
-
-                codeGenerationPhase.currentFunction.body.instructions.add(resultingType.getStoreMemoryInstruction())
-
+                codeGenerationPhase.memberAccessExpressionCodeGenerator.generateWrite(left, ctx.right)
             }
             else -> throw InvalidAssignmentException(left.start)
         }

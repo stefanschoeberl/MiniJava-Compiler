@@ -37,4 +37,8 @@ class ClassSymbolTable {
     fun getInitializerSymbolTable(className: String): InitializerSymbolTable {
         return classes[className]!!.initializerSymbolTable
     }
+
+    fun getConstructorAddress(className: String): Int {
+        return classes[className]!!.constructorAddress
+    }
 }

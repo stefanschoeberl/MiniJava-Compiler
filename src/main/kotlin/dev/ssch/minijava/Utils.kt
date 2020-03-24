@@ -106,7 +106,7 @@ fun DataType.castTypeTo(other: DataType): List<Instruction>? {
 }
 
 fun MethodSymbolTable.MethodSignature.externalName(): String {
-    return this.name + this.parameterTypes.map { "#$it" }.joinToString()
+    return this.name + this.parameterTypes.map { "#$it" }.joinToString("")
 }
 
 fun externalConstructorName(className: String): String {
