@@ -1,0 +1,8 @@
+class Console {
+    native static void println(int a);
+    native static void println(boolean a);
+    native static void println(float a);
+    native static void println(int[] a);
+    native static void println(boolean[] a);
+    native static void println(float[] a);
+}

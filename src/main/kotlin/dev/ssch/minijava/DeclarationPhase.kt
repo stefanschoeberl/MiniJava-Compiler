@@ -21,11 +21,11 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
 
     var declareOnly = true
 
-    override fun visitMinijava(ctx: MiniJavaParser.MinijavaContext) {
+    fun process(trees: List<MiniJavaParser.MinijavaContext>) {
         declareOnly = true
-        visitChildren(ctx)
+        trees.forEach(this::visitChildren)
         declareOnly = false
-        visitChildren(ctx)
+        trees.forEach(this::visitChildren)
 
         recalculateMethodAddresses()
     }

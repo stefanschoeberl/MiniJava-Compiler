@@ -1,14 +1,31 @@
 const fs = require('fs');
+const path = require('path');
 const { promisify } = require("util");
 
 // https://webassembly.org/getting-started/js-api/
 
 const readFile = promisify(fs.readFile);
 
-async function runFile(file) {
+async function runModule(folder) {
+    const folderAbsolute = path.resolve(folder);
+    const file = path.join(folderAbsolute, "module.wasm");
+    const scripts = require(path.join(folderAbsolute, "module"));
+
     const memory = new WebAssembly.Memory({initial:1});
     const memoryView = new DataView(memory.buffer);
     let nextFreeAddress = 1;
+
+    const runtime = {
+        memoryView: memoryView
+    };
+
+    const nativeMethods = {};
+    for (let script of scripts) {
+        const imports = script(runtime);
+        for (let name in imports) {
+            nativeMethods[name] = imports[name];
+        }
+    }
 
     const imports = {
         internal: {
@@ -19,43 +36,7 @@ async function runFile(file) {
                 return address;
             }
         },
-        imports: {
-            "Console.println#int": arg => console.log(arg),
-            "Console.println#float": arg => console.log(arg),
-            "Console.println#boolean": arg => console.log(arg === 0 ? 'false' : 'true'),
-            "Console.println#int[]": offset => {
-                const size = memoryView.getInt32(offset, true);
-                const firstElement = offset + 4;
-                const elementSize = 4;
-                const lastElement = firstElement + size * elementSize;
-                let result = [];
-                for (let i = firstElement; i < lastElement; i += elementSize) {
-                    result.push(memoryView.getInt32(i, true));
-                }
-                console.log('[' + result.join(', ') + ']');
-            },
-            "Console.println#boolean[]": offset => {
-                const size = memoryView.getInt32(offset, true);
-                const firstElement = offset + 4;
-                const lastElement = firstElement + size;
-                let result = [];
-                for (let i = firstElement; i < lastElement; i++) {
-                    result.push(memoryView.getInt8(i) === 0 ? 'false' : 'true');
-                }
-                console.log('[' + result.join(', ') + ']');
-            },
-            "Console.println#float[]": offset => {
-                const size = memoryView.getInt32(offset, true);
-                const firstElement = offset + 4;
-                const elementSize = 4;
-                const lastElement = firstElement + size * elementSize;
-                let result = [];
-                for (let i = firstElement; i < lastElement; i += elementSize) {
-                    result.push(memoryView.getFloat32(i, true));
-                }
-                console.log('[' + result.join(', ') + ']');
-            }
-        }
+        imports: nativeMethods
     };
     const bytes = await readFile(file);
     const module = await WebAssembly.compile(bytes);
@@ -63,4 +44,4 @@ async function runFile(file) {
     instance.exports["Main.main"]();
 }
 
-runFile(process.argv[2]);
+runModule(process.argv[2]);

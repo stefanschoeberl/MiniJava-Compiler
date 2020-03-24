@@ -1,35 +1,22 @@
 package dev.ssch.minijava
 
+import org.apache.commons.cli.DefaultParser
+import org.apache.commons.cli.Options
 import java.io.File
 
 fun main(args: Array<String>) {
-    if (args.size != 1) {
-        println("file missing")
-        return
-    }
+    val options = Options()
+    options.addRequiredOption("o", "output", true,"output folder")
+    val parser = DefaultParser()
+    val cli = parser.parse(options, args)
 
-    val input = args[0]
-    val parts = input.split(".")
+    val inputFiles = cli.argList
+    val outputFolder = cli.getOptionValue("o")
 
-    if (parts.size != 2 || parts[1] != "minijava") {
-        println("not a MiniJava file")
-        return
-    }
-
-    val name = parts[0]
-
+    val files = inputFiles.map(::File)
     val compiler = Compiler()
-    val module = compiler.compile(File(input).readText())
+    val module = compiler.compile(files)
 
-    val moduleGenerator = ModuleGenerator()
-    val watText = moduleGenerator.toSExpr(module)
-
-    println(watText)
-
-    val wat = File("$name.wat")
-    wat.writeText(watText)
-
-    val wasm = File("$name.wasm")
-    val assembler = WebAssemblyAssembler()
-    assembler.assemble(wat, wasm)
+    val bundleGenerator = BundleGenerator()
+    bundleGenerator.generateBundle(module, files, File(outputFolder))
 }

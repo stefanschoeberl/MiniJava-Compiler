@@ -3,7 +3,7 @@ package dev.ssch.minijava
 import dev.ssch.minijava.ast.*
 import dev.ssch.minijava.ast.Function
 
-class ModuleGenerator {
+class WebAssemblyModuleGenerator {
 
     fun toSExpr(module: Module): String {
         val sb = StringBuilder()
