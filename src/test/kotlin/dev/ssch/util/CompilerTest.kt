@@ -40,10 +40,10 @@ abstract class CompilerTest {
                 .forEach { allSourceFiles.add(it) }
         }
 
-        val module = compiler.compile(allSourceFiles)
+        val (module, classSymbolTable) = compiler.compile(allSourceFiles)
 
         val bundleGenerator = BundleGenerator()
-        bundleGenerator.generateBundle(module, allSourceFiles, wasmOutput)
+        bundleGenerator.generateBundle(module, allSourceFiles, wasmOutput, classSymbolTable)
 
         val runner = WebAssemblyRunner()
         return runner.run(wasmOutput.absolutePath)

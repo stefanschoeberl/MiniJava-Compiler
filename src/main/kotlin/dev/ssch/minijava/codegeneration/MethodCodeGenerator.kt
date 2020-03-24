@@ -5,7 +5,7 @@ import dev.ssch.minijava.DataType
 import dev.ssch.minijava.ast.Instruction
 import dev.ssch.minijava.getDataType
 import dev.ssch.minijava.grammar.MiniJavaParser
-import dev.ssch.minijava.symboltable.ConstructorSymbolTable
+import dev.ssch.minijava.symboltable.InitializerSymbolTable
 import dev.ssch.minijava.symboltable.LocalVariableSymbolTable
 import dev.ssch.minijava.symboltable.MethodSymbolTable
 import dev.ssch.minijava.toWebAssemblyType
@@ -38,7 +38,7 @@ class MethodCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) 
         val parameterTypes = extractParameterTypes(parameters)
         declareParameters(true, parameters)
 
-        codeGenerationPhase.currentFunction = codeGenerationPhase.constructors[Pair(codeGenerationPhase.currentClass, ConstructorSymbolTable.ConstructorSignature(parameterTypes))]!!
+        codeGenerationPhase.currentFunction = codeGenerationPhase.initializers[Pair(codeGenerationPhase.currentClass, InitializerSymbolTable.InitializerSignature(parameterTypes))]!!
 
         generateStatementExecution(ctx.statements)
         codeGenerationPhase.currentFunction.body.instructions.add(Instruction.local_get(codeGenerationPhase.localsVariableSymbolTable.addressOfThis()))

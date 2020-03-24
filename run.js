@@ -15,8 +15,25 @@ async function runModule(folder) {
     const memoryView = new DataView(memory.buffer);
     let nextFreeAddress = 1;
 
+    let nextFreeReference = 1;
+    const objects = {};
+    const references = {};
+
     const runtime = {
-        memoryView: memoryView
+        memoryView: memoryView,
+        wasmRef: (obj) => {
+            if (objects.hasOwnProperty(obj)) {
+                return objects[obj];
+            } else {
+                const address = nextFreeReference++;
+                objects[obj] = address;
+                references[address] = obj;
+                return address;
+            }
+        },
+        wasmDeref: (ref) => {
+            return references[ref];
+        }
     };
 
     const nativeMethods = {};

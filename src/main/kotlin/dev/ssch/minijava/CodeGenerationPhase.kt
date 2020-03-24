@@ -5,7 +5,7 @@ import dev.ssch.minijava.ast.Function
 import dev.ssch.minijava.codegeneration.*
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.symboltable.ClassSymbolTable
-import dev.ssch.minijava.symboltable.ConstructorSymbolTable
+import dev.ssch.minijava.symboltable.InitializerSymbolTable
 import dev.ssch.minijava.symboltable.MethodSymbolTable
 import dev.ssch.minijava.symboltable.LocalVariableSymbolTable
 
@@ -19,7 +19,7 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
     lateinit var methodSymbolTable: MethodSymbolTable
 
     lateinit var functions: MutableMap<Pair<String, MethodSymbolTable.MethodSignature>, Function>
-    lateinit var constructors: MutableMap<Pair<String, ConstructorSymbolTable.ConstructorSignature>, Function>
+    lateinit var initializers: MutableMap<Pair<String, InitializerSymbolTable.InitializerSignature>, Function>
 
     val operatorTable = OperatorTable()
 
@@ -44,33 +44,17 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
     private fun beginModule() {
         module = Module()
         functions = mutableMapOf()
-        constructors = mutableMapOf()
+        initializers = mutableMapOf()
 
-        fun declareFunctionType(
-            signature: MethodSymbolTable.MethodSignature,
-            information: MethodSymbolTable.MethodInformation
-        ): Int {
-            if (information.isStatic) {
-                val parameters = signature.parameterTypes.map { type -> type.toWebAssemblyType() }.toMutableList()
-                val returnType = information.returnType
-                    ?.let { type -> mutableListOf(type.toWebAssemblyType()) }
-                    ?: mutableListOf()
-                return module.declareType(FuncType(parameters, returnType))
-            } else {
-                TODO()
-            }
-        }
+        importMalloc()
+        importNativeMethods()
+        importConstructors()
+        importGetterSetters()
+        defineNormalMethods()
+        defineInitializers()
+    }
 
-        fun declareFunctionType(
-            signature: ConstructorSymbolTable.ConstructorSignature,
-            information: ConstructorSymbolTable.ConstructorInformation
-        ): Int {
-            val parameters = signature.parameterTypes.map { type -> type.toWebAssemblyType() }.toMutableList()
-            parameters.add(0, ValueType.I32)
-            val returnType = ValueType.I32
-            return module.declareType(FuncType(parameters, mutableListOf(returnType)))
-        }
-
+    private fun importMalloc() {
         mallocAddress = module.importFunction(
             Import(
                 "internal", "malloc",
@@ -86,7 +70,9 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
                 )
             )
         )
+    }
 
+    private fun importNativeMethods() {
         classSymbolTable.classes.flatMap { classEntry ->
             classEntry.value.methodSymbolTable.nativeMethods.map {
                 Pair(classEntry.key, it)
@@ -105,7 +91,56 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
                 )
             )
         }
+    }
 
+    private fun importConstructors() {
+        classSymbolTable.classes.entries
+            .sortedBy { it.value.constructorAddress }
+            .forEach {
+                val className = it.key
+                val functionType = module.declareType(FuncType(mutableListOf(), mutableListOf(ValueType.I32)))
+                module.importFunction(
+                    Import(
+                        "imports",
+                        externalConstructorName(className),
+                        ImportDesc.Func(functionType)
+                    )
+                )
+            }
+    }
+
+    private fun importGetterSetters() {
+        classSymbolTable.classes.entries.flatMap { classEntry ->
+            classEntry.value.fieldSymbolTable.fields.entries.map { fieldEntry ->
+                Pair(classEntry.key, fieldEntry)
+            }
+        }.sortedBy { it.second.value.getterAddress }.forEach {
+            val className = it.first
+            val fieldName = it.second.key
+            val fieldType = it.second.value.type.toWebAssemblyType()
+
+            val getterType = module.declareType(FuncType(mutableListOf(ValueType.I32), mutableListOf(fieldType)))
+            val setterType = module.declareType(FuncType(mutableListOf(ValueType.I32, fieldType), mutableListOf()))
+
+            module.importFunction(
+                Import(
+                    "imports",
+                    externalGetterName(className, fieldName),
+                    ImportDesc.Func(getterType)
+                )
+            )
+
+            module.importFunction(
+                Import(
+                    "imports",
+                    externalSetterName(className, fieldName),
+                    ImportDesc.Func(setterType)
+                )
+            )
+        }
+    }
+
+    private fun defineNormalMethods() {
         classSymbolTable.classes
             .flatMap { classEntry ->
                 classEntry.value.methodSymbolTable.methods.entries.map { Pair(classEntry.key, it) }
@@ -129,21 +164,46 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
                     )
                 }
             }
+    }
 
+    private fun defineInitializers() {
         classSymbolTable.classes
             .flatMap { classEntry ->
-                classEntry.value.constructorSymbolTable.constructors.entries.map { Pair(classEntry.key, it) }
+                classEntry.value.initializerSymbolTable.initializers.entries.map { Pair(classEntry.key, it) }
             }
             .sortedBy { it.second.value.address }
             .forEach {
                 val className = it.first
-                val constructorSignature = it.second.key
-                val constructorInfo = it.second.value
-                val functionType = declareFunctionType(constructorSignature, constructorInfo)
+                val initializerSignature = it.second.key
+                val functionType = declareFunctionType(initializerSignature)
                 val function = Function(functionType, mutableListOf(), Expr(mutableListOf()))
                 module.declareFunction(function)
-                constructors[Pair(className, constructorSignature)] = function
+                initializers[Pair(className, initializerSignature)] = function
             }
+    }
+
+    private fun declareFunctionType(
+        signature: MethodSymbolTable.MethodSignature,
+        information: MethodSymbolTable.MethodInformation
+    ): Int {
+        if (information.isStatic) {
+            val parameters = signature.parameterTypes.map { type -> type.toWebAssemblyType() }.toMutableList()
+            val returnType = information.returnType
+                ?.let { type -> mutableListOf(type.toWebAssemblyType()) }
+                ?: mutableListOf()
+            return module.declareType(FuncType(parameters, returnType))
+        } else {
+            TODO()
+        }
+    }
+
+    private fun declareFunctionType(
+        signature: InitializerSymbolTable.InitializerSignature
+    ): Int {
+        val parameters = signature.parameterTypes.map { type -> type.toWebAssemblyType() }.toMutableList()
+        parameters.add(0, ValueType.I32)
+        val returnType = ValueType.I32
+        return module.declareType(FuncType(parameters, mutableListOf(returnType)))
     }
 
     private fun endModule() {

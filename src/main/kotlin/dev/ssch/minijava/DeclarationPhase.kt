@@ -4,7 +4,7 @@ import dev.ssch.minijava.exception.*
 import dev.ssch.minijava.grammar.MiniJavaBaseVisitor
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.symboltable.ClassSymbolTable
-import dev.ssch.minijava.symboltable.ConstructorSymbolTable
+import dev.ssch.minijava.symboltable.InitializerSymbolTable
 import dev.ssch.minijava.symboltable.FieldSymbolTable
 import dev.ssch.minijava.symboltable.MethodSymbolTable
 
@@ -13,11 +13,13 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
     val classSymbolTable = ClassSymbolTable()
     private lateinit var methodSymbolTable: MethodSymbolTable
     private lateinit var fieldSymbolTable: FieldSymbolTable
-    private lateinit var constructorSymbolTable: ConstructorSymbolTable
+    private lateinit var initializerSymbolTable: InitializerSymbolTable
 
     private var currentNativeMethodAddress = 1 // malloc
     private var currentMethodAddress = 0
+    private var currentInitializerAddress = 0
     private var currentConstructorAddress = 0
+    private var currentGetterSetterAddress = 0
 
     var declareOnly = true
 
@@ -31,13 +33,38 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
     }
 
     private fun recalculateMethodAddresses() {
-        classSymbolTable.classes
-            .flatMap { it.value.methodSymbolTable.methods.values }
-            .forEach { it.address += currentNativeMethodAddress }
+        // Address Layout:
+        // 0: malloc
+        // native methods
+        // constructors
+        // getter/setter
+        // normal methods
+        // initializer
+
+        var currentOffset = currentNativeMethodAddress
+
+        classSymbolTable.classes.forEach { it.value.constructorAddress += currentOffset }
+
+        currentOffset += currentConstructorAddress
 
         classSymbolTable.classes
-            .flatMap { it.value.constructorSymbolTable.constructors.values }
-            .forEach { it.address += currentMethodAddress + currentNativeMethodAddress }
+            .flatMap { it.value.fieldSymbolTable.fields.values }
+            .forEach {
+                it.getterAddress += currentOffset
+                it.setterAddress += currentOffset
+            }
+
+        currentOffset += currentGetterSetterAddress
+
+        classSymbolTable.classes
+            .flatMap { it.value.methodSymbolTable.methods.values }
+            .forEach { it.address += currentOffset }
+
+        currentOffset += currentMethodAddress
+
+        classSymbolTable.classes
+            .flatMap { it.value.initializerSymbolTable.initializers.values }
+            .forEach { it.address += currentOffset }
     }
 
     override fun visitJavaclass(ctx: MiniJavaParser.JavaclassContext) {
@@ -47,11 +74,11 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
                 throw RedefinedClassException(className, ctx.name)
             }
 
-            classSymbolTable.declareClass(className)
+            classSymbolTable.declareClass(currentConstructorAddress++, className)
         } else {
             methodSymbolTable = classSymbolTable.getMethodSymbolTable(className)
             fieldSymbolTable = classSymbolTable.getFieldSymbolTable(className)
-            constructorSymbolTable = classSymbolTable.getConstructorSymbolTable(className)
+            initializerSymbolTable = classSymbolTable.getInitializerSymbolTable(className)
             visitChildren(ctx)
         }
     }
@@ -62,8 +89,9 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
         if (fieldSymbolTable.isDeclared(name)) {
             TODO()
         }
-
-        fieldSymbolTable.declareField(name, type)
+        val getterAddress = currentGetterSetterAddress++
+        val setterAddress = currentGetterSetterAddress++
+        fieldSymbolTable.declareField(getterAddress, setterAddress, name, type)
     }
 
     override fun visitMethod(ctx: MiniJavaParser.MethodContext) {
@@ -115,10 +143,10 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
             it.type.getDataType(classSymbolTable) ?: throw UnknownTypeException(it.type.text, it.type.start)
         }
 
-        if (constructorSymbolTable.isDeclared(parameters)) {
+        if (initializerSymbolTable.isDeclared(parameters)) {
             TODO()
         }
 
-        constructorSymbolTable.declareConstructor(currentConstructorAddress++, parameters)
+        initializerSymbolTable.declareInitializer(currentInitializerAddress++, parameters)
     }
 }

@@ -20,19 +20,19 @@ class ClassInstanceCreationExpressionCodeGenerator(private val codeGenerationPha
         // allocate memory
         codeGenerationPhase.currentFunction.body.instructions.add(Instruction.call(codeGenerationPhase.mallocAddress))
 
-        // evaluate constructor parameters
+        // evaluate initializer parameters
         val parameterTypes = ctx.parameters.map(codeGenerationPhase.expressionCodeGenerator::generateEvaluation)
-        val parameters = parameterTypes.mapIndexed { index, type ->
-            type ?: throw VoidParameterException(ctx.parameters[index].start)
+        val parameters = parameterTypes.mapIndexed { index, parameterType ->
+            parameterType ?: throw VoidParameterException(ctx.parameters[index].start)
         }
 
-        val constructors = codeGenerationPhase.classSymbolTable.getConstructorSymbolTable(type.name)
+        val initializers = codeGenerationPhase.classSymbolTable.getInitializerSymbolTable(type.name)
 
-        if (constructors.isDeclared(parameters)) {
-            val constructorAddress = constructors.addressOf(parameters)
-            codeGenerationPhase.currentFunction.body.instructions.add(Instruction.call(constructorAddress))
+        if (initializers.isDeclared(parameters)) {
+            val initializerAddress = initializers.addressOf(parameters)
+            codeGenerationPhase.currentFunction.body.instructions.add(Instruction.call(initializerAddress))
         } else if (parameters.isNotEmpty()) {
-            TODO("undeclared constructor")
+            TODO("undeclared initializer")
         }
 
         return type

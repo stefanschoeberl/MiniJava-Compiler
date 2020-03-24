@@ -108,3 +108,15 @@ fun DataType.castTypeTo(other: DataType): List<Instruction>? {
 fun MethodSymbolTable.MethodSignature.externalName(): String {
     return this.name + this.parameterTypes.map { "#$it" }.joinToString()
 }
+
+fun externalConstructorName(className: String): String {
+    return "new_$className"
+}
+
+fun externalGetterName(className: String, fieldName: String): String {
+    return "get_$className.$fieldName"
+}
+
+fun externalSetterName(className: String, fieldName: String): String {
+    return "set_$className.$fieldName"
+}
