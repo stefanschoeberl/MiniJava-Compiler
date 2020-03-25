@@ -55,8 +55,18 @@ class BundleGenerator {
             fields.forEach { field ->
                 val getter = externalGetterName(className, field.key)
                 val setter = externalSetterName(className, field.key)
-                functions.add("\"$getter\": function (ref) { return runtime.wasmDeref(ref)[\"${field.key}\"]; }")
-                functions.add("\"$setter\": function (ref, val) { runtime.wasmDeref(ref)[\"${field.key}\"] = val; }")
+                val type = field.value.type
+
+                if (type is DataType.PrimitiveType.Boolean) {
+                    functions.add("\"$getter\": function (ref) { return runtime.wasmDeref(ref)[\"${field.key}\"]; }")
+                    functions.add("\"$setter\": function (ref, val) { runtime.wasmDeref(ref)[\"${field.key}\"] = runtime.wasmBoolean(val); }")
+                } else if (type is DataType.ReferenceType || type is DataType.Array) {
+                    functions.add("\"$getter\": function (ref) { return runtime.wasmRef(runtime.wasmDeref(ref)[\"${field.key}\"]); }")
+                    functions.add("\"$setter\": function (ref, val) { runtime.wasmDeref(ref)[\"${field.key}\"] = runtime.wasmDeref(val); }")
+                } else {
+                    functions.add("\"$getter\": function (ref) { return runtime.wasmDeref(ref)[\"${field.key}\"]; }")
+                    functions.add("\"$setter\": function (ref, val) { runtime.wasmDeref(ref)[\"${field.key}\"] = val; }")
+                }
             }
         }
 

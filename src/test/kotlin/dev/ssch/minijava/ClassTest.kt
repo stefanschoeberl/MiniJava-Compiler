@@ -236,4 +236,69 @@ class ClassTest : CompilerTest() {
         """.compileAndRun()
         assertThat(output.lines()).containsExactly("10", "20", "")
     }
+
+    @Test
+    fun `nested objects`() {
+        val output = Source.withMiniJava("""
+            class A {
+                B b;
+            }
+            
+            class B {
+                int value;
+            }
+            
+            class Main {
+                public static void main() {
+                    A a = new A();
+                    B b = new B();
+                    a.b = b;
+                    b.value = 123;
+                    println(a);
+                }
+                
+                native static void println(A a);
+            }
+        """).andJavaScript("""
+            module.exports = function (runtime) {
+                return {
+                    "Main.println#A": function(aRef) {
+                        const a = runtime.wasmDeref(aRef);
+                        console.log(a.b.value);
+                    }
+                }
+            }
+        """).compileAndRun()
+        assertThat(output.lines()).containsExactly("123", "")
+    }
+
+    @Test
+    fun `nested arrays`() {
+        val output = Source.withMiniJava("""
+            class A {
+                int[] a;
+            }
+            
+            class Main {
+                public static void main() {
+                    A a = new A();
+                    a.a = new int[1];
+                    a.a[0] = 123;
+                    println(a);
+                }
+                
+                native static void println(A a);
+            }
+        """).andJavaScript("""
+            module.exports = function (runtime) {
+                return {
+                    "Main.println#A": function(aRef) {
+                        const a = runtime.wasmDeref(aRef);
+                        console.log(a.a[0]);
+                    }
+                }
+            }
+        """).compileAndRun()
+        assertThat(output.lines()).containsExactly("123", "")
+    }
 }
