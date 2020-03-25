@@ -14,7 +14,7 @@ class AndOrTest : CompilerTest() {
             Console.println(false && true);
             Console.println(true && true);
             Console.println(false && false);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("false", "false", "true", "false", "")
     }
 
@@ -25,7 +25,7 @@ class AndOrTest : CompilerTest() {
             Console.println(false || true);
             Console.println(true || true);
             Console.println(false || false);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "true", "true", "false", "")
     }
 
@@ -36,7 +36,7 @@ class AndOrTest : CompilerTest() {
                 boolean a = true;
                 int b = 123;
                 boolean c = a && b;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -47,7 +47,7 @@ class AndOrTest : CompilerTest() {
                 boolean a = true;
                 int b = 123;
                 boolean c = b && a;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -56,7 +56,7 @@ class AndOrTest : CompilerTest() {
         Assertions.assertThatThrownBy {
             """
                 boolean a = 123 && false;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -65,7 +65,7 @@ class AndOrTest : CompilerTest() {
         Assertions.assertThatThrownBy {
             """
                 boolean a = false && 123;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -75,7 +75,7 @@ class AndOrTest : CompilerTest() {
             """
                 boolean a = true;
                 boolean b = a && (2 * 4);
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -85,7 +85,7 @@ class AndOrTest : CompilerTest() {
             """
                 boolean a = true;
                 boolean b = (2 * 4) && a;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -96,7 +96,7 @@ class AndOrTest : CompilerTest() {
                 boolean a = true;
                 int b = 123;
                 boolean c = a || b;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -107,7 +107,7 @@ class AndOrTest : CompilerTest() {
                 boolean a = true;
                 int b = 123;
                 boolean c = b || a;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -116,7 +116,7 @@ class AndOrTest : CompilerTest() {
         Assertions.assertThatThrownBy {
             """
                 boolean a = 123 || false;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -125,7 +125,7 @@ class AndOrTest : CompilerTest() {
         Assertions.assertThatThrownBy {
             """
                 boolean a = false || 123;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -135,7 +135,7 @@ class AndOrTest : CompilerTest() {
             """
                 boolean a = true;
                 boolean b = a || (2 * 4);
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -145,7 +145,7 @@ class AndOrTest : CompilerTest() {
             """
                 boolean a = true;
                 boolean b = (2 * 4) || a;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -160,7 +160,7 @@ class AndOrTest : CompilerTest() {
             Console.println(true && false || false && true);
             Console.println(true && false || true && false);
             Console.println(true && (false || true) && false);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "true", "true", "true", "true", "false", "false", "false", "")
     }
 }

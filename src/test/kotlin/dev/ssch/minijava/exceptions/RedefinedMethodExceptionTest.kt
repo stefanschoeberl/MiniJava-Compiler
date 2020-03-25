@@ -14,7 +14,7 @@ class RedefinedMethodExceptionTest : CompilerTest() {
             void a() {}
             void a() {}
             public void main() {}
-        """.compileAndRunMainFunctionInMainClass()
+        """.compileAndRunInMainClass()
         }.isInstanceOf(RedefinedMethodException::class.java)
     }
 
@@ -25,7 +25,7 @@ class RedefinedMethodExceptionTest : CompilerTest() {
             int a() {}
             int a() {}
             public void main() {}
-        """.compileAndRunMainFunctionInMainClass()
+        """.compileAndRunInMainClass()
         }.isInstanceOf(RedefinedMethodException::class.java)
     }
 
@@ -36,7 +36,7 @@ class RedefinedMethodExceptionTest : CompilerTest() {
             boolean a() {}
             int a() {}
             public void main() {}
-        """.compileAndRunMainFunctionInMainClass()
+        """.compileAndRunInMainClass()
         }.isInstanceOf(RedefinedMethodException::class.java)
     }
 }

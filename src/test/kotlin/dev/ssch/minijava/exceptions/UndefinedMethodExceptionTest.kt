@@ -12,7 +12,7 @@ class UndefinedMethodExceptionTest : CompilerTest() {
         assertThatThrownBy {
         """
             undefinedMethod();
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(UndefinedMethodException::class.java)
     }
 
@@ -24,7 +24,7 @@ class UndefinedMethodExceptionTest : CompilerTest() {
             public static void main() {
                 a(true);
             }
-        """.compileAndRunMainFunctionInMainClass()
+        """.compileAndRunInMainClass()
         }.isInstanceOf(UndefinedMethodException::class.java)
     }
 }

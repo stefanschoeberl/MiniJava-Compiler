@@ -11,7 +11,7 @@ class AdditionSubtractionTest : CompilerTest() {
     fun `add two int values`() {
         val output = """
             Console.println(1 + 2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("3", "")
     }
 
@@ -19,7 +19,7 @@ class AdditionSubtractionTest : CompilerTest() {
     fun `add two float values`() {
         val output = """
             Console.println(1f + 2f);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(v(3f, 0.0001f), v(""))
     }
 
@@ -27,7 +27,7 @@ class AdditionSubtractionTest : CompilerTest() {
     fun `add two negative values`() {
         val output = """
             Console.println(-1 + -2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("-3", "")
     }
 
@@ -37,7 +37,7 @@ class AdditionSubtractionTest : CompilerTest() {
             int a = 1;
             int b = 2;
             Console.println(a + b);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("3", "")
     }
 
@@ -47,7 +47,7 @@ class AdditionSubtractionTest : CompilerTest() {
             int a = 1;
             int b = 2;
             Console.println(-a + -b);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("-3", "")
     }
 
@@ -57,7 +57,7 @@ class AdditionSubtractionTest : CompilerTest() {
             Console.println((1 + 2) + 3);
             Console.println(1 + 2 + 3);
             Console.println(1 + (2 + 3));
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("6", "6", "6", "")
     }
 
@@ -65,7 +65,7 @@ class AdditionSubtractionTest : CompilerTest() {
     fun `subtract two int values`() {
         val output = """
             Console.println(1 - 2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("-1", "")
     }
 
@@ -73,7 +73,7 @@ class AdditionSubtractionTest : CompilerTest() {
     fun `subtract two float values`() {
         val output = """
             Console.println(1f - 2f);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(v(-1f, 0.0001f), v(""))
     }
 
@@ -83,7 +83,7 @@ class AdditionSubtractionTest : CompilerTest() {
             int a = 1;
             int b = 2;
             Console.println(a - b);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("-1", "")
     }
 
@@ -93,7 +93,7 @@ class AdditionSubtractionTest : CompilerTest() {
             Console.println((1 - 2) - 3);
             Console.println(1 - 2 - 3);
             Console.println(1 - (2 - 3));
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("-4", "-4", "2", "")
     }
 
@@ -104,7 +104,7 @@ class AdditionSubtractionTest : CompilerTest() {
                 boolean a = true;
                 boolean b = true;
                 int c = a + b;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -113,7 +113,7 @@ class AdditionSubtractionTest : CompilerTest() {
         Assertions.assertThatThrownBy {
             """
                 int a = true + false;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -123,7 +123,7 @@ class AdditionSubtractionTest : CompilerTest() {
             """
                 boolean a = true;
                 int a = a + (2 * 4);
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -134,7 +134,7 @@ class AdditionSubtractionTest : CompilerTest() {
                 boolean a = true;
                 boolean b = true;
                 int c = a - b;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -143,7 +143,7 @@ class AdditionSubtractionTest : CompilerTest() {
         Assertions.assertThatThrownBy {
             """
                 int a = true - false;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -153,7 +153,7 @@ class AdditionSubtractionTest : CompilerTest() {
             """
                 boolean a = true;
                 int a = a - (2 * 4);
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 }

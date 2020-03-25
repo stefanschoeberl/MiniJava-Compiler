@@ -21,7 +21,7 @@ class ClassTest : CompilerTest() {
                     Console.println(x);
                 }
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRun()
         assertThat(output.lines()).containsExactly("123", "")
     }
 
@@ -31,7 +31,7 @@ class ClassTest : CompilerTest() {
             """
             class A {}
             class A {}
-        """.compileAndRunMainFunction()
+        """.compileAndRun()
         } // TODO
     }
 
@@ -48,7 +48,7 @@ class ClassTest : CompilerTest() {
                 int x;
                 int y;
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRun()
         assertThat(output.lines()).containsExactly("123", "")
     }
 
@@ -66,7 +66,7 @@ class ClassTest : CompilerTest() {
                 int x;
                 int y;
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRun()
         assertThat(output.lines()).containsExactly("123", "")
     }
 
@@ -84,7 +84,7 @@ class ClassTest : CompilerTest() {
                 int x;
                 int y;
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRun()
         assertThat(output.lines()).containsExactly("123", "")
     }
 
@@ -103,7 +103,7 @@ class ClassTest : CompilerTest() {
                 int x;
                 int y;
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRun()
         assertThat(output.lines()).containsExactly("123", "")
     }
 
@@ -122,7 +122,7 @@ class ClassTest : CompilerTest() {
                 int x;
                 int y;
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRun()
         assertThat(output.lines()).containsExactly("10", "")
     }
 
@@ -145,7 +145,7 @@ class ClassTest : CompilerTest() {
                 int x;
                 int y;
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRun()
         assertThat(output.lines()).containsExactly("30", "40", "")
     }
 
@@ -176,7 +176,7 @@ class ClassTest : CompilerTest() {
                 boolean c;
                 float d;
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRun()
         output.lines().matches(
             v(false),
             v(100),
@@ -207,7 +207,7 @@ class ClassTest : CompilerTest() {
                 int x;
                 int y;
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRun()
         assertThat(output.lines()).containsExactly("10", "20", "")
     }
 
@@ -233,7 +233,7 @@ class ClassTest : CompilerTest() {
                 int x;
                 int y;
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRun()
         assertThat(output.lines()).containsExactly("10", "20", "")
     }
 }

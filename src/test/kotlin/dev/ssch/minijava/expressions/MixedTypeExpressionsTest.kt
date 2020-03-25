@@ -11,7 +11,7 @@ class MixedTypeExpressionsTest : CompilerTest() {
         val output = """
             Console.println(1 + 1.5f);
             Console.println(1.5f + 1);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(
             v(2.5f, 0.0001f),
             v(2.5f, 0.0001f),
@@ -23,7 +23,7 @@ class MixedTypeExpressionsTest : CompilerTest() {
         val output = """
             Console.println(1 - 1.5f);
             Console.println(1.5f - 1);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(
             v(-0.5f, 0.0001f),
             v(0.5f, 0.0001f),
@@ -35,7 +35,7 @@ class MixedTypeExpressionsTest : CompilerTest() {
         val output = """
             Console.println(10 * 1.5f);
             Console.println(1.5f * 10);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(
             v(15f, 0.0001f),
             v(15f, 0.0001f),
@@ -47,7 +47,7 @@ class MixedTypeExpressionsTest : CompilerTest() {
         val output = """
             Console.println(5 / 2f);
             Console.println(5f / 2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(
             v(2.5f, 0.0001f),
             v(2.5f, 0.0001f),
@@ -59,7 +59,7 @@ class MixedTypeExpressionsTest : CompilerTest() {
         val output = """
             Console.println(5 == 2f);
             Console.println(5f == 2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("false", "false", "")
     }
 
@@ -68,7 +68,7 @@ class MixedTypeExpressionsTest : CompilerTest() {
         val output = """
             Console.println(5 != 2f);
             Console.println(5f != 2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("true", "true", "")
     }
 
@@ -77,7 +77,7 @@ class MixedTypeExpressionsTest : CompilerTest() {
         val output = """
             Console.println(5 < 2f);
             Console.println(5f < 2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("false", "false", "")
     }
 
@@ -86,7 +86,7 @@ class MixedTypeExpressionsTest : CompilerTest() {
         val output = """
             Console.println(5 <= 2f);
             Console.println(5f <= 2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("false", "false", "")
     }
 
@@ -95,7 +95,7 @@ class MixedTypeExpressionsTest : CompilerTest() {
         val output = """
             Console.println(5 > 2f);
             Console.println(5f > 2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("true", "true", "")
     }
 
@@ -104,7 +104,7 @@ class MixedTypeExpressionsTest : CompilerTest() {
         val output = """
             Console.println(5 >= 2f);
             Console.println(5f >= 2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("true", "true", "")
     }
 }

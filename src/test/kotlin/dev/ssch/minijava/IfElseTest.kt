@@ -16,7 +16,7 @@ class IfElseTest : CompilerTest() {
                 Console.println(123);
             }
             Console.println(2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("1", "123", "2", "")
     }
 
@@ -28,7 +28,7 @@ class IfElseTest : CompilerTest() {
                 Console.println(123);
             }
             Console.println(2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("1", "2", "")
     }
 
@@ -42,7 +42,7 @@ class IfElseTest : CompilerTest() {
                 Console.println(456);
             }
             Console.println(2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("1", "123", "2", "")
     }
 
@@ -56,7 +56,7 @@ class IfElseTest : CompilerTest() {
                 Console.println(456);
             }
             Console.println(2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("1", "456", "2", "")
     }
 
@@ -66,7 +66,7 @@ class IfElseTest : CompilerTest() {
             Console.println(1);
             if (true) Console.println(123);
             Console.println(2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("1", "123", "2", "")
     }
 
@@ -76,7 +76,7 @@ class IfElseTest : CompilerTest() {
             Console.println(1);
             if (false) Console.println(123);
             Console.println(2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("1", "2", "")
     }
 
@@ -86,7 +86,7 @@ class IfElseTest : CompilerTest() {
             Console.println(1);
             if (true) Console.println(123); else Console.println(456);
             Console.println(2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("1", "123", "2", "")
     }
 
@@ -96,7 +96,7 @@ class IfElseTest : CompilerTest() {
             Console.println(1);
             if (false) Console.println(123); else Console.println(456);
             Console.println(2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("1", "456", "2", "")
     }
 
@@ -110,7 +110,7 @@ class IfElseTest : CompilerTest() {
                 else 
                     Console.println(456);
             Console.println(2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("1", "456", "2", "")
     }
 
@@ -124,7 +124,7 @@ class IfElseTest : CompilerTest() {
                 else 
                     Console.println(456);
             Console.println(2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("1", "2", "")
     }
 
@@ -140,7 +140,7 @@ class IfElseTest : CompilerTest() {
                 Console.println(456);
             }
             Console.println(2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("1", "123", "2", "")
     }
 
@@ -156,7 +156,7 @@ class IfElseTest : CompilerTest() {
                 Console.println(456);
             }
             Console.println(2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("1", "456", "2", "")
     }
 
@@ -174,7 +174,7 @@ class IfElseTest : CompilerTest() {
                 Console.println(b * 1000);
             }
             Console.println(2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("1", "123", "123000", "2", "")
     }
 
@@ -192,7 +192,7 @@ class IfElseTest : CompilerTest() {
                 Console.println(b * 1000);
             }
             Console.println(2);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("1", "456", "456000", "2", "")
     }
 
@@ -205,7 +205,7 @@ class IfElseTest : CompilerTest() {
                 } else {
                     Console.println(456);
                 }
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(IncompatibleTypeException::class.java)
     }
 }

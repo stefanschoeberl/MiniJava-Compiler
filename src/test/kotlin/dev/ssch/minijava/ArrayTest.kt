@@ -14,7 +14,7 @@ class ArrayTest : CompilerTest() {
         val output = """
             int[] a = new int[1];
             Console.println(111);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("111", "")
     }
 
@@ -23,7 +23,7 @@ class ArrayTest : CompilerTest() {
         val output = """
             float[] a = new float[1];
             Console.println(111);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("111", "")
     }
 
@@ -32,7 +32,7 @@ class ArrayTest : CompilerTest() {
         val output = """
             boolean[] a = new boolean[1];
             Console.println(111);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("111", "")
     }
 
@@ -44,7 +44,7 @@ class ArrayTest : CompilerTest() {
             int[] a = new int[1];
             a[0] = 123;
             Console.println(111);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("111", "")
     }
 
@@ -56,7 +56,7 @@ class ArrayTest : CompilerTest() {
             a[1] = 456;
             a[2] = 789;
             Console.println(111);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("111", "")
     }
 
@@ -66,7 +66,7 @@ class ArrayTest : CompilerTest() {
             float[] a = new float[1];
             a[0] = 123f;
             Console.println(111);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("111", "")
     }
 
@@ -78,7 +78,7 @@ class ArrayTest : CompilerTest() {
             a[1] = 456f;
             a[2] = 789f;
             Console.println(111);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("111", "")
     }
 
@@ -90,7 +90,7 @@ class ArrayTest : CompilerTest() {
             int[] a = new int[1];
             a[0] = 123;
             Console.println(a[0]);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("123", "")
     }
 
@@ -104,7 +104,7 @@ class ArrayTest : CompilerTest() {
             Console.println(a[0]);
             Console.println(a[1]);
             Console.println(a[2]);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("123", "456", "789", "")
     }
 
@@ -114,7 +114,7 @@ class ArrayTest : CompilerTest() {
             float[] a = new float[1];
             a[0] = 123f;
             Console.println(a[0]);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(v(123f, 0.0001f), v(""))
     }
 
@@ -128,7 +128,7 @@ class ArrayTest : CompilerTest() {
             Console.println(a[0]);
             Console.println(a[1]);
             Console.println(a[2]);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(
             v(123f, 0.0001f),
             v(456f, 0.0001f),
@@ -142,7 +142,7 @@ class ArrayTest : CompilerTest() {
             boolean[] a = new boolean[1];
             a[0] = true;
             Console.println(a[0]);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("true", "")
     }
 
@@ -156,7 +156,7 @@ class ArrayTest : CompilerTest() {
             Console.println(a[0]);
             Console.println(a[1]);
             Console.println(a[2]);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("true", "false", "true", "")
     }
 
@@ -176,7 +176,7 @@ class ArrayTest : CompilerTest() {
                 a[2] = 789;
                 writeArray(a);
             }
-        """.compileAndRunMainFunctionInMainClass()
+        """.compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("123", "456", "789", "")
     }
 
@@ -197,7 +197,7 @@ class ArrayTest : CompilerTest() {
                 Console.println(x[1]);
                 Console.println(x[2]);
             }
-        """.compileAndRunMainFunctionInMainClass()
+        """.compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("123", "456", "789", "")
     }
 
@@ -217,7 +217,7 @@ class ArrayTest : CompilerTest() {
                 Console.println(generateArray()[1]);
                 Console.println(generateArray()[2]);
             }
-        """.compileAndRunMainFunctionInMainClass()
+        """.compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("123", "456", "789", "")
     }
 
@@ -237,7 +237,7 @@ class ArrayTest : CompilerTest() {
                 Console.println(map(a)[0]);
                 Console.println(map(a)[0]);
             }
-        """.compileAndRunMainFunctionInMainClass()
+        """.compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("1230", "1230", "")
     }
 
@@ -262,7 +262,7 @@ class ArrayTest : CompilerTest() {
                 Console.println(map(a)[1]);
                 Console.println(map(a)[2]);
             }
-        """.compileAndRunMainFunctionInMainClass()
+        """.compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("1230", "4560", "7890", "")
     }
 
@@ -274,7 +274,7 @@ class ArrayTest : CompilerTest() {
             a[1] = 456;
             a[2] = 789;
             Console.println(a);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("[123, 456, 789]", "")
     }
 
@@ -286,7 +286,7 @@ class ArrayTest : CompilerTest() {
             a[1] = 2.5f;
             a[2] = 3.5f;
             Console.println(a);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("[1.5, 2.5, 3.5]", "")
     }
 
@@ -298,7 +298,7 @@ class ArrayTest : CompilerTest() {
             a[1] = false;
             a[2] = true;
             Console.println(a);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("[true, false, true]", "")
     }
 
@@ -307,7 +307,7 @@ class ArrayTest : CompilerTest() {
         Assertions.assertThatThrownBy {
             """
             int[] a = new int[true];
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(IncompatibleTypeException::class.java)
     }
 
@@ -317,7 +317,7 @@ class ArrayTest : CompilerTest() {
             """
             boolean a;
             Console.println(a[0]);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(ExpressionIsNotAnArrayException::class.java)
     }
 
@@ -327,7 +327,7 @@ class ArrayTest : CompilerTest() {
             """
             int[] a = new int[1];
             Console.println(a[true]);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(IncompatibleTypeException::class.java)
     }
 }

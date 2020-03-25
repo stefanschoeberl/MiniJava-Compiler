@@ -12,7 +12,7 @@ class IncompatibleAssignmentExceptionTest : CompilerTest() {
         assertThatThrownBy {
         """
             boolean a = 123;
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(IncompatibleAssignmentException::class.java)
     }
 
@@ -21,7 +21,7 @@ class IncompatibleAssignmentExceptionTest : CompilerTest() {
         assertThatThrownBy {
         """
             int a = false;
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(IncompatibleAssignmentException::class.java)
     }
 
@@ -31,7 +31,7 @@ class IncompatibleAssignmentExceptionTest : CompilerTest() {
         """
             boolean a;
             a = 123;
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(IncompatibleAssignmentException::class.java)
     }
 
@@ -41,7 +41,7 @@ class IncompatibleAssignmentExceptionTest : CompilerTest() {
         """
             int a;
             a = false;
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(IncompatibleAssignmentException::class.java)
     }
 }

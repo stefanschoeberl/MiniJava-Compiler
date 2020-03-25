@@ -12,7 +12,7 @@ module.exports = function (runtime) {
             console.log(arg)
         },
         "Console.println#boolean": function(arg) {
-            console.log(arg === 0 ? 'false' : 'true')
+            console.log(runtime.wasmBoolean(arg))
         },
         "Console.println#int[]": writeArray,
         "Console.println#boolean[]": writeArray,

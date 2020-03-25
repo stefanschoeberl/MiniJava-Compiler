@@ -12,7 +12,7 @@ class UndefinedVariableExceptionTest : CompilerTest() {
         assertThatThrownBy {
         """
             println(a);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(UndefinedVariableException::class.java)
     }
 
@@ -21,7 +21,7 @@ class UndefinedVariableExceptionTest : CompilerTest() {
         assertThatThrownBy {
         """
             int a = 2 * b + 1;
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(UndefinedVariableException::class.java)
     }
 
@@ -30,7 +30,7 @@ class UndefinedVariableExceptionTest : CompilerTest() {
         assertThatThrownBy {
         """
             a = 1;
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(UndefinedVariableException::class.java)
     }
 
@@ -40,7 +40,7 @@ class UndefinedVariableExceptionTest : CompilerTest() {
         """
             int b = 1;
             a = b;
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(UndefinedVariableException::class.java)
     }
 }

@@ -16,7 +16,7 @@ class ScopesTest : CompilerTest() {
                 int b = 123;
             }
             Console.println(b);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(UndefinedVariableException::class.java)
     }
 
@@ -32,7 +32,7 @@ class ScopesTest : CompilerTest() {
                 }
             }
             Console.println(c);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(UndefinedVariableException::class.java)
     }
 
@@ -48,7 +48,7 @@ class ScopesTest : CompilerTest() {
                 }
                 Console.println(c);
             }
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(UndefinedVariableException::class.java)
     }
 
@@ -64,7 +64,7 @@ class ScopesTest : CompilerTest() {
                 }
             }
             Console.println(b);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(UndefinedVariableException::class.java)
     }
 
@@ -99,7 +99,7 @@ class ScopesTest : CompilerTest() {
                 Console.println(b);
             }
             Console.println(a);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("1", "2", "3", "2", "1", "4", "5", "4", "6", "1", "4", "1", "")
     }
 }

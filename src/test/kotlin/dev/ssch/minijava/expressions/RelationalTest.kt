@@ -14,7 +14,7 @@ class RelationalTest : CompilerTest() {
             Console.println(2 < 1);
             Console.println(-1 < 15);
             Console.println(15 < -1);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "false", "")
     }
 
@@ -25,7 +25,7 @@ class RelationalTest : CompilerTest() {
             Console.println(2f < 1f);
             Console.println(-1f < 15f);
             Console.println(15f < -1f);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "false", "")
     }
 
@@ -38,7 +38,7 @@ class RelationalTest : CompilerTest() {
             Console.println(15 <= -1);
             Console.println(1 <= 1);
             Console.println(-10 <= -10);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "false", "true", "true", "")
     }
 
@@ -51,7 +51,7 @@ class RelationalTest : CompilerTest() {
             Console.println(15f <= -1f);
             Console.println(1f <= 1f);
             Console.println(-10f <= -10f);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "false", "true", "true", "")
     }
 
@@ -62,7 +62,7 @@ class RelationalTest : CompilerTest() {
             Console.println(2 > 1);
             Console.println(-1 > 15);
             Console.println(15 > -1);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "true", "")
     }
 
@@ -73,7 +73,7 @@ class RelationalTest : CompilerTest() {
             Console.println(2f > 1f);
             Console.println(-1f > 15f);
             Console.println(15f > -1f);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "true", "")
     }
 
@@ -86,7 +86,7 @@ class RelationalTest : CompilerTest() {
             Console.println(15 >= -1);
             Console.println(1 >= 1);
             Console.println(-10 >= -10);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "true", "true", "true", "")
     }
 
@@ -99,7 +99,7 @@ class RelationalTest : CompilerTest() {
             Console.println(15f >= -1f);
             Console.println(1f >= 1f);
             Console.println(-10f >= -10f);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "true", "true", "true", "")
     }
 
@@ -108,7 +108,7 @@ class RelationalTest : CompilerTest() {
         Assertions.assertThatThrownBy {
             """
                 boolean a = 123 < false;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -117,7 +117,7 @@ class RelationalTest : CompilerTest() {
         Assertions.assertThatThrownBy {
             """
                 boolean a = 123 <= false;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -126,7 +126,7 @@ class RelationalTest : CompilerTest() {
         Assertions.assertThatThrownBy {
             """
                 boolean a = 123 > false;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -135,7 +135,7 @@ class RelationalTest : CompilerTest() {
         Assertions.assertThatThrownBy {
             """
                 boolean a = 123 >= false;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -146,7 +146,7 @@ class RelationalTest : CompilerTest() {
             Console.println(1 > 2 && 2 > 3);
             Console.println(1 <= 2 && 2 <= 3);
             Console.println(1 >= 2 && 2 >= 3);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "false", "")
     }
 

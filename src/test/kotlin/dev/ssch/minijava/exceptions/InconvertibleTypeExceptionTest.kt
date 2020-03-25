@@ -12,7 +12,7 @@ class InconvertibleTypeExceptionTest : CompilerTest() {
         assertThatThrownBy {
         """
             int a = (int) true;
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(InconvertibleTypeException::class.java)
     }
 
@@ -21,7 +21,7 @@ class InconvertibleTypeExceptionTest : CompilerTest() {
         assertThatThrownBy {
         """
             float a = (float) true;
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(InconvertibleTypeException::class.java)
     }
 
@@ -33,7 +33,7 @@ class InconvertibleTypeExceptionTest : CompilerTest() {
             public static void main() {
                 int a = (int) test();
             }
-        """.compileAndRunMainFunctionInMainClass()
+        """.compileAndRunInMainClass()
         }.isInstanceOf(InconvertibleTypeException::class.java)
     }
 }

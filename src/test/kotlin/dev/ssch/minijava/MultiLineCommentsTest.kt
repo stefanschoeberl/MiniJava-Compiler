@@ -8,13 +8,13 @@ class MultiLineCommentsTest : CompilerTest() {
 
     @Test
     fun `empty comment`() {
-        val output = "/**/Console.println(123);".runInMainFunction()
+        val output = "/**/Console.println(123);".compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("123", "")
     }
 
     @Test
     fun `single line`() {
-        val output = "/* this is a comment */Console.println(123);".runInMainFunction()
+        val output = "/* this is a comment */Console.println(123);".compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("123", "")
     }
 
@@ -25,7 +25,7 @@ class MultiLineCommentsTest : CompilerTest() {
             /* line 2 */
             /* line 3 */
             Console.println(123);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("123", "")
     }
 
@@ -36,7 +36,7 @@ class MultiLineCommentsTest : CompilerTest() {
             /**/
             /**/
             Console.println(123);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("123", "")
     }
 
@@ -54,25 +54,25 @@ class MultiLineCommentsTest : CompilerTest() {
                 Console.println(a);
                 /* done */
             }
-        """.compileAndRunMainFunctionInMainClass()
+        """.compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("123", "")
     }
 
     @Test
     fun `edge cases 1`() {
-        val output = "/***/Console.println(123);".runInMainFunction()
+        val output = "/***/Console.println(123);".compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("123", "")
     }
 
     @Test
     fun `edge cases 2`() {
-        val output = "/*/**/Console.println(123);".runInMainFunction()
+        val output = "/*/**/Console.println(123);".compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("123", "")
     }
 
     @Test
     fun `edge cases 3`() {
-        val output = "/*/* */Console.println(123);".runInMainFunction()
+        val output = "/*/* */Console.println(123);".compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("123", "")
     }
 

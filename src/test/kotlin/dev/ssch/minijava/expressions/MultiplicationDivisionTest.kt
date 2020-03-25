@@ -11,7 +11,7 @@ class MultiplicationDivisionTest : CompilerTest() {
     fun `multiply two int values`() {
         val output = """
             Console.println(2 * 3);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("6", "")
     }
 
@@ -19,7 +19,7 @@ class MultiplicationDivisionTest : CompilerTest() {
     fun `multiply two float values`() {
         val output = """
             Console.println(2f * 3f);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(v(6f, 0.0001f), v(""))
     }
 
@@ -27,7 +27,7 @@ class MultiplicationDivisionTest : CompilerTest() {
     fun `multiply two negative values`() {
         val output = """
             Console.println(-2 * -3);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("6", "")
     }
 
@@ -37,7 +37,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             int a = 2;
             int b = 3;
             Console.println(a * b);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("6", "")
     }
 
@@ -47,7 +47,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             int a = 2;
             int b = 3;
             Console.println(-a * -b);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("6", "")
     }
 
@@ -57,7 +57,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             Console.println((2 * 3) * 4);
             Console.println(2 * 3 * 4);
             Console.println(2 * (3 * 4));
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("24", "24", "24", "")
     }
 
@@ -67,7 +67,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             Console.println(1 / 2);
             Console.println(8 / 3);
             Console.println(6 / 3);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("0", "2", "2", "")
     }
 
@@ -77,7 +77,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             Console.println(1f / 2f);
             Console.println(8f / 3f);
             Console.println(6f / 3f);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(
             v(1/2f, 0.0001f),
             v(8/3f, 0.0001f),
@@ -91,7 +91,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             Console.println(-1 / 2);
             Console.println(8 / -3);
             Console.println(-6 / -3);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("0", "-2", "2", "")
     }
 
@@ -106,7 +106,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             Console.println(one / two);
             Console.println(eight / three);
             Console.println(six / three);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("0", "2", "2", "")
     }
 
@@ -121,7 +121,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             Console.println(-one / two);
             Console.println(eight / -three);
             Console.println(-six / -three);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("0", "-2", "2", "")
     }
 
@@ -131,7 +131,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             Console.println((8 / 3) / 2);
             Console.println(8 / 3 / 2);
             Console.println(8 / (3 / 2));
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("1", "1", "8", "")
     }
 
@@ -142,7 +142,7 @@ class MultiplicationDivisionTest : CompilerTest() {
                 boolean a = true;
                 boolean b = true;
                 int c = a * b;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -151,7 +151,7 @@ class MultiplicationDivisionTest : CompilerTest() {
         Assertions.assertThatThrownBy {
             """
                 int a = true * false;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -161,7 +161,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             """
                 boolean a = true;
                 int a = a * (2 * 4);
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -172,7 +172,7 @@ class MultiplicationDivisionTest : CompilerTest() {
                 boolean a = true;
                 boolean b = true;
                 int c = a / b;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -181,7 +181,7 @@ class MultiplicationDivisionTest : CompilerTest() {
         Assertions.assertThatThrownBy {
             """
                 int a = true / false;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -191,7 +191,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             """
                 boolean a = true;
                 int a = a / (2 * 4);
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 }

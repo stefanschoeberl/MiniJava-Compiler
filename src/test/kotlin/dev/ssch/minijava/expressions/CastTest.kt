@@ -19,7 +19,7 @@ class CastTest : CompilerTest() {
             Console.println(c);
             Console.println(d);
             Console.println(e);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(
             v(123),
             v(123),
@@ -44,7 +44,7 @@ class CastTest : CompilerTest() {
             Console.println(b);
             Console.println(c);
             Console.println(d);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(
             v(123),
             v(123),
@@ -74,7 +74,7 @@ class CastTest : CompilerTest() {
                 a((int)1);
                 a((int)1f);
             }
-        """.compileAndRunMainFunctionInMainClass()
+        """.compileAndRunInMainClass()
         output.lines().matches(
             v(1111), v(1),
             v(2222), v(1f, 0.0001f),

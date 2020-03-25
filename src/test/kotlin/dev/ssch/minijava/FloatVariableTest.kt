@@ -10,7 +10,7 @@ class FloatVariableTest : CompilerTest() {
     fun `declare a variable`() {
         val output = """
             float a;
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("")
     }
 
@@ -19,7 +19,7 @@ class FloatVariableTest : CompilerTest() {
         val output = """
             float a = 1.2f;
             Console.println(a);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(v(1.2f, 0.0001f), v(""))
     }
 
@@ -29,7 +29,7 @@ class FloatVariableTest : CompilerTest() {
             float a = 1.2f;
             float b = a;
             Console.println(b);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(v(1.2f, 0.0001f), v(""))
     }
 
@@ -39,7 +39,7 @@ class FloatVariableTest : CompilerTest() {
             float a;
             a = 1.2f;
             Console.println(a);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(v(1.2f, 0.0001f), v(""))
     }
 
@@ -49,7 +49,7 @@ class FloatVariableTest : CompilerTest() {
             float a = 1.2f;
             float b = a;
             Console.println(b);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(v(1.2f, 0.0001f), v(""))
     }
 
@@ -58,7 +58,7 @@ class FloatVariableTest : CompilerTest() {
         val output = """
             float a = 123;
             Console.println(a);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(v(123f, 0.0001f), v(""))
     }
 
@@ -68,7 +68,7 @@ class FloatVariableTest : CompilerTest() {
             int a = 123;
             float b = a;
             Console.println(a);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(v(123f, 0.0001f), v(""))
     }
 
@@ -78,7 +78,7 @@ class FloatVariableTest : CompilerTest() {
             float a;
             a = 123;
             Console.println(a);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(v(123f, 0.0001f), v(""))
     }
 
@@ -89,7 +89,7 @@ class FloatVariableTest : CompilerTest() {
             float b;
             b = a;
             Console.println(a);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(v(123f, 0.0001f), v(""))
     }
 }

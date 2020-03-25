@@ -14,7 +14,7 @@ class EqualNotEqualTest : CompilerTest() {
             Console.println(false == true);
             Console.println(true == true);
             Console.println(false == false);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("false", "false", "true", "true", "")
     }
 
@@ -24,7 +24,7 @@ class EqualNotEqualTest : CompilerTest() {
             Console.println(1 == 2);
             Console.println(1 == 1);
             Console.println(2 == 1);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "")
     }
 
@@ -34,7 +34,7 @@ class EqualNotEqualTest : CompilerTest() {
             Console.println(1f == 2f);
             Console.println(1f == 1f);
             Console.println(2f == 1f);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "")
     }
 
@@ -45,7 +45,7 @@ class EqualNotEqualTest : CompilerTest() {
             Console.println(false != true);
             Console.println(true != true);
             Console.println(false != false);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "true", "false", "false", "")
     }
 
@@ -55,7 +55,7 @@ class EqualNotEqualTest : CompilerTest() {
             Console.println(1 != 2);
             Console.println(1 != 1);
             Console.println(2 != 1);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "")
     }
 
@@ -65,7 +65,7 @@ class EqualNotEqualTest : CompilerTest() {
             Console.println(1f != 2f);
             Console.println(1f != 1f);
             Console.println(2f != 1f);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "")
     }
 
@@ -76,7 +76,7 @@ class EqualNotEqualTest : CompilerTest() {
                 boolean a = true;
                 int b = 123;
                 boolean c = a == b;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -87,7 +87,7 @@ class EqualNotEqualTest : CompilerTest() {
                 boolean a = true;
                 int b = 123;
                 boolean c = b == a;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -96,7 +96,7 @@ class EqualNotEqualTest : CompilerTest() {
         Assertions.assertThatThrownBy {
             """
                 boolean a = 123 == false;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -105,7 +105,7 @@ class EqualNotEqualTest : CompilerTest() {
         Assertions.assertThatThrownBy {
             """
                 boolean a = false == 123;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -115,7 +115,7 @@ class EqualNotEqualTest : CompilerTest() {
             """
                 boolean a = true;
                 boolean b = a == (2 * 4);
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -125,7 +125,7 @@ class EqualNotEqualTest : CompilerTest() {
             """
                 boolean a = true;
                 boolean b = (2 * 4) == a;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -136,7 +136,7 @@ class EqualNotEqualTest : CompilerTest() {
                 boolean a = true;
                 int b = 123;
                 boolean c = a != b;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -147,7 +147,7 @@ class EqualNotEqualTest : CompilerTest() {
                 boolean a = true;
                 int b = 123;
                 boolean c = b != a;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -156,7 +156,7 @@ class EqualNotEqualTest : CompilerTest() {
         Assertions.assertThatThrownBy {
             """
                 boolean a = 123 != false;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -165,7 +165,7 @@ class EqualNotEqualTest : CompilerTest() {
         Assertions.assertThatThrownBy {
             """
                 boolean a = false != 123;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -175,7 +175,7 @@ class EqualNotEqualTest : CompilerTest() {
             """
                 boolean a = true;
                 boolean b = a != (2 * 4);
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 
@@ -185,7 +185,7 @@ class EqualNotEqualTest : CompilerTest() {
             """
                 boolean a = true;
                 boolean b = (2 * 4) != a;
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidBinaryOperationException::class.java)
     }
 }

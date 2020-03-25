@@ -13,7 +13,7 @@ class WhileTest : CompilerTest() {
         val output = """
             while (false) Console.println(123);
             Console.println(-1);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("-1", "")
     }
 
@@ -24,7 +24,7 @@ class WhileTest : CompilerTest() {
                 Console.println(123);
             }
             Console.println(-1);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("-1", "")
     }
 
@@ -37,7 +37,7 @@ class WhileTest : CompilerTest() {
                 i = i + 1;
             }
             Console.println(-1);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("0", "1", "2", "-1", "")
     }
 
@@ -54,7 +54,7 @@ class WhileTest : CompilerTest() {
                 i = i + 1;
             }
             Console.println(-1);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("101", "102", "201", "202", "-1", "")
     }
 
@@ -69,7 +69,7 @@ class WhileTest : CompilerTest() {
                 i = i + 1;
             }
             Console.println(-1);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("1", "3", "5", "-1", "")
     }
 
@@ -84,7 +84,7 @@ class WhileTest : CompilerTest() {
                 i = i + 1;
             }
             Console.println(-1);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("2", "3", "4", "-1", "")
     }
 
@@ -95,7 +95,7 @@ class WhileTest : CompilerTest() {
                 while (1 + 2) {
                     Console.println(123);
                 }
-            """.runInMainFunction()
+            """.compileAndRunInMainFunction()
         }.isInstanceOf(IncompatibleTypeException::class.java)
     }
 }

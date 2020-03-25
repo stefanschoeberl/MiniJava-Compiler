@@ -16,7 +16,7 @@ class ParensMinusTest : CompilerTest() {
             Console.println(-(-1));
             Console.println(-(-(-1)));
             Console.println(-(1+2));
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         Assertions.assertThat(output.lines()).containsExactly("1", "1", "-1", "-1", "1", "-1", "-3", "")
     }
 }

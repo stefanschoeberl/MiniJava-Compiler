@@ -8,7 +8,7 @@ class MethodsTest : CompilerTest() {
 
     @Test
     fun `empty program`() {
-        val output = "public static void main() { }".compileAndRunMainFunctionInMainClass()
+        val output = "public static void main() { }".compileAndRunInMainClass()
         assertThat(output).hasLineCount(0)
     }
 
@@ -17,7 +17,7 @@ class MethodsTest : CompilerTest() {
         val output = """
             public static void main() { 
                 Console.println(1);
-            }""".compileAndRunMainFunctionInMainClass()
+            }""".compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("1", "")
     }
 
@@ -30,7 +30,7 @@ class MethodsTest : CompilerTest() {
             
             public static void main() { 
                 Console.println(1);
-            }""".compileAndRunMainFunctionInMainClass()
+            }""".compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("1", "")
     }
 
@@ -43,7 +43,7 @@ class MethodsTest : CompilerTest() {
             
             public static void main() { 
                 other();
-            }""".compileAndRunMainFunctionInMainClass()
+            }""".compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("2", "")
     }
 
@@ -64,7 +64,7 @@ class MethodsTest : CompilerTest() {
             
             static void b() {
                 Console.println(3);
-            }""".compileAndRunMainFunctionInMainClass()
+            }""".compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("1", "2", "3", "22", "11", "")
     }
 
@@ -77,7 +77,7 @@ class MethodsTest : CompilerTest() {
             
             static void a(int x) {
                 Console.println(x);
-            }""".compileAndRunMainFunctionInMainClass()
+            }""".compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("123", "")
     }
 
@@ -90,7 +90,7 @@ class MethodsTest : CompilerTest() {
             
             static void a(float x) {
                 Console.println(x);
-            }""".compileAndRunMainFunctionInMainClass()
+            }""".compileAndRunInMainClass()
         output.lines().matches(v(123f, 0.0001f), v(""))
     }
 
@@ -104,7 +104,7 @@ class MethodsTest : CompilerTest() {
             static void a(int x) {
                 int a = 100;
                 Console.println(x * a);
-            }""".compileAndRunMainFunctionInMainClass()
+            }""".compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("12300", "")
     }
 
@@ -123,7 +123,7 @@ class MethodsTest : CompilerTest() {
             static void sub(int x, int y) {
                 Console.println(x - y);
             }
-            """.compileAndRunMainFunctionInMainClass()
+            """.compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("5", "8", "")
     }
 
@@ -142,7 +142,7 @@ class MethodsTest : CompilerTest() {
             static void sub(int x, int y) {
                 Console.println(x - y);
             }
-            """.compileAndRunMainFunctionInMainClass()
+            """.compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("5", "-1", "")
     }
 
@@ -161,7 +161,7 @@ class MethodsTest : CompilerTest() {
             static void sub(int x, int y, int z) {
                 Console.println(x - y - z);
             }
-            """.compileAndRunMainFunctionInMainClass()
+            """.compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("9", "-5", "")
     }
 
@@ -176,7 +176,7 @@ class MethodsTest : CompilerTest() {
             static int increment(int x) {
                 return x + 1;
             }
-            """.compileAndRunMainFunctionInMainClass()
+            """.compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("11", "")
     }
 
@@ -190,7 +190,7 @@ class MethodsTest : CompilerTest() {
             static int increment(int x) {
                 return x + 1;
             }
-            """.compileAndRunMainFunctionInMainClass()
+            """.compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("4", "")
     }
 
@@ -205,7 +205,7 @@ class MethodsTest : CompilerTest() {
             static int increment(int x) {
                 return x + 1;
             }
-            """.compileAndRunMainFunctionInMainClass()
+            """.compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("11", "")
     }
 
@@ -223,7 +223,7 @@ class MethodsTest : CompilerTest() {
                     return 2 * duplicate(a, n - 1);
                 }
             }
-            """.compileAndRunMainFunctionInMainClass()
+            """.compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("32", "")
     }
 
@@ -245,7 +245,29 @@ class MethodsTest : CompilerTest() {
                     return fib(n - 1) + fib(n - 2);
                 }
             }
-            """.compileAndRunMainFunctionInMainClass()
+            """.compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("0", "1", "1", "2", "3", "5", "8", "13", "21", "34", "")
+    }
+
+    @Test
+    fun `native method with multiple parameters`() {
+        val output = Source.withMiniJava("""
+            public static void main() {
+                println(123, true, 123.123f);
+            }
+            
+            native static void println(int a, boolean b, float c);
+        """).andJavaScript("""
+            module.exports = function (runtime) {
+                return {
+                    "Main.println#int#boolean#float": function(a, b, c) {
+                        console.log(a);
+                        console.log(runtime.wasmBoolean(b));
+                        console.log(c);
+                    }
+                }
+            }
+        """).compileAndRunInMainClass()
+        output.lines().matches(v(123), v(true), v(123.123f, 0.0001f), v(""))
     }
 }

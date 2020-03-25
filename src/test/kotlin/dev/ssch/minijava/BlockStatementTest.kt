@@ -12,7 +12,7 @@ class BlockStatementTest : CompilerTest() {
             {
                 Console.println(123);
             }
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("123", "")
     }
 
@@ -27,7 +27,7 @@ class BlockStatementTest : CompilerTest() {
                     Console.println(456);
                 }
             }
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("123", "456", "")
     }
 }

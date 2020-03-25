@@ -8,26 +8,69 @@ import java.io.File
 
 abstract class CompilerTest {
 
+    class Source (miniJava: String) {
+
+        var miniJava: String = miniJava
+            private set
+
+        var javaScript: String? = null
+            private set
+
+        companion object {
+            fun withMiniJava(src: String): Source {
+                return Source(src)
+            }
+        }
+
+        fun andJavaScript(src: String): Source {
+            javaScript = src
+            return this
+        }
+
+        fun wrapInMainClass(): Source {
+            miniJava = "class Main {\n${miniJava.trimIndent().prependIndent("    ")}\n}"
+            return this
+        }
+
+        fun wrapInMainFunction(): Source {
+            miniJava = "public static void main() {\n${miniJava.trimIndent().prependIndent("    ")}\n}"
+            return this
+        }
+    }
+
     @TempDir
     lateinit var temporaryFolder: File
 
-    fun String.runInMainFunction(withStandardLibrary: Boolean = true): String {
-        return "public static void main() {\n${this.trimIndent().prependIndent("    ")}\n}".compileAndRunMainFunctionInMainClass(withStandardLibrary)
+    fun String.compileAndRunInMainFunction(withStandardLibrary: Boolean = true): String {
+        return Source.withMiniJava(this).wrapInMainFunction().compileAndRunInMainClass(withStandardLibrary)
     }
 
-    fun String.compileAndRunMainFunctionInMainClass(withStandardLibrary: Boolean = true): String {
-        return "class Main {\n${this.trimIndent().prependIndent("    ")}\n}".compileAndRunMainFunction(withStandardLibrary)
+    // ---
+
+    fun Source.compileAndRunInMainClass(withStandardLibrary: Boolean = true): String {
+        return this.wrapInMainClass().compileAndRun(withStandardLibrary)
     }
 
-    fun String.compileAndRunMainFunction(withStandardLibrary: Boolean = true): String {
+    fun String.compileAndRunInMainClass(withStandardLibrary: Boolean = true): String {
+        return Source.withMiniJava(this).wrapInMainClass().compileAndRun(withStandardLibrary)
+    }
+
+    // ---
+
+    fun Source.compileAndRun(withStandardLibrary: Boolean = true): String {
         val compiler = Compiler()
-        val source = this.trimIndent()
+        val miniJavaSource = this.miniJava.trimIndent()
+        val javaScriptSource = this.javaScript?.trimIndent()
 
-        println(source)
+        println(miniJavaSource)
         println()
 
         val testSourceFile = File(temporaryFolder, "main.minijava")
-        testSourceFile.writeText(source)
+        testSourceFile.writeText(miniJavaSource)
+
+        if (javaScriptSource != null) {
+            File(temporaryFolder, "main.js").writeText(javaScriptSource)
+        }
 
         val wasmOutput = File(temporaryFolder, "wasm-output")
 
@@ -47,6 +90,10 @@ abstract class CompilerTest {
 
         val runner = WebAssemblyRunner()
         return runner.run(wasmOutput.absolutePath)
+    }
+
+    fun String.compileAndRun(withStandardLibrary: Boolean = true): String {
+        return Source.withMiniJava(this).compileAndRun(withStandardLibrary)
     }
 
     fun v(value: String): (String) -> Unit = { actual ->

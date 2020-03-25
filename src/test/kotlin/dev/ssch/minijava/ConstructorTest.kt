@@ -21,7 +21,7 @@ class ConstructorTest : CompilerTest() {
                 
                 Point() {}
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRun()
         assertThat(output.lines()).containsExactly("123", "")
     }
 
@@ -42,7 +42,7 @@ class ConstructorTest : CompilerTest() {
                     Console.println(123);
                 }
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRun()
         assertThat(output.lines()).containsExactly("123", "")
     }
 
@@ -64,7 +64,7 @@ class ConstructorTest : CompilerTest() {
                     Console.println(b);
                 }
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRun()
         assertThat(output.lines()).containsExactly("123", "456", "")
     }
 
@@ -88,7 +88,7 @@ class ConstructorTest : CompilerTest() {
                     y = x;
                 }
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRun()
         assertThat(output.lines()).containsExactly("123", "123", "")
     }
 
@@ -122,7 +122,7 @@ class ConstructorTest : CompilerTest() {
                     Console.println(y);
                 }
             }
-        """.compileAndRunMainFunction()
+        """.compileAndRun()
         assertThat(output.lines()).containsExactly("123", "456", "456", "123", "123", "456", "123", "456", "")
     }
 }

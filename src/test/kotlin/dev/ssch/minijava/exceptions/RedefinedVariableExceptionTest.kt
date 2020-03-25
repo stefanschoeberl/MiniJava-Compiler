@@ -13,7 +13,7 @@ class RedefinedVariableExceptionTest : CompilerTest() {
         """
             int a;
             int a;
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(RedefinedVariableException::class.java)
     }
 
@@ -23,7 +23,7 @@ class RedefinedVariableExceptionTest : CompilerTest() {
         """
             int a;
             boolean a;
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(RedefinedVariableException::class.java)
     }
 
@@ -33,7 +33,7 @@ class RedefinedVariableExceptionTest : CompilerTest() {
         """
             int a;
             int a = 1;
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(RedefinedVariableException::class.java)
     }
 
@@ -43,7 +43,7 @@ class RedefinedVariableExceptionTest : CompilerTest() {
         """
             int a;
             boolean a = true;
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(RedefinedVariableException::class.java)
     }
 
@@ -54,7 +54,7 @@ class RedefinedVariableExceptionTest : CompilerTest() {
             static void a(int x) {
                 int x = 123;
             }
-        """.compileAndRunMainFunctionInMainClass()
+        """.compileAndRunInMainClass()
         }.isInstanceOf(RedefinedVariableException::class.java)
     }
 }

@@ -13,7 +13,7 @@ class MinusTest : CompilerTest() {
             Console.println(-1);
             Console.println(-(1+2));
             Console.println(-1f);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         output.lines().matches(v(-1), v(-3), v(-1f, 0.0001f), v(""))
     }
 
@@ -23,7 +23,7 @@ class MinusTest : CompilerTest() {
             """
             boolean a = true;
             int c = -a;
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidUnaryOperationException::class.java)
     }
 
@@ -32,7 +32,7 @@ class MinusTest : CompilerTest() {
         Assertions.assertThatThrownBy {
             """
             int a = -true;
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidUnaryOperationException::class.java)
     }
 
@@ -42,7 +42,7 @@ class MinusTest : CompilerTest() {
             """
             boolean a = true;
             int a = -(a);
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(InvalidUnaryOperationException::class.java)
     }
 }

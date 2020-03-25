@@ -12,7 +12,7 @@ class UnknownTypeExceptionTest : CompilerTest() {
         assertThatThrownBy {
         """
             xyz a;
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(UnknownTypeException::class.java)
     }
 
@@ -21,7 +21,7 @@ class UnknownTypeExceptionTest : CompilerTest() {
         assertThatThrownBy {
         """
             xyz a = 123;
-        """.runInMainFunction()
+        """.compileAndRunInMainFunction()
         }.isInstanceOf(UnknownTypeException::class.java)
     }
 
@@ -31,7 +31,7 @@ class UnknownTypeExceptionTest : CompilerTest() {
         """
             void a(xyz b) {}
             public void main() {}
-        """.compileAndRunMainFunctionInMainClass()
+        """.compileAndRunInMainClass()
         }.isInstanceOf(UnknownTypeException::class.java)
     }
 

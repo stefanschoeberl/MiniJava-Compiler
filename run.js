@@ -31,6 +31,9 @@ async function runModule(folder) {
         },
         wasmDeref: (address) => {
             return references.get(address);
+        },
+        wasmBoolean: (value) => {
+            return value !== 0
         }
     };
 
