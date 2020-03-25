@@ -23,8 +23,6 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
 
     val operatorTable = OperatorTable()
 
-    var mallocAddress: Int = -1
-
     var newArrayNumericAddress: Int = -1
     var newArrayBooleanAddress: Int = -1
     var newArrayReferenceAddress: Int = -1
@@ -50,18 +48,16 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
     val statementCodeGenerator = StatementCodeGenerator(this)
 
     fun generateModule(trees: List<MiniJavaParser.MinijavaContext>): Module {
-        beginModule()
+        initModule()
         trees.flatMap {it.javaclass()}.forEach(classCodeGenerator::generate)
-        endModule()
         return module
     }
 
-    private fun beginModule() {
+    private fun initModule() {
         module = Module()
         functions = mutableMapOf()
         initializers = mutableMapOf()
 
-        importMalloc()
         importArrayFunctions()
         importNativeMethods()
         importConstructors()
@@ -76,24 +72,6 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
                 "internal", name,
                 ImportDesc.Func(
                     module.declareType(FuncType(parameters, result))
-                )
-            )
-        )
-    }
-
-    private fun importMalloc() {
-        mallocAddress = module.importFunction(
-            Import(
-                "internal", "malloc",
-                ImportDesc.Func(
-                    declareFunctionType(
-                        MethodSymbolTable.MethodSignature("malloc", listOf(DataType.PrimitiveType.Integer)),
-                        MethodSymbolTable.MethodInformation(
-                            -1, DataType.PrimitiveType.Integer,
-                            isPublic = false,
-                            isStatic = true
-                        )
-                    )
                 )
             )
         )
@@ -247,9 +225,5 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
         parameters.add(0, ValueType.I32)
         val returnType = ValueType.I32
         return module.declareType(FuncType(parameters, mutableListOf(returnType)))
-    }
-
-    private fun endModule() {
-        module.imports.add(Import("internal", "memory", ImportDesc.Memory(MemType(1))))
     }
 }

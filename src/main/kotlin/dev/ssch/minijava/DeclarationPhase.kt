@@ -15,7 +15,7 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
     private lateinit var fieldSymbolTable: FieldSymbolTable
     private lateinit var initializerSymbolTable: InitializerSymbolTable
 
-    private var currentNativeMethodAddress = 12 // malloc and array functions
+    private var currentNativeMethodAddress = 11 // array functions
     private var currentMethodAddress = 0
     private var currentInitializerAddress = 0
     private var currentConstructorAddress = 0
@@ -34,7 +34,6 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
 
     private fun recalculateMethodAddresses() {
         // Address Layout:
-        // 0: malloc
         // native methods
         // constructors
         // getter/setter

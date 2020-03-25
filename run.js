@@ -11,16 +11,12 @@ async function runModule(folder) {
     const file = path.join(folderAbsolute, "module.wasm");
     const scripts = require(path.join(folderAbsolute, "module"));
 
-    const memory = new WebAssembly.Memory({initial:1});
-    const memoryView = new DataView(memory.buffer);
-    let nextFreeAddress = 1;
 
     let nextFreeReference = 1;
     const objects = new Map();
     const references = new Map();
 
     const runtime = {
-        memoryView: memoryView,
         wasmRef: (obj) => {
             if (obj == null) {
                 return 0;
@@ -50,12 +46,6 @@ async function runModule(folder) {
 
     const imports = {
         internal: {
-            "memory": memory,
-            "malloc": numBytes => {
-                const address = nextFreeAddress;
-                nextFreeAddress += numBytes;
-                return address;
-            },
             "new_array_numeric": size => {
                 return runtime.wasmRef(Array(size).fill(0))
             },
