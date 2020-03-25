@@ -43,26 +43,6 @@ fun DataType.toWebAssemblyType(): ValueType {
     }
 }
 
-fun DataType.getStoreMemoryInstruction(): Instruction {
-    return when (this) {
-        DataType.PrimitiveType.Integer -> Instruction.i32_store
-        DataType.PrimitiveType.Boolean -> Instruction.i32_store8
-        DataType.PrimitiveType.Float -> Instruction.f32_store
-        is DataType.Array -> Instruction.i32_store
-        is DataType.ReferenceType -> Instruction.i32_store
-    }
-}
-
-fun DataType.getLoadMemoryInstruction(): Instruction {
-    return when (this) {
-        DataType.PrimitiveType.Integer -> Instruction.i32_load
-        DataType.PrimitiveType.Boolean -> Instruction.i32_load8_s
-        DataType.PrimitiveType.Float -> Instruction.f32_load
-        is DataType.Array -> Instruction.i32_load
-        is DataType.ReferenceType -> Instruction.i32_load
-    }
-}
-
 fun MiniJavaParser.TypeDefinitionContext.getDataType(classSymbolTable: ClassSymbolTable): DataType? {
     return when (val ctx = this) {
         is MiniJavaParser.SimpleTypeContext -> {

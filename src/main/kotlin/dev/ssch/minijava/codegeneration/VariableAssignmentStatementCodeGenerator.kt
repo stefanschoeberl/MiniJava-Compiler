@@ -7,7 +7,6 @@ import dev.ssch.minijava.ast.Instruction
 import dev.ssch.minijava.exception.IncompatibleAssignmentException
 import dev.ssch.minijava.exception.InvalidAssignmentException
 import dev.ssch.minijava.exception.UndefinedVariableException
-import dev.ssch.minijava.getStoreMemoryInstruction
 import dev.ssch.minijava.grammar.MiniJavaParser
 import org.antlr.v4.runtime.Token
 
@@ -43,13 +42,20 @@ class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: 
                 }
             }
             is MiniJavaParser.ArrayAccessExprContext -> {
-                val elementType = codeGenerationPhase.arrayAccessExpressionCodeGeneration.generateElementAddressCodeAndReturnElementType(left)
+                val elementType = codeGenerationPhase.arrayAccessExpressionCodeGeneration.generateArrayAndIndexAddressesAndReturnElementType(left)
 
                 val rightType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
                 checkAndConvertAssigment(elementType, rightType, ctx.left.start)
 
-                codeGenerationPhase.currentFunction.body.instructions.add(elementType.getStoreMemoryInstruction())
+                val address = when (elementType) {
+                    is DataType.PrimitiveType.Integer -> codeGenerationPhase.setArrayPrimitiveIntAddress
+                    is DataType.PrimitiveType.Float -> codeGenerationPhase.setArrayPrimitiveFloatAddress
+                    is DataType.PrimitiveType.Boolean -> codeGenerationPhase.setArrayPrimitiveBooleanAddress
+                    is DataType.ReferenceType -> codeGenerationPhase.setArrayReferenceAddress
+                    else -> TODO()
+                }
 
+                codeGenerationPhase.currentFunction.body.instructions.add(Instruction.call(address))
             }
             is MiniJavaParser.MemberExprContext -> {
                 codeGenerationPhase.memberAccessExpressionCodeGenerator.generateWrite(left, ctx.right)

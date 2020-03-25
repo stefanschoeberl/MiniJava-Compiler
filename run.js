@@ -16,23 +16,25 @@ async function runModule(folder) {
     let nextFreeAddress = 1;
 
     let nextFreeReference = 1;
-    const objects = {};
-    const references = {};
+    const objects = new Map();
+    const references = new Map();
 
     const runtime = {
         memoryView: memoryView,
         wasmRef: (obj) => {
-            if (objects.hasOwnProperty(obj)) {
-                return objects[obj];
+            if (obj == null) {
+                return 0;
+            } if (objects.has(obj)) {
+                return objects.get(obj);
             } else {
                 const address = nextFreeReference++;
-                objects[obj] = address;
-                references[address] = obj;
+                objects.set(obj, address);
+                references.set(address, obj);
                 return address;
             }
         },
         wasmDeref: (address) => {
-            return references[address];
+            return references.get(address);
         }
     };
 
@@ -53,7 +55,40 @@ async function runModule(folder) {
                 const address = nextFreeAddress;
                 nextFreeAddress += numBytes;
                 return address;
-            }
+            },
+            "new_array_numeric": size => {
+                return runtime.wasmRef(Array(size).fill(0))
+            },
+            "new_array_boolean": size => {
+                return runtime.wasmRef(Array(size).fill(false))
+            },
+            "new_array_reference": size => {
+                return runtime.wasmRef(Array(size).fill(null))
+            },
+            "get_array_numeric": (arrayAddress, index) => {
+                const a = runtime.wasmDeref(arrayAddress);
+                return a[index];
+            },
+            "get_array_boolean": (arrayAddress, index) => {
+                const a = runtime.wasmDeref(arrayAddress);
+                return a[index] ? 1 : 0;
+            },
+            "get_array_reference": (arrayAddress, index) => {
+                const a = runtime.wasmDeref(arrayAddress);
+                return runtime.wasmRef(a[index]);
+            },
+            "set_array_numeric": (arrayAddress, index, value) => {
+                const a = runtime.wasmDeref(arrayAddress);
+                a[index] = value;
+            },
+            "set_array_boolean": (arrayAddress, index, value) => {
+                const a = runtime.wasmDeref(arrayAddress);
+                a[index] = value > 0;
+            },
+            "set_array_reference": (arrayAddress, index, valueAddress) => {
+                const a = runtime.wasmDeref(arrayAddress);
+                a[index] = runtime.wasmDeref(valueAddress);
+            },
         },
         imports: nativeMethods
     };

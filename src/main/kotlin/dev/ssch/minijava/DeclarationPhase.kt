@@ -15,7 +15,7 @@ class DeclarationPhase: MiniJavaBaseVisitor<Unit>() {
     private lateinit var fieldSymbolTable: FieldSymbolTable
     private lateinit var initializerSymbolTable: InitializerSymbolTable
 
-    private var currentNativeMethodAddress = 1 // malloc
+    private var currentNativeMethodAddress = 12 // malloc and array functions
     private var currentMethodAddress = 0
     private var currentInitializerAddress = 0
     private var currentConstructorAddress = 0
