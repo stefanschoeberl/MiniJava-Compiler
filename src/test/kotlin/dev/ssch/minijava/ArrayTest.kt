@@ -330,4 +330,44 @@ class ArrayTest : CompilerTest() {
         """.compileAndRunInMainFunction()
         }.isInstanceOf(IncompatibleTypeException::class.java)
     }
+
+    @Test
+    fun `array of objects`() {
+        val output = Source.withMiniJava("""
+            class Point {
+                int x;
+                int y;
+            }
+            
+            class Main {
+                public static void main() {
+                    Point[] points = new Point[2];
+                    points[0] = new Point();
+                    points[1] = new Point();
+                    
+                    points[0].x = 1;
+                    points[0].y = 2;
+                    points[1].x = 3;
+                    points[1].y = 4;
+                    
+                    println(points);
+                }
+                
+                native static void println(Point[] points);
+            }
+        """).andJavaScript("""
+            module.exports = function (runtime) {
+                return {
+                    "Main.println#Point[]": function(pointsRef) {
+                        const points = runtime.wasmDeref(pointsRef);
+                        console.log(points[0].x);
+                        console.log(points[0].y);
+                        console.log(points[1].x);
+                        console.log(points[1].y);
+                    }
+                }
+            }
+        """).compileAndRun()
+        assertThat(output.lines()).containsExactly("1", "2", "3", "4", "")
+    }
 }

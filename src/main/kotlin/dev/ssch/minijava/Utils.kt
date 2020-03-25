@@ -44,18 +44,27 @@ fun DataType.toWebAssemblyType(): ValueType {
 }
 
 fun MiniJavaParser.TypeDefinitionContext.getDataType(classSymbolTable: ClassSymbolTable): DataType? {
+    fun asReferenceType(name: String): DataType? {
+        if (classSymbolTable.classes.containsKey(name)) {
+            return DataType.ReferenceType(name)
+        } else {
+            return null
+        }
+    }
+
     return when (val ctx = this) {
         is MiniJavaParser.SimpleTypeContext -> {
             val primitiveType = DataType.PrimitiveType.fromString(ctx.IDENT().text)
+            primitiveType ?: asReferenceType(ctx.IDENT().text)
+        }
+        is MiniJavaParser.ArrayTypeContext -> {
+            val primitiveType = DataType.PrimitiveType.fromString(ctx.IDENT().text)
             if (primitiveType != null) {
-                primitiveType
-            } else if (classSymbolTable.classes.containsKey(ctx.IDENT().text)) {
-                DataType.ReferenceType(ctx.IDENT().text)
+                DataType.Array(primitiveType)
             } else {
-                null
+                asReferenceType(ctx.IDENT().text)?.let { DataType.Array(it) }
             }
         }
-        is MiniJavaParser.ArrayTypeContext -> DataType.PrimitiveType.fromString(ctx.IDENT().text)?.let { DataType.Array(it) }
         else -> null
     }
 }
