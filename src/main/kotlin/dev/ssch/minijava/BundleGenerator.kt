@@ -38,15 +38,25 @@ class BundleGenerator {
 
         classSymbolTable.classes.forEach {
             val className = it.key
-            val fields = it.value.fieldSymbolTable.fields.keys
-            val initObject = fields.joinToString(",") { "\"$it\":0" }
+            val fields = it.value.fieldSymbolTable.fields.entries
+            val initObject = fields.joinToString(",") { field ->
+                val initValue = when (field.value.type) {
+                    DataType.PrimitiveType.Integer -> "0"
+                    DataType.PrimitiveType.Boolean -> "false"
+                    DataType.PrimitiveType.Float -> "0"
+                    is DataType.ReferenceType -> "null"
+                    is DataType.Array -> "null"
+                }
+                "\"${field.key}\":$initValue"
+            }
+
             val constructor = externalConstructorName(className)
             functions.add("\"$constructor\": function() { return runtime.wasmRef({$initObject}); }")
-            fields.forEach { fieldName ->
-                val getter = externalGetterName(className, fieldName)
-                val setter = externalSetterName(className, fieldName)
-                functions.add("\"$getter\": function (ref) { return runtime.wasmDeref(ref)[\"$fieldName\"]; }")
-                functions.add("\"$setter\": function (ref, val) { runtime.wasmDeref(ref)[\"$fieldName\"] = val; }")
+            fields.forEach { field ->
+                val getter = externalGetterName(className, field.key)
+                val setter = externalSetterName(className, field.key)
+                functions.add("\"$getter\": function (ref) { return runtime.wasmDeref(ref)[\"${field.key}\"]; }")
+                functions.add("\"$setter\": function (ref, val) { runtime.wasmDeref(ref)[\"${field.key}\"] = val; }")
             }
         }
 
