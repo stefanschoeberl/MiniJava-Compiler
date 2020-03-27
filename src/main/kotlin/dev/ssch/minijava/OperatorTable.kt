@@ -54,6 +54,11 @@ class OperatorTable {
         MiniJavaParser.OR to Pair(Instruction.i32_or, DataType.PrimitiveType.Boolean)
     )
 
+    private val referenceOperations = hashMapOf(
+        MiniJavaParser.EQ to Pair(Instruction.i32_eq, DataType.PrimitiveType.Boolean),
+        MiniJavaParser.NEQ to Pair(Instruction.i32_ne, DataType.PrimitiveType.Boolean)
+    )
+
     fun findBinaryOperation(left: DataType?, right: DataType?, op: Token): BinaryOperation? {
         return if (numericTypes.contains(left) && numericTypes.contains(right)) {
             if (left == DataType.PrimitiveType.Float || right == DataType.PrimitiveType.Float) {
@@ -64,6 +69,12 @@ class OperatorTable {
                 intOperations[op.type]?.let {
                     BinaryOperation(null, null, it.first, it.second)
                 }
+            }
+        }
+        else if (left is DataType.ReferenceType && (left == right || right == DataType.NullType)
+            || left == DataType.NullType && (right is DataType.ReferenceType || right == DataType.NullType)) {
+            referenceOperations[op.type]?.let {
+                BinaryOperation(null, null, it.first, it.second)
             }
         }
         else if (left == DataType.PrimitiveType.Boolean && right == DataType.PrimitiveType.Boolean) {
