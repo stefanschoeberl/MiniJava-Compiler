@@ -40,6 +40,7 @@ fun DataType.toWebAssemblyType(): ValueType {
         DataType.PrimitiveType.Float -> ValueType.F32
         is DataType.Array -> ValueType.I32
         is DataType.ReferenceType -> ValueType.I32
+        DataType.NullType -> TODO()
     }
 }
 
@@ -80,6 +81,8 @@ val dataTypeCastingConversions = hashMapOf(
 
 fun DataType.assignTypeTo(other: DataType): List<Instruction>? {
     if (this == other) {
+        return listOf()
+    } else if (this == DataType.NullType && (other is DataType.ReferenceType || other is DataType.Array)) {
         return listOf()
     } else {
         return dataTypeWideningConversions[Pair(this, other)]

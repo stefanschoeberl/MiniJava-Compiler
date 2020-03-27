@@ -16,11 +16,12 @@ async function runModule(folder) {
     const objects = new Map();
     const references = new Map();
 
+    objects.set(null, 0);
+    references.set(0, null);
+
     const runtime = {
         wasmRef: (obj) => {
-            if (obj == null) {
-                return 0;
-            } if (objects.has(obj)) {
+            if (objects.has(obj)) {
                 return objects.get(obj);
             } else {
                 const address = nextFreeReference++;

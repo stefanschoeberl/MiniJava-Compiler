@@ -82,4 +82,9 @@ class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerati
 
         return type
     }
+
+    fun generateNullEvaluation(): DataType {
+        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.i32_const(0))
+        return DataType.NullType
+    }
 }

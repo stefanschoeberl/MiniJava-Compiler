@@ -1,7 +1,11 @@
 module.exports = function (runtime) {
     function writeArray(ref) {
         const array = runtime.wasmDeref(ref);
-        console.log('[' + array.join(', ') + ']');
+        if (array != null) {
+            console.log('[' + array.join(', ') + ']');
+        } else {
+            console.log(null);
+        }
     }
 
     return {

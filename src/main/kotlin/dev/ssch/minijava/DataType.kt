@@ -46,5 +46,14 @@ sealed class DataType {
         }
     }
 
+    object NullType: DataType() {
+        override fun toString(): String {
+            return "null"
+        }
+        override fun sizeInBytes(): Int {
+            return 0
+        }
+    }
+
     abstract fun sizeInBytes(): Int
 }

@@ -46,6 +46,7 @@ class BundleGenerator {
                     DataType.PrimitiveType.Float -> "0"
                     is DataType.ReferenceType -> "null"
                     is DataType.Array -> "null"
+                    DataType.NullType -> TODO()
                 }
                 "\"${field.key}\":$initValue"
             }
