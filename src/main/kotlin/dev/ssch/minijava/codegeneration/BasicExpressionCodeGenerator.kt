@@ -4,10 +4,7 @@ import dev.ssch.minijava.CodeGenerationPhase
 import dev.ssch.minijava.DataType
 import dev.ssch.minijava.ast.Instruction
 import dev.ssch.minijava.castTypeTo
-import dev.ssch.minijava.exception.InconvertibleTypeException
-import dev.ssch.minijava.exception.InvalidUnaryOperationException
-import dev.ssch.minijava.exception.UndefinedVariableException
-import dev.ssch.minijava.exception.UnknownTypeException
+import dev.ssch.minijava.exception.*
 import dev.ssch.minijava.getDataType
 import dev.ssch.minijava.grammar.MiniJavaParser
 
@@ -25,10 +22,7 @@ class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerati
                 localsVariableSymbolTable.typeOf(name)
             }
             localsVariableSymbolTable.doesThisParameterExist() -> {
-                codeGenerationPhase.memberAccessExpressionCodeGenerator.generateEvaluation(name) {
-                    instructions.add(Instruction.local_get(localsVariableSymbolTable.addressOfThis()))
-                    DataType.ReferenceType(codeGenerationPhase.currentClass)
-                }
+                codeGenerationPhase.memberAccessExpressionCodeGenerator.generateEvaluation(name, this::generateThis)
             }
             else -> throw UndefinedVariableException(name, ctx.IDENT().symbol)
         }
@@ -88,5 +82,19 @@ class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerati
     fun generateNullEvaluation(): DataType {
         codeGenerationPhase.currentFunction.body.instructions.add(Instruction.i32_const(0))
         return DataType.NullType
+    }
+
+    fun generateThisEvaluation(ctx: MiniJavaParser.ThisExprContext): DataType? {
+        return if (codeGenerationPhase.localsVariableSymbolTable.doesThisParameterExist()) {
+            generateThis()
+        } else {
+            throw ThisReferencedFromStaticContextException(ctx.start)
+        }
+    }
+
+    private fun generateThis(): DataType {
+        val thisAddress = codeGenerationPhase.localsVariableSymbolTable.addressOfThis()
+        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.local_get(thisAddress))
+        return DataType.ReferenceType(codeGenerationPhase.currentClass)
     }
 }

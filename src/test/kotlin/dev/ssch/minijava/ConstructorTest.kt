@@ -125,4 +125,38 @@ class ConstructorTest : CompilerTest() {
         """.compileAndRun()
         assertThat(output.lines()).containsExactly("123", "456", "456", "123", "123", "456", "123", "456", "")
     }
+
+    @Test
+    fun `access fields in constructor with this`() {
+        val output = """
+            class Main {
+                public static void main() {
+                    Point p = new Point(123, 456);
+                    Console.println(p.x);
+                    Console.println(p.y);
+                }
+            }
+            
+            class Point {
+                int x;
+                int y;
+                
+                Point(int x, int y) {
+                    this.x = x;
+                    this.y = y;
+                    Console.println(this.x);
+                    Console.println(this.y);
+                    this.x = this.y;
+                    this.y = x;
+                    Console.println(this.x);
+                    Console.println(this.y);
+                    this.y = this.x;
+                    this.x = x;
+                    Console.println(this.x);
+                    Console.println(this.y);
+                }
+            }
+        """.compileAndRun()
+        assertThat(output.lines()).containsExactly("123", "456", "456", "123", "123", "456", "123", "456", "")
+    }
 }

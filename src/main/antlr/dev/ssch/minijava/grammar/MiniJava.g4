@@ -59,6 +59,7 @@ expr: array=expr '[' index=expr ']'                                             
     | INT                                                                           # IntExpr
     | FLOAT                                                                         # FloatExpr
     | NULL                                                                          # NullExpr
+    | THIS                                                                          # ThisExpr
     | value=(TRUE|FALSE)                                                            # BoolExpr
     | '(' expr ')'                                                                  # ParensExpr
     | 'new' type=typeDefinition '(' (parameters+=expr (',' parameters+=expr)*)? ')' # ClassInstanceCreationExpr
@@ -82,6 +83,7 @@ DIV: '/';
 TRUE: 'true';
 FALSE: 'false';
 NULL: 'null';
+THIS: 'this';
 IDENT: [_a-zA-Z][_a-zA-Z0-9]*;
 FLOAT: [0-9]+ ('.' [0-9]*)? 'f';
 INT: [0-9]+;

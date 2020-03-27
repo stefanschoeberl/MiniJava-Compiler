@@ -56,6 +56,10 @@ class ExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPha
             return basicExpressionCodeGenerator.generateNullEvaluation()
         }
 
+        override fun visitThisExpr(ctx: MiniJavaParser.ThisExprContext): DataType? {
+            return basicExpressionCodeGenerator.generateThisEvaluation(ctx)
+        }
+
         override fun visitParensExpr(ctx: MiniJavaParser.ParensExprContext): DataType? {
             return basicExpressionCodeGenerator.generateEvaluation(ctx)
         }
