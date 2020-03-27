@@ -71,9 +71,9 @@ class BundleGenerator {
             }
         }
 
-        val classCode = functions
-            .map { it.prependIndent("                    ") }
-            .joinToString(",\n")
+        val classCode = functions.joinToString(",\n") {
+            it.prependIndent("                    ")
+        }
         return """
             function (runtime) {
                 return {

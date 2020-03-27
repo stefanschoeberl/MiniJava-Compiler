@@ -6,8 +6,8 @@ import dev.ssch.minijava.codegeneration.*
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.symboltable.ClassSymbolTable
 import dev.ssch.minijava.symboltable.InitializerSymbolTable
-import dev.ssch.minijava.symboltable.MethodSymbolTable
 import dev.ssch.minijava.symboltable.LocalVariableSymbolTable
+import dev.ssch.minijava.symboltable.MethodSymbolTable
 
 class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
 
@@ -37,7 +37,7 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
     var setArrayPrimitiveBooleanAddress: Int = -1
     var setArrayReferenceAddress: Int = -1
 
-    val classCodeGenerator = ClassCodeGenerator(this)
+    private val classCodeGenerator = ClassCodeGenerator(this)
     val methodCodeGenerator = MethodCodeGenerator(this)
 
     val arrayAccessExpressionCodeGeneration = ArrayAccessExpressionCodeGenerator(this)

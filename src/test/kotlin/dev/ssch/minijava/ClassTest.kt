@@ -1,8 +1,8 @@
 package dev.ssch.minijava
 
 import dev.ssch.util.CompilerTest
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 class ClassTest : CompilerTest() {
@@ -27,7 +27,7 @@ class ClassTest : CompilerTest() {
 
     @Test
     fun `redefine class`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
             class A {}
             class A {}
@@ -71,7 +71,7 @@ class ClassTest : CompilerTest() {
     }
 
     @Test
-    fun `instatiate class`() {
+    fun `instantiate class`() {
         val output = """
             class Main {
                 public static void main() {

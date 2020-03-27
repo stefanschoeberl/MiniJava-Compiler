@@ -8,11 +8,11 @@ data class Module (
 ) {
     fun declareType(type: FuncType): Int {
         val index = types.indexOf(type)
-        if (index == -1) {
+        return if (index == -1) {
             types.add(type)
-            return types.size - 1
+            types.size - 1
         } else {
-            return index
+            index
         }
     }
 

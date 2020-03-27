@@ -23,9 +23,9 @@ class ArrayAccessExpressionCodeGenerator(private val codeGenerationPhase: CodeGe
     fun generateEvaluation(ctx: MiniJavaParser.ArrayAccessExprContext): DataType {
         val elementType = generateArrayAndIndexAddressesAndReturnElementType(ctx)
         val address = when (elementType) {
-            is DataType.PrimitiveType.Integer -> codeGenerationPhase.getArrayPrimitiveIntAddress
-            is DataType.PrimitiveType.Float -> codeGenerationPhase.getArrayPrimitiveFloatAddress
-            is DataType.PrimitiveType.Boolean -> codeGenerationPhase.getArrayPrimitiveBooleanAddress
+            DataType.PrimitiveType.Integer -> codeGenerationPhase.getArrayPrimitiveIntAddress
+            DataType.PrimitiveType.Float -> codeGenerationPhase.getArrayPrimitiveFloatAddress
+            DataType.PrimitiveType.Boolean -> codeGenerationPhase.getArrayPrimitiveBooleanAddress
             is DataType.ReferenceType -> codeGenerationPhase.getArrayReferenceAddress
             else -> TODO()
         }

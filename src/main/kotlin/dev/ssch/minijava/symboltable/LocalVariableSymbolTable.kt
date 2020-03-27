@@ -30,9 +30,8 @@ class LocalVariableSymbolTable {
     }
 
     private fun getFreeAddressForLocal(type: DataType): Int {
-        val pool = unusedVariables[type] ?: return allocateNewAddressForLocal(type)
-        val address = pool.removeFirstOrNull() ?: return allocateNewAddressForLocal(type)
-        return address
+        val addressPool = unusedVariables[type] ?: return allocateNewAddressForLocal(type)
+        return addressPool.removeFirstOrNull() ?: return allocateNewAddressForLocal(type)
     }
 
     fun declareVariable(name: String, type: DataType): Int {

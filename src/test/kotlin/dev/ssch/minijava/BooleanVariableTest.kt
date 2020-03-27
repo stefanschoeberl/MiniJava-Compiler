@@ -1,7 +1,7 @@
 package dev.ssch.minijava
 
 import dev.ssch.util.CompilerTest
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class BooleanVariableTest : CompilerTest() {
@@ -11,26 +11,26 @@ class BooleanVariableTest : CompilerTest() {
         val output = """
             boolean a;
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("")
+        assertThat(output.lines()).containsExactly("")
     }
 
     @Test
-    fun `declare a variable and initilize it with a value`() {
+    fun `declare a variable and initialize it with a value`() {
         val output = """
             boolean a = true;
             Console.println(a);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("true", "")
+        assertThat(output.lines()).containsExactly("true", "")
     }
 
     @Test
-    fun `declare a variable and initilize it with another variable`() {
+    fun `declare a variable and initialize it with another variable`() {
         val output = """
             boolean a = false;
             boolean b = a;
             Console.println(b);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("false", "")
+        assertThat(output.lines()).containsExactly("false", "")
     }
 
     @Test
@@ -40,7 +40,7 @@ class BooleanVariableTest : CompilerTest() {
             a = true;
             Console.println(a);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("true", "")
+        assertThat(output.lines()).containsExactly("true", "")
     }
 
     @Test
@@ -50,6 +50,6 @@ class BooleanVariableTest : CompilerTest() {
             boolean b = a;
             Console.println(b);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("false", "")
+        assertThat(output.lines()).containsExactly("false", "")
     }
 }

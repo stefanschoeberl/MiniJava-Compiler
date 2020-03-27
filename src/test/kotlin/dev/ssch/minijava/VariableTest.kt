@@ -1,7 +1,7 @@
 package dev.ssch.minijava
 
 import dev.ssch.util.CompilerTest
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class VariableTest : CompilerTest() {
@@ -11,7 +11,7 @@ class VariableTest : CompilerTest() {
         val output = """
             int a;
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("")
+        assertThat(output.lines()).containsExactly("")
     }
 
     @Test
@@ -20,7 +20,7 @@ class VariableTest : CompilerTest() {
             int a = 123;
             Console.println(a);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("123", "")
+        assertThat(output.lines()).containsExactly("123", "")
     }
 
     @Test
@@ -30,7 +30,7 @@ class VariableTest : CompilerTest() {
             int b = a;
             Console.println(b);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("123", "")
+        assertThat(output.lines()).containsExactly("123", "")
     }
 
     @Test
@@ -40,7 +40,7 @@ class VariableTest : CompilerTest() {
             a = 123;
             Console.println(a);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("123", "")
+        assertThat(output.lines()).containsExactly("123", "")
     }
 
     @Test
@@ -50,6 +50,6 @@ class VariableTest : CompilerTest() {
             int b = a;
             Console.println(b);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("123", "")
+        assertThat(output.lines()).containsExactly("123", "")
     }
 }

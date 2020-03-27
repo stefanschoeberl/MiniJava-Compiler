@@ -26,7 +26,7 @@ class StatementCodeGenerator(codeGenerationPhase: CodeGenerationPhase) {
         visitor.visit(ctx)
     }
 
-    inner class Visitor : MiniJavaBaseVisitor<Unit>() {
+    private inner class Visitor : MiniJavaBaseVisitor<Unit>() {
         override fun visitVardeclassignStmt(ctx: MiniJavaParser.VardeclassignStmtContext) {
             variableDeclarationStatementCodeGenerator.generate(ctx)
         }

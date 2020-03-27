@@ -8,7 +8,7 @@ class ClassCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
 
     private val visitor = Visitor()
 
-    inner class Visitor : MiniJavaBaseVisitor<Unit>() {
+    private inner class Visitor : MiniJavaBaseVisitor<Unit>() {
         override fun visitMethod(ctx: MiniJavaParser.MethodContext) {
             codeGenerationPhase.methodCodeGenerator.generate(ctx)
         }

@@ -1,7 +1,7 @@
 package dev.ssch.minijava.expressions
 
 import dev.ssch.util.CompilerTest
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class MixedExpressionsTest : CompilerTest() {
@@ -19,7 +19,7 @@ class MixedExpressionsTest : CompilerTest() {
             Console.println(b);
             Console.println(c);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("2", "3", "5", "")
+        assertThat(output.lines()).containsExactly("2", "3", "5", "")
     }
 
     @Test
@@ -37,7 +37,7 @@ class MixedExpressionsTest : CompilerTest() {
             c = a - b;
             Console.println(c);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("2", "3", "1", "-1", "")
+        assertThat(output.lines()).containsExactly("2", "3", "1", "-1", "")
     }
 
     @Test
@@ -52,7 +52,7 @@ class MixedExpressionsTest : CompilerTest() {
             Console.println(c);
             Console.println((a + a + a) - b);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("5", "5", "")
+        assertThat(output.lines()).containsExactly("5", "5", "")
     }
 
     @Test
@@ -68,7 +68,7 @@ class MixedExpressionsTest : CompilerTest() {
             Console.println(30 / 1 - 2 + 3 * 4 + 5);
             Console.println(-30 / 1 - 2 + 3 * -4 + -5);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("20", "-20", "2", "-14", "2", "-2", "-3", "45", "-49", "")
+        assertThat(output.lines()).containsExactly("20", "-20", "2", "-14", "2", "-2", "-3", "45", "-49", "")
     }
 
 

@@ -2,7 +2,8 @@ package dev.ssch.minijava.expressions
 
 import dev.ssch.minijava.exception.InvalidBinaryOperationException
 import dev.ssch.util.CompilerTest
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 class EqualNotEqualTest : CompilerTest() {
@@ -15,7 +16,7 @@ class EqualNotEqualTest : CompilerTest() {
             Console.println(true == true);
             Console.println(false == false);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("false", "false", "true", "true", "")
+        assertThat(output.lines()).containsExactly("false", "false", "true", "true", "")
     }
 
     @Test
@@ -25,7 +26,7 @@ class EqualNotEqualTest : CompilerTest() {
             Console.println(1 == 1);
             Console.println(2 == 1);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "")
+        assertThat(output.lines()).containsExactly("false", "true", "false", "")
     }
 
     @Test
@@ -35,7 +36,7 @@ class EqualNotEqualTest : CompilerTest() {
             Console.println(1f == 1f);
             Console.println(2f == 1f);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "")
+        assertThat(output.lines()).containsExactly("false", "true", "false", "")
     }
 
     @Test
@@ -46,7 +47,7 @@ class EqualNotEqualTest : CompilerTest() {
             Console.println(true != true);
             Console.println(false != false);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("true", "true", "false", "false", "")
+        assertThat(output.lines()).containsExactly("true", "true", "false", "false", "")
     }
 
     @Test
@@ -56,7 +57,7 @@ class EqualNotEqualTest : CompilerTest() {
             Console.println(1 != 1);
             Console.println(2 != 1);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "")
+        assertThat(output.lines()).containsExactly("true", "false", "true", "")
     }
 
     @Test
@@ -66,12 +67,12 @@ class EqualNotEqualTest : CompilerTest() {
             Console.println(1f != 1f);
             Console.println(2f != 1f);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "")
+        assertThat(output.lines()).containsExactly("true", "false", "true", "")
     }
 
     @Test
     fun `== two variables 1`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 int b = 123;
@@ -82,7 +83,7 @@ class EqualNotEqualTest : CompilerTest() {
 
     @Test
     fun `== two variables 2`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 int b = 123;
@@ -93,7 +94,7 @@ class EqualNotEqualTest : CompilerTest() {
 
     @Test
     fun `== two literals 1`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = 123 == false;
             """.compileAndRunInMainFunction()
@@ -102,7 +103,7 @@ class EqualNotEqualTest : CompilerTest() {
 
     @Test
     fun `== two literals 2`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = false == 123;
             """.compileAndRunInMainFunction()
@@ -111,7 +112,7 @@ class EqualNotEqualTest : CompilerTest() {
 
     @Test
     fun `== two complex expressions 1`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 boolean b = a == (2 * 4);
@@ -121,7 +122,7 @@ class EqualNotEqualTest : CompilerTest() {
 
     @Test
     fun `== two complex expressions 2`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 boolean b = (2 * 4) == a;
@@ -131,7 +132,7 @@ class EqualNotEqualTest : CompilerTest() {
 
     @Test
     fun `!= two variables 1`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 int b = 123;
@@ -142,7 +143,7 @@ class EqualNotEqualTest : CompilerTest() {
 
     @Test
     fun `!= two variables 2`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 int b = 123;
@@ -153,7 +154,7 @@ class EqualNotEqualTest : CompilerTest() {
 
     @Test
     fun `!= two literals 1`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = 123 != false;
             """.compileAndRunInMainFunction()
@@ -162,7 +163,7 @@ class EqualNotEqualTest : CompilerTest() {
 
     @Test
     fun `!= two literals 2`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = false != 123;
             """.compileAndRunInMainFunction()
@@ -171,7 +172,7 @@ class EqualNotEqualTest : CompilerTest() {
 
     @Test
     fun `!= two complex expressions 1`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 boolean b = a != (2 * 4);
@@ -181,7 +182,7 @@ class EqualNotEqualTest : CompilerTest() {
 
     @Test
     fun `!= two complex expressions 2`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 boolean b = (2 * 4) != a;

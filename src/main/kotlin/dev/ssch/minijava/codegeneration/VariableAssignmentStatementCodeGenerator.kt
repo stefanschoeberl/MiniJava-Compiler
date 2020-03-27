@@ -28,17 +28,20 @@ class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: 
                 val instructions = codeGenerationPhase.currentFunction.body.instructions
                 val localsVariableSymbolTable = codeGenerationPhase.localsVariableSymbolTable
 
-                if (localsVariableSymbolTable.isDeclared(name)) {
-                    val rightType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
-                    checkAndConvertAssigment(codeGenerationPhase.localsVariableSymbolTable.typeOf(name), rightType, ctx.left.start)
-                    codeGenerationPhase.currentFunction.body.instructions.add(Instruction.local_set(codeGenerationPhase.localsVariableSymbolTable.addressOf(name)))
-                } else if (localsVariableSymbolTable.doesThisParameterExist()) {
-                    codeGenerationPhase.memberAccessExpressionCodeGenerator.generateWrite(name, ctx.right, ctx.left.start) {
-                        instructions.add(Instruction.local_get(localsVariableSymbolTable.addressOfThis()))
-                        DataType.ReferenceType(codeGenerationPhase.currentClass)
+                when {
+                    localsVariableSymbolTable.isDeclared(name) -> {
+                        val rightType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
+                        checkAndConvertAssigment(codeGenerationPhase.localsVariableSymbolTable.typeOf(name), rightType, ctx.left.start)
+                        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.local_set(codeGenerationPhase.localsVariableSymbolTable.addressOf(name)))
                     }
-                } else {
-                    throw UndefinedVariableException(name, left.IDENT().symbol)
+                    localsVariableSymbolTable.doesThisParameterExist() -> {
+                        codeGenerationPhase.memberAccessExpressionCodeGenerator.generateWrite(name, ctx.right, ctx.left.start) {
+                            instructions.add(Instruction.local_get(localsVariableSymbolTable.addressOfThis()))
+                            DataType.ReferenceType(codeGenerationPhase.currentClass)
+                        }
+                    }
+                    else -> throw UndefinedVariableException(name, left.IDENT().symbol)
+
                 }
             }
             is MiniJavaParser.ArrayAccessExprContext -> {
@@ -48,9 +51,9 @@ class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: 
                 checkAndConvertAssigment(elementType, rightType, ctx.left.start)
 
                 val address = when (elementType) {
-                    is DataType.PrimitiveType.Integer -> codeGenerationPhase.setArrayPrimitiveIntAddress
-                    is DataType.PrimitiveType.Float -> codeGenerationPhase.setArrayPrimitiveFloatAddress
-                    is DataType.PrimitiveType.Boolean -> codeGenerationPhase.setArrayPrimitiveBooleanAddress
+                    DataType.PrimitiveType.Integer -> codeGenerationPhase.setArrayPrimitiveIntAddress
+                    DataType.PrimitiveType.Float -> codeGenerationPhase.setArrayPrimitiveFloatAddress
+                    DataType.PrimitiveType.Boolean -> codeGenerationPhase.setArrayPrimitiveBooleanAddress
                     is DataType.ReferenceType -> codeGenerationPhase.setArrayReferenceAddress
                     else -> TODO()
                 }

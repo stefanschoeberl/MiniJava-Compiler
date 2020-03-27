@@ -2,14 +2,15 @@ package dev.ssch.minijava
 
 import dev.ssch.minijava.exception.UndefinedVariableException
 import dev.ssch.util.CompilerTest
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 class ScopesTest : CompilerTest() {
 
     @Test
     fun `use variable outside of block`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
         """
             int a;
             {
@@ -22,7 +23,7 @@ class ScopesTest : CompilerTest() {
 
     @Test
     fun `use variable outside of block (complex nesting 1)`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
         """
             int a = 111;
             {
@@ -38,7 +39,7 @@ class ScopesTest : CompilerTest() {
 
     @Test
     fun `use variable outside of block (complex nesting 2)`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
         """
             int a = 111;
             {
@@ -54,7 +55,7 @@ class ScopesTest : CompilerTest() {
 
     @Test
     fun `use variable outside of block (complex nesting 3)`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
         """
             int a = 111;
             {
@@ -100,6 +101,6 @@ class ScopesTest : CompilerTest() {
             }
             Console.println(a);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("1", "2", "3", "2", "1", "4", "5", "4", "6", "1", "4", "1", "")
+        assertThat(output.lines()).containsExactly("1", "2", "3", "2", "1", "4", "5", "4", "6", "1", "4", "1", "")
     }
 }

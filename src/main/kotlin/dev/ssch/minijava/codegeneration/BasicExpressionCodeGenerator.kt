@@ -19,16 +19,18 @@ class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerati
         val instructions = codeGenerationPhase.currentFunction.body.instructions
         val localsVariableSymbolTable = codeGenerationPhase.localsVariableSymbolTable
 
-        if (localsVariableSymbolTable.isDeclared(name)) {
-            instructions.add(Instruction.local_get(localsVariableSymbolTable.addressOf(name)))
-            return localsVariableSymbolTable.typeOf(name)
-        } else if (localsVariableSymbolTable.doesThisParameterExist()) {
-            return codeGenerationPhase.memberAccessExpressionCodeGenerator.generateEvaluation(name) {
-                instructions.add(Instruction.local_get(localsVariableSymbolTable.addressOfThis()))
-                DataType.ReferenceType(codeGenerationPhase.currentClass)
+        return when {
+            localsVariableSymbolTable.isDeclared(name) -> {
+                instructions.add(Instruction.local_get(localsVariableSymbolTable.addressOf(name)))
+                localsVariableSymbolTable.typeOf(name)
             }
-        } else {
-            throw UndefinedVariableException(name, ctx.IDENT().symbol)
+            localsVariableSymbolTable.doesThisParameterExist() -> {
+                codeGenerationPhase.memberAccessExpressionCodeGenerator.generateEvaluation(name) {
+                    instructions.add(Instruction.local_get(localsVariableSymbolTable.addressOfThis()))
+                    DataType.ReferenceType(codeGenerationPhase.currentClass)
+                }
+            }
+            else -> throw UndefinedVariableException(name, ctx.IDENT().symbol)
         }
     }
 

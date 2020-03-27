@@ -3,8 +3,8 @@ package dev.ssch.minijava
 import dev.ssch.minijava.exception.ExpressionIsNotAnArrayException
 import dev.ssch.minijava.exception.IncompatibleTypeException
 import dev.ssch.util.CompilerTest
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 class ArrayTest : CompilerTest() {
@@ -304,7 +304,7 @@ class ArrayTest : CompilerTest() {
 
     @Test
     fun `create array with non-int size`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
             int[] a = new int[true];
         """.compileAndRunInMainFunction()
@@ -313,7 +313,7 @@ class ArrayTest : CompilerTest() {
 
     @Test
     fun `index non-array variable`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
             boolean a;
             Console.println(a[0]);
@@ -323,7 +323,7 @@ class ArrayTest : CompilerTest() {
 
     @Test
     fun `index array with non-int expression`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
             int[] a = new int[1];
             Console.println(a[true]);

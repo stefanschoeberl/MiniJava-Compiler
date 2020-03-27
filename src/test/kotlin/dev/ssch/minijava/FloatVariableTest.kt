@@ -1,7 +1,7 @@
 package dev.ssch.minijava
 
 import dev.ssch.util.CompilerTest
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class FloatVariableTest : CompilerTest() {
@@ -11,7 +11,7 @@ class FloatVariableTest : CompilerTest() {
         val output = """
             float a;
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("")
+        assertThat(output.lines()).containsExactly("")
     }
 
     @Test

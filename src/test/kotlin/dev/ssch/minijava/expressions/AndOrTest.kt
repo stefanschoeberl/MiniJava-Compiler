@@ -2,7 +2,8 @@ package dev.ssch.minijava.expressions
 
 import dev.ssch.minijava.exception.InvalidBinaryOperationException
 import dev.ssch.util.CompilerTest
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 class AndOrTest : CompilerTest() {
@@ -15,7 +16,7 @@ class AndOrTest : CompilerTest() {
             Console.println(true && true);
             Console.println(false && false);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("false", "false", "true", "false", "")
+        assertThat(output.lines()).containsExactly("false", "false", "true", "false", "")
     }
 
     @Test
@@ -26,12 +27,12 @@ class AndOrTest : CompilerTest() {
             Console.println(true || true);
             Console.println(false || false);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("true", "true", "true", "false", "")
+        assertThat(output.lines()).containsExactly("true", "true", "true", "false", "")
     }
 
     @Test
     fun `&& two variables 1`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 int b = 123;
@@ -42,7 +43,7 @@ class AndOrTest : CompilerTest() {
 
     @Test
     fun `&& two variables 2`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 int b = 123;
@@ -53,7 +54,7 @@ class AndOrTest : CompilerTest() {
 
     @Test
     fun `&& two literals 1`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = 123 && false;
             """.compileAndRunInMainFunction()
@@ -62,7 +63,7 @@ class AndOrTest : CompilerTest() {
 
     @Test
     fun `&& two literals 2`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = false && 123;
             """.compileAndRunInMainFunction()
@@ -71,7 +72,7 @@ class AndOrTest : CompilerTest() {
 
     @Test
     fun `&& two complex expressions 1`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 boolean b = a && (2 * 4);
@@ -81,7 +82,7 @@ class AndOrTest : CompilerTest() {
 
     @Test
     fun `&& two complex expressions 2`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 boolean b = (2 * 4) && a;
@@ -91,7 +92,7 @@ class AndOrTest : CompilerTest() {
 
     @Test
     fun `|| two variables 1`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 int b = 123;
@@ -102,7 +103,7 @@ class AndOrTest : CompilerTest() {
 
     @Test
     fun `|| two variables 2`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 int b = 123;
@@ -113,7 +114,7 @@ class AndOrTest : CompilerTest() {
 
     @Test
     fun `|| two literals 1`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = 123 || false;
             """.compileAndRunInMainFunction()
@@ -122,7 +123,7 @@ class AndOrTest : CompilerTest() {
 
     @Test
     fun `|| two literals 2`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = false || 123;
             """.compileAndRunInMainFunction()
@@ -131,7 +132,7 @@ class AndOrTest : CompilerTest() {
 
     @Test
     fun `|| two complex expressions 1`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 boolean b = a || (2 * 4);
@@ -141,7 +142,7 @@ class AndOrTest : CompilerTest() {
 
     @Test
     fun `|| two complex expressions 2`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 boolean b = (2 * 4) || a;
@@ -161,6 +162,6 @@ class AndOrTest : CompilerTest() {
             Console.println(true && false || true && false);
             Console.println(true && (false || true) && false);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("true", "true", "true", "true", "true", "false", "false", "false", "")
+        assertThat(output.lines()).containsExactly("true", "true", "true", "true", "true", "false", "false", "false", "")
     }
 }

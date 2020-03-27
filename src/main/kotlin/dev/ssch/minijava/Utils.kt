@@ -26,10 +26,10 @@ fun List<String>.runCommand(workingDir: File): String {
 }
 
 fun <T> MutableList<T>.removeFirstOrNull(): T? {
-    if (this.isEmpty()) {
-        return null
+    return if (this.isEmpty()) {
+        null
     } else {
-        return this.removeAt(0)
+        this.removeAt(0)
     }
 }
 
@@ -46,10 +46,10 @@ fun DataType.toWebAssemblyType(): ValueType {
 
 fun MiniJavaParser.TypeDefinitionContext.getDataType(classSymbolTable: ClassSymbolTable): DataType? {
     fun asReferenceType(name: String): DataType? {
-        if (classSymbolTable.classes.containsKey(name)) {
-            return DataType.ReferenceType(name)
+        return if (classSymbolTable.classes.containsKey(name)) {
+            DataType.ReferenceType(name)
         } else {
-            return null
+            null
         }
     }
 
@@ -80,25 +80,25 @@ val dataTypeCastingConversions = hashMapOf(
 )
 
 fun DataType.assignTypeTo(other: DataType): List<Instruction>? {
-    if (this == other) {
-        return listOf()
+    return if (this == other) {
+        listOf()
     } else if (this == DataType.NullType && (other is DataType.ReferenceType || other is DataType.Array)) {
-        return listOf()
+        listOf()
     } else {
-        return dataTypeWideningConversions[Pair(this, other)]
+        dataTypeWideningConversions[Pair(this, other)]
     }
 }
 
 fun DataType.castTypeTo(other: DataType): List<Instruction>? {
-    if (this == other) {
-        return listOf()
+    return if (this == other) {
+        listOf()
     } else {
-        return dataTypeCastingConversions[Pair(this, other)]
+        dataTypeCastingConversions[Pair(this, other)]
     }
 }
 
 fun MethodSymbolTable.MethodSignature.externalName(): String {
-    return this.name + this.parameterTypes.map { "#$it" }.joinToString("")
+    return this.name + this.parameterTypes.joinToString("") { "#$it" }
 }
 
 fun externalConstructorName(className: String): String {

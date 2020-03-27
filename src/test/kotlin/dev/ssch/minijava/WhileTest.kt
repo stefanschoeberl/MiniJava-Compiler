@@ -2,8 +2,8 @@ package dev.ssch.minijava
 
 import dev.ssch.minijava.exception.IncompatibleTypeException
 import dev.ssch.util.CompilerTest
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 class WhileTest : CompilerTest() {
@@ -90,7 +90,7 @@ class WhileTest : CompilerTest() {
 
     @Test
     fun `non boolean condition`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 while (1 + 2) {
                     Console.println(123);

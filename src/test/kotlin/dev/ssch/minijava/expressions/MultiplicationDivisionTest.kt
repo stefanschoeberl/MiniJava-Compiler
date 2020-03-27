@@ -2,7 +2,8 @@ package dev.ssch.minijava.expressions
 
 import dev.ssch.minijava.exception.InvalidBinaryOperationException
 import dev.ssch.util.CompilerTest
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 class MultiplicationDivisionTest : CompilerTest() {
@@ -12,7 +13,7 @@ class MultiplicationDivisionTest : CompilerTest() {
         val output = """
             Console.println(2 * 3);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("6", "")
+        assertThat(output.lines()).containsExactly("6", "")
     }
 
     @Test
@@ -28,7 +29,7 @@ class MultiplicationDivisionTest : CompilerTest() {
         val output = """
             Console.println(-2 * -3);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("6", "")
+        assertThat(output.lines()).containsExactly("6", "")
     }
 
     @Test
@@ -38,7 +39,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             int b = 3;
             Console.println(a * b);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("6", "")
+        assertThat(output.lines()).containsExactly("6", "")
     }
 
     @Test
@@ -48,7 +49,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             int b = 3;
             Console.println(-a * -b);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("6", "")
+        assertThat(output.lines()).containsExactly("6", "")
     }
 
     @Test
@@ -58,7 +59,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             Console.println(2 * 3 * 4);
             Console.println(2 * (3 * 4));
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("24", "24", "24", "")
+        assertThat(output.lines()).containsExactly("24", "24", "24", "")
     }
 
     @Test
@@ -68,7 +69,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             Console.println(8 / 3);
             Console.println(6 / 3);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("0", "2", "2", "")
+        assertThat(output.lines()).containsExactly("0", "2", "2", "")
     }
 
     @Test
@@ -92,7 +93,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             Console.println(8 / -3);
             Console.println(-6 / -3);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("0", "-2", "2", "")
+        assertThat(output.lines()).containsExactly("0", "-2", "2", "")
     }
 
     @Test
@@ -107,7 +108,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             Console.println(eight / three);
             Console.println(six / three);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("0", "2", "2", "")
+        assertThat(output.lines()).containsExactly("0", "2", "2", "")
     }
 
     @Test
@@ -122,7 +123,7 @@ class MultiplicationDivisionTest : CompilerTest() {
             Console.println(eight / -three);
             Console.println(-six / -three);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("0", "-2", "2", "")
+        assertThat(output.lines()).containsExactly("0", "-2", "2", "")
     }
 
     @Test
@@ -132,12 +133,12 @@ class MultiplicationDivisionTest : CompilerTest() {
             Console.println(8 / 3 / 2);
             Console.println(8 / (3 / 2));
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("1", "1", "8", "")
+        assertThat(output.lines()).containsExactly("1", "1", "8", "")
     }
 
     @Test
     fun `multiply two boolean variables`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 boolean b = true;
@@ -148,7 +149,7 @@ class MultiplicationDivisionTest : CompilerTest() {
 
     @Test
     fun `multiply two boolean literals`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 int a = true * false;
             """.compileAndRunInMainFunction()
@@ -157,7 +158,7 @@ class MultiplicationDivisionTest : CompilerTest() {
 
     @Test
     fun `multiply two complex expressions`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 int a = a * (2 * 4);
@@ -167,7 +168,7 @@ class MultiplicationDivisionTest : CompilerTest() {
 
     @Test
     fun `divide two boolean variables`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 boolean b = true;
@@ -178,7 +179,7 @@ class MultiplicationDivisionTest : CompilerTest() {
 
     @Test
     fun `divide two boolean literals`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 int a = true / false;
             """.compileAndRunInMainFunction()
@@ -187,7 +188,7 @@ class MultiplicationDivisionTest : CompilerTest() {
 
     @Test
     fun `divide two complex expressions`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 int a = a / (2 * 4);

@@ -2,7 +2,7 @@ package dev.ssch.minijava.expressions
 
 import dev.ssch.minijava.exception.InvalidUnaryOperationException
 import dev.ssch.util.CompilerTest
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 class MinusTest : CompilerTest() {
@@ -19,7 +19,7 @@ class MinusTest : CompilerTest() {
 
     @Test
     fun `minus variable`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
             boolean a = true;
             int c = -a;
@@ -29,7 +29,7 @@ class MinusTest : CompilerTest() {
 
     @Test
     fun `minus literal`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
             int a = -true;
         """.compileAndRunInMainFunction()
@@ -38,7 +38,7 @@ class MinusTest : CompilerTest() {
 
     @Test
     fun `minus complex expression`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
             boolean a = true;
             int a = -(a);

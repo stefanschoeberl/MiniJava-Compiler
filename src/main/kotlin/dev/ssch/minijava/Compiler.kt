@@ -23,9 +23,9 @@ class Compiler {
         }
 
         val declarationPhase = DeclarationPhase()
-        declarationPhase.process(trees)
-        val codeGenerationPhase = CodeGenerationPhase(declarationPhase.classSymbolTable)
-        return Pair(codeGenerationPhase.generateModule(trees), declarationPhase.classSymbolTable)
+        val classSymbolTable = declarationPhase.generateClassSymbolTable(trees)
+        val codeGenerationPhase = CodeGenerationPhase(classSymbolTable)
+        return Pair(codeGenerationPhase.generateModule(trees), classSymbolTable)
     }
 
 }

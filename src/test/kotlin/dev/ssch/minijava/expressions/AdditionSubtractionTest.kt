@@ -2,7 +2,8 @@ package dev.ssch.minijava.expressions
 
 import dev.ssch.minijava.exception.InvalidBinaryOperationException
 import dev.ssch.util.CompilerTest
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 class AdditionSubtractionTest : CompilerTest() {
@@ -12,7 +13,7 @@ class AdditionSubtractionTest : CompilerTest() {
         val output = """
             Console.println(1 + 2);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("3", "")
+        assertThat(output.lines()).containsExactly("3", "")
     }
 
     @Test
@@ -28,7 +29,7 @@ class AdditionSubtractionTest : CompilerTest() {
         val output = """
             Console.println(-1 + -2);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("-3", "")
+        assertThat(output.lines()).containsExactly("-3", "")
     }
 
     @Test
@@ -38,7 +39,7 @@ class AdditionSubtractionTest : CompilerTest() {
             int b = 2;
             Console.println(a + b);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("3", "")
+        assertThat(output.lines()).containsExactly("3", "")
     }
 
     @Test
@@ -48,7 +49,7 @@ class AdditionSubtractionTest : CompilerTest() {
             int b = 2;
             Console.println(-a + -b);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("-3", "")
+        assertThat(output.lines()).containsExactly("-3", "")
     }
 
     @Test
@@ -58,7 +59,7 @@ class AdditionSubtractionTest : CompilerTest() {
             Console.println(1 + 2 + 3);
             Console.println(1 + (2 + 3));
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("6", "6", "6", "")
+        assertThat(output.lines()).containsExactly("6", "6", "6", "")
     }
 
     @Test
@@ -66,7 +67,7 @@ class AdditionSubtractionTest : CompilerTest() {
         val output = """
             Console.println(1 - 2);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("-1", "")
+        assertThat(output.lines()).containsExactly("-1", "")
     }
 
     @Test
@@ -84,7 +85,7 @@ class AdditionSubtractionTest : CompilerTest() {
             int b = 2;
             Console.println(a - b);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("-1", "")
+        assertThat(output.lines()).containsExactly("-1", "")
     }
 
     @Test
@@ -94,12 +95,12 @@ class AdditionSubtractionTest : CompilerTest() {
             Console.println(1 - 2 - 3);
             Console.println(1 - (2 - 3));
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("-4", "-4", "2", "")
+        assertThat(output.lines()).containsExactly("-4", "-4", "2", "")
     }
 
     @Test
     fun `add two boolean variables`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 boolean b = true;
@@ -110,7 +111,7 @@ class AdditionSubtractionTest : CompilerTest() {
 
     @Test
     fun `add two boolean literals`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 int a = true + false;
             """.compileAndRunInMainFunction()
@@ -119,7 +120,7 @@ class AdditionSubtractionTest : CompilerTest() {
 
     @Test
     fun `add two complex expressions`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 int a = a + (2 * 4);
@@ -129,7 +130,7 @@ class AdditionSubtractionTest : CompilerTest() {
 
     @Test
     fun `subtract two boolean variables`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 boolean b = true;
@@ -140,7 +141,7 @@ class AdditionSubtractionTest : CompilerTest() {
 
     @Test
     fun `subtract two boolean literals`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 int a = true - false;
             """.compileAndRunInMainFunction()
@@ -149,7 +150,7 @@ class AdditionSubtractionTest : CompilerTest() {
 
     @Test
     fun `subtract two complex expressions`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = true;
                 int a = a - (2 * 4);

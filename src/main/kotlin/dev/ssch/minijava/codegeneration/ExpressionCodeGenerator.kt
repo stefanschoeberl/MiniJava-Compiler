@@ -19,7 +19,7 @@ class ExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPha
         return visitor.visit(ctx)
     }
 
-    inner class Visitor : MiniJavaBaseVisitor<DataType?>() {
+    private inner class Visitor : MiniJavaBaseVisitor<DataType?>() {
         override fun visitArrayAccessExpr(ctx: MiniJavaParser.ArrayAccessExprContext): DataType? {
             return codeGenerationPhase.arrayAccessExpressionCodeGeneration.generateEvaluation(ctx)
         }

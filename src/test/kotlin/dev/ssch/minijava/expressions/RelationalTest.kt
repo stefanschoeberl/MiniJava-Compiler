@@ -2,7 +2,8 @@ package dev.ssch.minijava.expressions
 
 import dev.ssch.minijava.exception.InvalidBinaryOperationException
 import dev.ssch.util.CompilerTest
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 class RelationalTest : CompilerTest() {
@@ -15,7 +16,7 @@ class RelationalTest : CompilerTest() {
             Console.println(-1 < 15);
             Console.println(15 < -1);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "false", "")
+        assertThat(output.lines()).containsExactly("true", "false", "true", "false", "")
     }
 
     @Test
@@ -26,7 +27,7 @@ class RelationalTest : CompilerTest() {
             Console.println(-1f < 15f);
             Console.println(15f < -1f);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "false", "")
+        assertThat(output.lines()).containsExactly("true", "false", "true", "false", "")
     }
 
     @Test
@@ -39,7 +40,7 @@ class RelationalTest : CompilerTest() {
             Console.println(1 <= 1);
             Console.println(-10 <= -10);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "false", "true", "true", "")
+        assertThat(output.lines()).containsExactly("true", "false", "true", "false", "true", "true", "")
     }
 
     @Test
@@ -52,7 +53,7 @@ class RelationalTest : CompilerTest() {
             Console.println(1f <= 1f);
             Console.println(-10f <= -10f);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "false", "true", "true", "")
+        assertThat(output.lines()).containsExactly("true", "false", "true", "false", "true", "true", "")
     }
 
     @Test
@@ -63,7 +64,7 @@ class RelationalTest : CompilerTest() {
             Console.println(-1 > 15);
             Console.println(15 > -1);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "true", "")
+        assertThat(output.lines()).containsExactly("false", "true", "false", "true", "")
     }
 
     @Test
@@ -74,7 +75,7 @@ class RelationalTest : CompilerTest() {
             Console.println(-1f > 15f);
             Console.println(15f > -1f);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "true", "")
+        assertThat(output.lines()).containsExactly("false", "true", "false", "true", "")
     }
 
     @Test
@@ -87,7 +88,7 @@ class RelationalTest : CompilerTest() {
             Console.println(1 >= 1);
             Console.println(-10 >= -10);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "true", "true", "true", "")
+        assertThat(output.lines()).containsExactly("false", "true", "false", "true", "true", "true", "")
     }
 
     @Test
@@ -100,12 +101,12 @@ class RelationalTest : CompilerTest() {
             Console.println(1f >= 1f);
             Console.println(-10f >= -10f);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("false", "true", "false", "true", "true", "true", "")
+        assertThat(output.lines()).containsExactly("false", "true", "false", "true", "true", "true", "")
     }
 
     @Test
     fun `lt two incompatible literals`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = 123 < false;
             """.compileAndRunInMainFunction()
@@ -114,7 +115,7 @@ class RelationalTest : CompilerTest() {
 
     @Test
     fun `lte two incompatible literals`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = 123 <= false;
             """.compileAndRunInMainFunction()
@@ -123,7 +124,7 @@ class RelationalTest : CompilerTest() {
 
     @Test
     fun `gt two incompatible literals`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = 123 > false;
             """.compileAndRunInMainFunction()
@@ -132,7 +133,7 @@ class RelationalTest : CompilerTest() {
 
     @Test
     fun `gte two incompatible literals`() {
-        Assertions.assertThatThrownBy {
+        assertThatThrownBy {
             """
                 boolean a = 123 >= false;
             """.compileAndRunInMainFunction()
@@ -147,7 +148,7 @@ class RelationalTest : CompilerTest() {
             Console.println(1 <= 2 && 2 <= 3);
             Console.println(1 >= 2 && 2 >= 3);
         """.compileAndRunInMainFunction()
-        Assertions.assertThat(output.lines()).containsExactly("true", "false", "true", "false", "")
+        assertThat(output.lines()).containsExactly("true", "false", "true", "false", "")
     }
 
 }
