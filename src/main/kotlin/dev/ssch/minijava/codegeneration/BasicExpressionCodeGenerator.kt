@@ -22,7 +22,7 @@ class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerati
                 localsVariableSymbolTable.typeOf(name)
             }
             localsVariableSymbolTable.doesThisParameterExist() -> {
-                codeGenerationPhase.memberAccessExpressionCodeGenerator.generateEvaluation(name, this::generateThis)
+                codeGenerationPhase.memberAccessExpressionCodeGenerator.generateEvaluation(name, ctx.start, this::generateThis)
             }
             else -> throw UndefinedVariableException(name, ctx.IDENT().symbol)
         }

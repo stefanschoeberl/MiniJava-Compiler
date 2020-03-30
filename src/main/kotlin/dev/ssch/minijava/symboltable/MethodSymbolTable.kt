@@ -25,6 +25,14 @@ class MethodSymbolTable {
         return nativeMethods.contains(signature) || methods.contains(signature)
     }
 
+    fun isNative(name: String, parameters: List<DataType>): Boolean {
+        return nativeMethods.contains(MethodSignature(name, parameters))
+    }
+
+    fun isStatic(name: String, parameters: List<DataType>): Boolean {
+        return findMethodInformation(name, parameters)!!.isStatic
+    }
+
     fun declareNativeMethod(address: Int, returnType: DataType?, name: String, parameters: List<DataType>, isPublic: Boolean, isStatic: Boolean): MethodInformation {
         val signature =
             MethodSignature(name, parameters)
@@ -61,7 +69,6 @@ class MethodSymbolTable {
 
         return methods[signature]
     }
-
     fun addressOf(name: String, parameters: List<DataType>): Int = findMethodInformation(name, parameters)!!.address
     fun returnTypeOf(name: String, parameters: List<DataType>): DataType? = findMethodInformation(name, parameters)!!.returnType
 

@@ -12,21 +12,23 @@ import dev.ssch.minijava.toWebAssemblyType
 
 class MethodCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
     fun generate(ctx: MiniJavaParser.MethodContext) {
-        if (ctx.nativemodifier.isNotEmpty()) {
-            return
-        }
+        val methodName = ctx.name.text
 
         val parameters = beginMethod(ctx.parameters)
         val parameterTypes = extractParameterTypes(parameters)
 
-        declareParameters(false, parameters)
+        if (codeGenerationPhase.methodSymbolTable.isNative(methodName, parameterTypes)) {
+            return
+        }
 
-        codeGenerationPhase.currentFunction = codeGenerationPhase.functions[Pair(codeGenerationPhase.currentClass, MethodSymbolTable.MethodSignature(ctx.name.text, parameterTypes))]!!
+        declareParameters(!codeGenerationPhase.methodSymbolTable.isStatic(methodName, parameterTypes), parameters)
+
+        codeGenerationPhase.currentFunction = codeGenerationPhase.functions[Pair(codeGenerationPhase.currentClass, MethodSymbolTable.MethodSignature(methodName, parameterTypes))]!!
 
         generateStatementExecution(ctx.statements)
 
         // "workaround" idea from https://github.com/WebAssembly/wabt/issues/1075
-        if (codeGenerationPhase.methodSymbolTable.returnTypeOf(ctx.name.text, parameterTypes) != null) {
+        if (codeGenerationPhase.methodSymbolTable.returnTypeOf(methodName, parameterTypes) != null) {
             codeGenerationPhase.currentFunction.body.instructions.add(Instruction.unreachable)
         }
 

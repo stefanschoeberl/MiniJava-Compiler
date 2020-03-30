@@ -45,6 +45,7 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
 
     val arrayAccessExpressionCodeGeneration = ArrayAccessExpressionCodeGenerator(this)
     val memberAccessExpressionCodeGenerator = MemberExpressionCodeGenerator(this)
+    val basicExpressionCodeGenerator = BasicExpressionCodeGenerator(this)
 
     val variableAssignmentStatementCodeGenerator = VariableAssignmentStatementCodeGenerator(this)
     val expressionCodeGenerator = ExpressionCodeGenerator(this)
@@ -213,15 +214,14 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
         signature: MethodSymbolTable.MethodSignature,
         information: MethodSymbolTable.MethodInformation
     ): Int {
-        if (information.isStatic) {
-            val parameters = signature.parameterTypes.map { type -> type.toWebAssemblyType() }.toMutableList()
-            val returnType = information.returnType
-                ?.let { type -> mutableListOf(type.toWebAssemblyType()) }
-                ?: mutableListOf()
-            return module.declareType(FuncType(parameters, returnType))
-        } else {
-            TODO()
+        val parameters = signature.parameterTypes.map { type -> type.toWebAssemblyType() }.toMutableList()
+        if (!information.isStatic) {
+            parameters.add(0, ValueType.I32)
         }
+        val returnType = information.returnType
+            ?.let { type -> mutableListOf(type.toWebAssemblyType()) }
+            ?: mutableListOf()
+        return module.declareType(FuncType(parameters, returnType))
     }
 
     private fun declareFunctionType(

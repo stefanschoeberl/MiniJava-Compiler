@@ -3,6 +3,7 @@ package dev.ssch.minijava.codegeneration
 import dev.ssch.minijava.CodeGenerationPhase
 import dev.ssch.minijava.DataType
 import dev.ssch.minijava.ast.Instruction
+import dev.ssch.minijava.exception.UndefinedVariableException
 import dev.ssch.minijava.grammar.MiniJavaParser
 import org.antlr.v4.runtime.Token
 
@@ -10,18 +11,18 @@ class MemberExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerat
 
     fun generateEvaluation(ctx: MiniJavaParser.MemberExprContext): DataType {
         val fieldName = ctx.right.text
-        return generateEvaluation(fieldName) {
+        return generateEvaluation(fieldName, ctx.right) {
             codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.left)
         }
     }
 
-    fun generateEvaluation(fieldName: String, objectAddressCode: () -> DataType?): DataType {
+    fun generateEvaluation(fieldName: String, token: Token, objectAddressCode: () -> DataType?): DataType {
         val objType = objectAddressCode() as? DataType.ReferenceType ?: TODO()
 
 
         val field = codeGenerationPhase.classSymbolTable
             .getFieldSymbolTable(objType.name)
-            .findFieldInfo(fieldName) ?: TODO()
+            .findFieldInfo(fieldName) ?: throw UndefinedVariableException(fieldName, token) // TODO: better exception like "UndefinedField"
 
         codeGenerationPhase.currentFunction.body.instructions.add(Instruction.call(field.getterAddress))
         return field.type

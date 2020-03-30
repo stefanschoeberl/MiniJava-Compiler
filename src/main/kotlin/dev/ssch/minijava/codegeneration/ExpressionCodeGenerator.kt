@@ -7,7 +7,7 @@ import dev.ssch.minijava.grammar.MiniJavaParser
 
 class ExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
 
-    private val basicExpressionCodeGenerator = BasicExpressionCodeGenerator(codeGenerationPhase)
+    private val basicExpressionCodeGenerator = codeGenerationPhase.basicExpressionCodeGenerator
     private val binaryExpressionCodeGenerator = BinaryExpressionCodeGenerator(codeGenerationPhase)
     private val arrayCreationExpressionCodeGenerator = ArrayCreationExpressionCodeGenerator(codeGenerationPhase)
     private val callExpressionCodeGenerator = CallExpressionCodeGeneration(codeGenerationPhase)
