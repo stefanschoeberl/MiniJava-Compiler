@@ -35,6 +35,12 @@ async function runModule(folder) {
         },
         wasmBoolean: (value) => {
             return value !== 0
+        },
+        wasmToChar: (value) => {
+            return String.fromCodePoint(value);
+        },
+        charToWasm: (value) => {
+            return value.codePointAt(0);
         }
     };
 
@@ -56,6 +62,9 @@ async function runModule(folder) {
             "new_array_boolean": size => {
                 return runtime.wasmRef(Array(size).fill(false))
             },
+            "new_array_char": size => {
+                return runtime.wasmRef(Array(size).fill('\0'))
+            },
             "new_array_reference": size => {
                 return runtime.wasmRef(Array(size).fill(null))
             },
@@ -66,6 +75,10 @@ async function runModule(folder) {
             "get_array_boolean": (arrayAddress, index) => {
                 const a = runtime.wasmDeref(arrayAddress);
                 return a[index] ? 1 : 0;
+            },
+            "get_array_char": (arrayAddress, index) => {
+                const a = runtime.wasmDeref(arrayAddress);
+                return runtime.charToWasm(a[index]);
             },
             "get_array_reference": (arrayAddress, index) => {
                 const a = runtime.wasmDeref(arrayAddress);
@@ -78,6 +91,10 @@ async function runModule(folder) {
             "set_array_boolean": (arrayAddress, index, value) => {
                 const a = runtime.wasmDeref(arrayAddress);
                 a[index] = value > 0;
+            },
+            "set_array_char": (arrayAddress, index, value) => {
+                const a = runtime.wasmDeref(arrayAddress);
+                a[index] = runtime.wasmToChar(value);
             },
             "set_array_reference": (arrayAddress, index, valueAddress) => {
                 const a = runtime.wasmDeref(arrayAddress);

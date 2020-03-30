@@ -19,6 +19,7 @@ class ArrayCreationExpressionCodeGenerator(private val codeGenerationPhase: Code
 
         val address = when (arrayType) {
             is DataType.PrimitiveType.Boolean -> codeGenerationPhase.newArrayBooleanAddress
+            is DataType.PrimitiveType.Char -> codeGenerationPhase.newArrayCharAddress
             is DataType.PrimitiveType -> codeGenerationPhase.newArrayNumericAddress
             is DataType.ReferenceType -> codeGenerationPhase.newArrayReferenceAddress
             else -> TODO()

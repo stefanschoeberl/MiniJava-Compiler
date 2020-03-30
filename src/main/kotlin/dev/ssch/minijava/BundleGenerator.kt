@@ -44,6 +44,7 @@ class BundleGenerator {
                     DataType.PrimitiveType.Integer -> "0"
                     DataType.PrimitiveType.Boolean -> "false"
                     DataType.PrimitiveType.Float -> "0"
+                    DataType.PrimitiveType.Char -> "'\\0'"
                     is DataType.ReferenceType -> "null"
                     is DataType.Array -> "null"
                     DataType.NullType -> TODO()

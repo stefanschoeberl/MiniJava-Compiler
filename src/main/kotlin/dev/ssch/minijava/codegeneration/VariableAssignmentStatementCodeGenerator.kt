@@ -54,6 +54,7 @@ class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: 
                     DataType.PrimitiveType.Integer -> codeGenerationPhase.setArrayPrimitiveIntAddress
                     DataType.PrimitiveType.Float -> codeGenerationPhase.setArrayPrimitiveFloatAddress
                     DataType.PrimitiveType.Boolean -> codeGenerationPhase.setArrayPrimitiveBooleanAddress
+                    DataType.PrimitiveType.Char -> codeGenerationPhase.setArrayPrimitiveCharAddress
                     is DataType.ReferenceType -> codeGenerationPhase.setArrayReferenceAddress
                     else -> TODO()
                 }

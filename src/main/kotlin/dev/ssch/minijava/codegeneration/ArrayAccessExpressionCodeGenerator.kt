@@ -26,6 +26,7 @@ class ArrayAccessExpressionCodeGenerator(private val codeGenerationPhase: CodeGe
             DataType.PrimitiveType.Integer -> codeGenerationPhase.getArrayPrimitiveIntAddress
             DataType.PrimitiveType.Float -> codeGenerationPhase.getArrayPrimitiveFloatAddress
             DataType.PrimitiveType.Boolean -> codeGenerationPhase.getArrayPrimitiveBooleanAddress
+            DataType.PrimitiveType.Char -> codeGenerationPhase.getArrayPrimitiveCharAddress
             is DataType.ReferenceType -> codeGenerationPhase.getArrayReferenceAddress
             else -> TODO()
         }

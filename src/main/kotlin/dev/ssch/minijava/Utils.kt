@@ -38,6 +38,7 @@ fun DataType.toWebAssemblyType(): ValueType {
         DataType.PrimitiveType.Integer -> ValueType.I32
         DataType.PrimitiveType.Boolean -> ValueType.I32
         DataType.PrimitiveType.Float -> ValueType.F32
+        DataType.PrimitiveType.Char -> ValueType.I32
         is DataType.Array -> ValueType.I32
         is DataType.ReferenceType -> ValueType.I32
         DataType.NullType -> TODO()

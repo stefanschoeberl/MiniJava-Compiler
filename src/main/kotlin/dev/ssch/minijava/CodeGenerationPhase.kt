@@ -25,16 +25,19 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
 
     var newArrayNumericAddress: Int = -1
     var newArrayBooleanAddress: Int = -1
+    var newArrayCharAddress: Int = -1
     var newArrayReferenceAddress: Int = -1
 
     var getArrayPrimitiveIntAddress: Int = -1
     var getArrayPrimitiveFloatAddress: Int = -1
     var getArrayPrimitiveBooleanAddress: Int = -1
+    var getArrayPrimitiveCharAddress: Int = -1
     var getArrayReferenceAddress: Int = -1
 
     var setArrayPrimitiveIntAddress: Int = -1
     var setArrayPrimitiveFloatAddress: Int = -1
     var setArrayPrimitiveBooleanAddress: Int = -1
+    var setArrayPrimitiveCharAddress: Int = -1
     var setArrayReferenceAddress: Int = -1
 
     private val classCodeGenerator = ClassCodeGenerator(this)
@@ -80,16 +83,19 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
     private fun importArrayFunctions() {
         newArrayNumericAddress = importInternal("new_array_numeric", mutableListOf(ValueType.I32), mutableListOf(ValueType.I32))
         newArrayBooleanAddress = importInternal("new_array_boolean", mutableListOf(ValueType.I32), mutableListOf(ValueType.I32))
+        newArrayCharAddress = importInternal("new_array_char", mutableListOf(ValueType.I32), mutableListOf(ValueType.I32))
         newArrayReferenceAddress = importInternal("new_array_reference", mutableListOf(ValueType.I32), mutableListOf(ValueType.I32))
 
         getArrayPrimitiveIntAddress = importInternal("get_array_numeric", mutableListOf(ValueType.I32, ValueType.I32), mutableListOf(ValueType.I32))
         getArrayPrimitiveFloatAddress = importInternal("get_array_numeric", mutableListOf(ValueType.I32, ValueType.I32), mutableListOf(ValueType.F32))
         getArrayPrimitiveBooleanAddress = importInternal("get_array_boolean", mutableListOf(ValueType.I32, ValueType.I32), mutableListOf(ValueType.I32))
+        getArrayPrimitiveCharAddress = importInternal("get_array_char", mutableListOf(ValueType.I32, ValueType.I32), mutableListOf(ValueType.I32))
         getArrayReferenceAddress = importInternal("get_array_reference", mutableListOf(ValueType.I32, ValueType.I32), mutableListOf(ValueType.I32))
 
         setArrayPrimitiveIntAddress = importInternal("set_array_numeric", mutableListOf(ValueType.I32, ValueType.I32, ValueType.I32), mutableListOf())
         setArrayPrimitiveFloatAddress = importInternal("set_array_numeric", mutableListOf(ValueType.I32, ValueType.I32, ValueType.F32), mutableListOf())
         setArrayPrimitiveBooleanAddress = importInternal("set_array_boolean", mutableListOf(ValueType.I32, ValueType.I32, ValueType.I32), mutableListOf())
+        setArrayPrimitiveCharAddress = importInternal("set_array_char", mutableListOf(ValueType.I32, ValueType.I32, ValueType.I32), mutableListOf())
         setArrayReferenceAddress = importInternal("set_array_reference", mutableListOf(ValueType.I32, ValueType.I32, ValueType.I32), mutableListOf())
     }
 

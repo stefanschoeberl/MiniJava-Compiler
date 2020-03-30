@@ -8,6 +8,7 @@ sealed class DataType {
                     "int" -> Integer
                     "boolean" -> Boolean
                     "float" -> Float
+                    "char" -> Char
                     else -> null
                 }
             }
@@ -16,6 +17,7 @@ sealed class DataType {
         object Integer: PrimitiveType("int")
         object Boolean: PrimitiveType("boolean")
         object Float: PrimitiveType("float")
+        object Char: PrimitiveType("char")
 
         override fun toString(): String {
             return name

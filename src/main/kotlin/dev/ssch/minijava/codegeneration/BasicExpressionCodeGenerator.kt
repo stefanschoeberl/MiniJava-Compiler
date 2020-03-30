@@ -49,6 +49,12 @@ class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerati
         return DataType.PrimitiveType.Float
     }
 
+    fun generateEvaluation(ctx: MiniJavaParser.CharExprContext): DataType {
+        val char = ctx.CHAR().text[1]
+        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.i32_const(char.toInt()))
+        return DataType.PrimitiveType.Char
+    }
+
     fun generateEvaluation(ctx: MiniJavaParser.ParensExprContext): DataType? {
         return codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
     }

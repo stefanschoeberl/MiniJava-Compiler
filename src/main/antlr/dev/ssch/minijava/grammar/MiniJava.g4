@@ -60,6 +60,7 @@ expr: array=expr '[' index=expr ']'                                             
     | FLOAT                                                                         # FloatExpr
     | NULL                                                                          # NullExpr
     | THIS                                                                          # ThisExpr
+    | CHAR                                                                          # CharExpr
     | value=(TRUE|FALSE)                                                            # BoolExpr
     | '(' expr ')'                                                                  # ParensExpr
     | 'new' type=typeDefinition '(' (parameters+=expr (',' parameters+=expr)*)? ')' # ClassInstanceCreationExpr
@@ -87,6 +88,7 @@ THIS: 'this';
 IDENT: [_a-zA-Z][_a-zA-Z0-9]*;
 FLOAT: [0-9]+ ('.' [0-9]*)? 'f';
 INT: [0-9]+;
+CHAR: '\'' . '\'';
 WS: [ \t\r\n]+ -> skip;
 SINGLE_LINE_COMMENT: '//' .*? [\r\n]+ -> skip;
 MULTI_LINE_COMMENT: '/*' .*? '*/' -> skip;
