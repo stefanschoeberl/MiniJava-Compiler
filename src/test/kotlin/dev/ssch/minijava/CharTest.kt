@@ -69,4 +69,49 @@ class CharTest : CompilerTest() {
         """.compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("['a', 'b', 'c', 'b']", "")
     }
+
+    @Test
+    fun `calculations with chars 1`() {
+        val output = """
+            char f = 'f';
+            Console.println((char)(f - 5));
+            Console.println((char)(f + 5));
+        """.compileAndRunInMainFunction()
+        assertThat(output.lines()).containsExactly("a", "k", "")
+    }
+
+    @Test
+    fun `calculations with chars 2`() {
+        val output = """
+            char a = 'a';
+            char z = 'z';
+            Console.println((int)(z + a));
+            Console.println((int)(z - a));
+            Console.println((int)(z * a));
+            Console.println((int)(z / a));
+        """.compileAndRunInMainFunction()
+        assertThat(output.lines()).containsExactly("219", "25", "11834", "1", "")
+    }
+
+    @Test
+    fun `comparison with chars`() {
+        val output = """
+            char a = 'a';
+            char aa = 'a';
+            char z = 'z';
+            Console.println(a > z);
+            Console.println(a < z);
+            Console.println(a >= z);
+            Console.println(a <= z);
+            Console.println(a > aa);
+            Console.println(a < aa);
+            Console.println(a >= aa);
+            Console.println(a <= aa);
+            Console.println(a == z);
+            Console.println(a != z);
+            Console.println(a == aa);
+            Console.println(a != aa);
+        """.compileAndRunInMainFunction()
+        assertThat(output.lines()).containsExactly("false", "true", "false", "true", "false", "false", "true", "true", "false", "true", "true", "false", "")
+    }
 }

@@ -72,12 +72,18 @@ fun MiniJavaParser.TypeDefinitionContext.getDataType(classSymbolTable: ClassSymb
 }
 
 val dataTypeWideningConversions = hashMapOf(
-    Pair(Pair(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float), listOf(Instruction.f32_convert_i32_s))
+    Pair(Pair(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float), listOf(Instruction.f32_convert_i32_s)),
+    Pair(Pair(DataType.PrimitiveType.Char, DataType.PrimitiveType.Integer), listOf()),
+    Pair(Pair(DataType.PrimitiveType.Char, DataType.PrimitiveType.Float), listOf(Instruction.f32_convert_i32_s))
 )
 
 val dataTypeCastingConversions = hashMapOf(
     Pair(Pair(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Float), listOf(Instruction.f32_convert_i32_s)),
-    Pair(Pair(DataType.PrimitiveType.Float, DataType.PrimitiveType.Integer), listOf(Instruction.i32_trunc_f32_s))
+    Pair(Pair(DataType.PrimitiveType.Integer, DataType.PrimitiveType.Char), listOf()),
+    Pair(Pair(DataType.PrimitiveType.Float, DataType.PrimitiveType.Integer), listOf(Instruction.i32_trunc_f32_s)),
+    Pair(Pair(DataType.PrimitiveType.Float, DataType.PrimitiveType.Char), listOf(Instruction.i32_trunc_f32_s)),
+    Pair(Pair(DataType.PrimitiveType.Char, DataType.PrimitiveType.Integer), listOf()),
+    Pair(Pair(DataType.PrimitiveType.Char, DataType.PrimitiveType.Float), listOf(Instruction.f32_convert_i32_s))
 )
 
 fun DataType.assignTypeTo(other: DataType): List<Instruction>? {
