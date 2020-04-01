@@ -79,7 +79,7 @@ abstract class CompilerTest {
         val allSourceFiles = mutableListOf(testSourceFile)
 
         if (withStandardLibrary) {
-            val stdlib = File(File(System.getProperty("user.dir")), "stdlib")
+            val stdlib = File(File(System.getProperty("user.dir")).parentFile, "stdlib")
             stdlib.listFiles()!!
                 .filter { it.isFile && it.name.endsWith(".minijava") }
                 .forEach { allSourceFiles.add(it) }

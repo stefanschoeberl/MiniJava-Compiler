@@ -1,0 +1,14 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    implementation "commons-cli:commons-cli:1.4"
+
+    testImplementation "org.junit.jupiter:junit-jupiter:5.5.2"
+    testImplementation "org.assertj:assertj-core:3.11.1"
+
+    implementation project(':grammar')
+}

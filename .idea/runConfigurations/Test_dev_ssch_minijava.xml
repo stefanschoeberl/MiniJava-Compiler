@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Test dev.ssch.minijava" type="JUnit" factoryName="JUnit">
-    <module name="minijava.test" />
+    <module name="minijava.compiler.test" />
     <extension name="net.ashald.envfile">
       <option name="IS_ENABLED" value="false" />
       <option name="IS_SUBST" value="false" />

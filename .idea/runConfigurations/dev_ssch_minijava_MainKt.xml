@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="dev.ssch.minijava.MainKt" type="JetRunConfigurationType" factoryName="Kotlin" nameIsGenerated="true">
-    <module name="minijava.main" />
+    <module name="minijava.compiler.main" />
     <extension name="net.ashald.envfile">
       <option name="IS_ENABLED" value="false" />
       <option name="IS_SUBST" value="false" />

@@ -1,0 +1,13 @@
+plugins {
+    id 'antlr'
+}
+
+dependencies {
+    antlr "org.antlr:antlr4:4.7.2"
+}
+
+compileJava.dependsOn generateGrammarSource
+
+generateGrammarSource {
+    arguments << "-lib" << "src/main/antlr/dev/ssch/minijava/grammar" << "-visitor"
+}

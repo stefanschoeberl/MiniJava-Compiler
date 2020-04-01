@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run Demo file (script)" type="ShConfigurationType">
+    <option name="SCRIPT_PATH" value="$PROJECT_DIR$/run" />
+    <option name="SCRIPT_OPTIONS" value="./wasm-output" />
+    <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <option name="INTERPRETER_PATH" value="/usr/local/bin/bash" />
+    <option name="INTERPRETER_OPTIONS" value="" />
+    <method v="2">
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="dev.ssch.minijava.MainKt" run_configuration_type="JetRunConfigurationType" />
+    </method>
+  </configuration>
+</component>

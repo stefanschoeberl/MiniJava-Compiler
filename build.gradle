@@ -1,34 +1,22 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.3.11'
-    id 'antlr'
 }
 
-group 'dev.ssch'
-version '1.0-SNAPSHOT'
+allprojects {
+    group 'dev.ssch.minijava'
+    version '1.0-SNAPSHOT'
 
-repositories {
-    mavenCentral()
-}
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 
-dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    antlr "org.antlr:antlr4:4.7.2"
+    repositories {
+        mavenCentral()
+    }
 
-    compile("commons-cli:commons-cli:1.4")
-
-    testCompile "org.junit.jupiter:junit-jupiter:5.5.2"
-    testCompile "org.assertj:assertj-core:3.11.1"
-}
-
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-compileKotlin.dependsOn generateGrammarSource
-
-generateGrammarSource {
-    arguments << "-lib" << "src/main/antlr/dev/ssch/minijava/grammar" << "-visitor"
+    compileKotlin {
+        kotlinOptions.jvmTarget = "1.8"
+    }
+    compileTestKotlin {
+        kotlinOptions.jvmTarget = "1.8"
+    }
 }
