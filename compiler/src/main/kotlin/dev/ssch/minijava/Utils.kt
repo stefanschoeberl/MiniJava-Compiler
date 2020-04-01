@@ -1,29 +1,10 @@
 package dev.ssch.minijava
 
-import dev.ssch.minijava.ast.Instruction
-import dev.ssch.minijava.ast.ValueType
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.symboltable.ClassSymbolTable
 import dev.ssch.minijava.symboltable.MethodSymbolTable
-import java.io.File
-import java.util.concurrent.TimeUnit
-
-// https://stackoverflow.com/questions/35421699/how-to-invoke-external-command-from-within-kotlin-code
-fun List<String>.runCommand(workingDir: File): String {
-    val process = ProcessBuilder(this)
-        .directory(workingDir)
-        .redirectOutput(ProcessBuilder.Redirect.PIPE)
-        .redirectError(ProcessBuilder.Redirect.PIPE)
-        .start()
-    process.waitFor(60, TimeUnit.MINUTES)
-
-    val error = process.errorStream.bufferedReader().readText()
-    if (error.isNotEmpty()) {
-        throw RuntimeException("WebAssembly Execution Error:\n$error")
-    }
-
-    return process.inputStream.bufferedReader().readText()
-}
+import dev.ssch.minijava.wasm.ast.Instruction
+import dev.ssch.minijava.wasm.ast.ValueType
 
 fun <T> MutableList<T>.removeFirstOrNull(): T? {
     return if (this.isEmpty()) {

@@ -1,7 +1,7 @@
 package dev.ssch.minijava
 
-import dev.ssch.minijava.ast.Instruction
 import dev.ssch.minijava.grammar.MiniJavaParser
+import dev.ssch.minijava.wasm.ast.Instruction
 import org.antlr.v4.runtime.Token
 
 class OperatorTable {

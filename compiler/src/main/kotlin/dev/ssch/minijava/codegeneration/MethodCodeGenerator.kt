@@ -2,13 +2,13 @@ package dev.ssch.minijava.codegeneration
 
 import dev.ssch.minijava.CodeGenerationPhase
 import dev.ssch.minijava.DataType
-import dev.ssch.minijava.ast.Instruction
 import dev.ssch.minijava.getDataType
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.symboltable.InitializerSymbolTable
 import dev.ssch.minijava.symboltable.LocalVariableSymbolTable
 import dev.ssch.minijava.symboltable.MethodSymbolTable
 import dev.ssch.minijava.toWebAssemblyType
+import dev.ssch.minijava.wasm.ast.Instruction
 
 class MethodCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
     fun generate(ctx: MiniJavaParser.MethodContext) {

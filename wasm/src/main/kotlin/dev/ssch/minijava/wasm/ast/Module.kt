@@ -1,4 +1,4 @@
-package dev.ssch.minijava.ast
+package dev.ssch.minijava.wasm.ast
 
 data class Module (
     val types: MutableList<FuncType> = mutableListOf(),

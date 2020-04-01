@@ -1,4 +1,4 @@
-package dev.ssch.minijava.ast
+package dev.ssch.minijava.wasm.ast
 
 sealed class ImportDesc {
     data class Func(

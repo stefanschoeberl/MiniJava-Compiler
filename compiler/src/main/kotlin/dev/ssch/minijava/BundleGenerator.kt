@@ -1,7 +1,9 @@
 package dev.ssch.minijava
 
-import dev.ssch.minijava.ast.Module
 import dev.ssch.minijava.symboltable.ClassSymbolTable
+import dev.ssch.minijava.wasm.WebAssemblyAssembler
+import dev.ssch.minijava.wasm.WebAssemblyModuleGenerator
+import dev.ssch.minijava.wasm.ast.Module
 import java.io.File
 
 class BundleGenerator {

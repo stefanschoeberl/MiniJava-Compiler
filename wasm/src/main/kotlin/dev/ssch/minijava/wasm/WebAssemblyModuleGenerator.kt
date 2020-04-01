@@ -1,7 +1,7 @@
-package dev.ssch.minijava
+package dev.ssch.minijava.wasm
 
-import dev.ssch.minijava.ast.*
-import dev.ssch.minijava.ast.Function
+import dev.ssch.minijava.wasm.ast.*
+import dev.ssch.minijava.wasm.ast.Function
 
 class WebAssemblyModuleGenerator {
 

@@ -1,4 +1,4 @@
-package dev.ssch.minijava
+package dev.ssch.minijava.wasm
 
 import java.io.File
 

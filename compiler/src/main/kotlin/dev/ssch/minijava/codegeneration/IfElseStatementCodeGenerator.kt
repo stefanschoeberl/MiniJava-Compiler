@@ -2,9 +2,9 @@ package dev.ssch.minijava.codegeneration
 
 import dev.ssch.minijava.CodeGenerationPhase
 import dev.ssch.minijava.DataType
-import dev.ssch.minijava.ast.Instruction
 import dev.ssch.minijava.exception.IncompatibleTypeException
 import dev.ssch.minijava.grammar.MiniJavaParser
+import dev.ssch.minijava.wasm.ast.Instruction
 
 class IfElseStatementCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
 

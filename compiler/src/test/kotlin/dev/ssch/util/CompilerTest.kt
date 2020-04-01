@@ -2,7 +2,7 @@ package dev.ssch.util
 
 import dev.ssch.minijava.BundleGenerator
 import dev.ssch.minijava.Compiler
-import dev.ssch.minijava.WebAssemblyRunner
+import dev.ssch.minijava.wasm.WebAssemblyRunner
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.within
 import org.junit.jupiter.api.io.TempDir

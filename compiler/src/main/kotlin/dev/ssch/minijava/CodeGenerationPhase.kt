@@ -1,13 +1,13 @@
 package dev.ssch.minijava
 
-import dev.ssch.minijava.ast.*
-import dev.ssch.minijava.ast.Function
 import dev.ssch.minijava.codegeneration.*
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.symboltable.ClassSymbolTable
 import dev.ssch.minijava.symboltable.InitializerSymbolTable
 import dev.ssch.minijava.symboltable.LocalVariableSymbolTable
 import dev.ssch.minijava.symboltable.MethodSymbolTable
+import dev.ssch.minijava.wasm.ast.*
+import dev.ssch.minijava.wasm.ast.Function
 
 class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
 

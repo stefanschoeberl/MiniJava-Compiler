@@ -1,8 +1,8 @@
 package dev.ssch.minijava.codegeneration
 
 import dev.ssch.minijava.CodeGenerationPhase
-import dev.ssch.minijava.ast.Instruction
 import dev.ssch.minijava.grammar.MiniJavaParser
+import dev.ssch.minijava.wasm.ast.Instruction
 
 class BasicStatementCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
 

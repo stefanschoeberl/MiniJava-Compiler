@@ -3,11 +3,11 @@ package dev.ssch.minijava.codegeneration
 import dev.ssch.minijava.CodeGenerationPhase
 import dev.ssch.minijava.DataType
 import dev.ssch.minijava.assignTypeTo
-import dev.ssch.minijava.ast.Instruction
 import dev.ssch.minijava.exception.IncompatibleAssignmentException
 import dev.ssch.minijava.exception.InvalidAssignmentException
 import dev.ssch.minijava.exception.UndefinedVariableException
 import dev.ssch.minijava.grammar.MiniJavaParser
+import dev.ssch.minijava.wasm.ast.Instruction
 import org.antlr.v4.runtime.Token
 
 class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {

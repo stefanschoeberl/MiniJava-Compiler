@@ -1,9 +1,9 @@
 package dev.ssch.minijava
 
-import dev.ssch.minijava.ast.Module
 import dev.ssch.minijava.grammar.MiniJavaLexer
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.symboltable.ClassSymbolTable
+import dev.ssch.minijava.wasm.ast.Module
 import org.antlr.v4.runtime.BailErrorStrategy
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
