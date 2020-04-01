@@ -34,16 +34,16 @@ class BinaryExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerat
 
     private fun visitBinaryOperatorExpression(left: MiniJavaParser.ExprContext, right: MiniJavaParser.ExprContext, op: Token): DataType {
         val leftType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(left)
-        val codePositionAfterLeftOperand = codeGenerationPhase.currentFunction.body.instructions.size
+        val codePositionAfterLeftOperand = codeGenerationPhase.nextInstructionAddress
         val rightType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(right)
 
         val binaryOperation = codeGenerationPhase.operatorTable.findBinaryOperation(leftType, rightType, op)
             ?: throw InvalidBinaryOperationException(leftType, rightType, op)
 
-        binaryOperation.leftPromotion?.let { codeGenerationPhase.currentFunction.body.instructions.add(codePositionAfterLeftOperand, it) }
-        binaryOperation.rightPromotion?.let { codeGenerationPhase.currentFunction.body.instructions.add(it) }
+        binaryOperation.leftPromotion?.let { codeGenerationPhase.emitInstruction(codePositionAfterLeftOperand, it) }
+        binaryOperation.rightPromotion?.let { codeGenerationPhase.emitInstruction(it) }
 
-        codeGenerationPhase.currentFunction.body.instructions.add(binaryOperation.operation)
+        codeGenerationPhase.emitInstruction(binaryOperation.operation)
 
         return binaryOperation.resultingType
     }

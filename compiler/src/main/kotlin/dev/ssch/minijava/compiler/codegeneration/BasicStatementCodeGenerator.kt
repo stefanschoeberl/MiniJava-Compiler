@@ -11,7 +11,7 @@ class BasicStatementCodeGenerator(private val codeGenerationPhase: CodeGeneratio
             val exprType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
 
             if (exprType != null) {
-                codeGenerationPhase.currentFunction.body.instructions.add(Instruction.drop)
+                codeGenerationPhase.emitInstruction(Instruction.drop)
             }
         } else {
             TODO()
@@ -20,7 +20,7 @@ class BasicStatementCodeGenerator(private val codeGenerationPhase: CodeGeneratio
 
     fun generateExecution(ctx: MiniJavaParser.ReturnStmtContext) {
         codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.value)
-        codeGenerationPhase.currentFunction.body.instructions.add(Instruction._return)
+        codeGenerationPhase.emitInstruction(Instruction._return)
     }
 
     fun generateExecution(ctx: MiniJavaParser.BlockStmtContext) {

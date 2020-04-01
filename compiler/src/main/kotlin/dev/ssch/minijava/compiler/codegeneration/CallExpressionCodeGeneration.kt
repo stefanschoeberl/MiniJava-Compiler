@@ -13,7 +13,7 @@ class CallExpressionCodeGeneration(private val codeGenerationPhase: CodeGenerati
     fun generateEvaluation(ctx: MiniJavaParser.CallExprContext): DataType? {
         val (className, generatedTargetReferenceOnStack) = extractTargetClassNameAndGenerateTargetReference(ctx)
 
-        val codePositionBeforeParameters = codeGenerationPhase.currentFunction.body.instructions.size
+        val codePositionBeforeParameters = codeGenerationPhase.nextInstructionAddress
         val parameterTypes = evaluateParameters(ctx)
 
         val methodName = extractMethodName(ctx)
@@ -32,25 +32,17 @@ class CallExpressionCodeGeneration(private val codeGenerationPhase: CodeGenerati
 
         if (methodSymbolTableOfTargetClass.isStatic(methodName, parameterTypes) && generatedTargetReferenceOnStack) {
             // remove reference to target object
-            codeGenerationPhase.currentFunction.body.instructions.add(codePositionBeforeParameters, Instruction.drop)
+            codeGenerationPhase.emitInstruction(codePositionBeforeParameters, Instruction.drop)
         }
 
-        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.call(address))
+        codeGenerationPhase.emitInstruction(Instruction.call(address))
 
         return methodSymbolTableOfTargetClass.returnTypeOf(methodName, parameterTypes)
     }
 
-    private fun removeInstructionsBeginningAt(n: Int) {
-        val instructions = codeGenerationPhase.currentFunction.body.instructions
-        while (instructions.size > n) {
-            instructions.removeAt(instructions.size - 1)
-        }
-
-    }
-
     private fun extractTargetClassNameAndGenerateTargetReference(ctx: MiniJavaParser.CallExprContext): Pair<String, Boolean> {
         val target = ctx.target
-        val startCodePosition = codeGenerationPhase.currentFunction.body.instructions.size
+        val startCodePosition = codeGenerationPhase.nextInstructionAddress
         if (target is MiniJavaParser.MemberExprContext) {
             return when (val left = target.left) {
                 is MiniJavaParser.IdExprContext -> try {
@@ -60,7 +52,7 @@ class CallExpressionCodeGeneration(private val codeGenerationPhase: CodeGenerati
                 } catch (e: UndefinedVariableException) {
                     // if evaluation fails, try to interpret identifier as class name
 
-                    removeInstructionsBeginningAt(startCodePosition) // remove previous evaluation
+                    codeGenerationPhase.deleteInstructionsBeginningAt(startCodePosition) // remove previous evaluation
                     val className = left.IDENT().text
                     if (codeGenerationPhase.classSymbolTable.isDeclared(className)) {
                         Pair(className, false)

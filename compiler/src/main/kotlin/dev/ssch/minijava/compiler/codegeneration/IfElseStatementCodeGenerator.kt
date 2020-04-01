@@ -35,12 +35,12 @@ class IfElseStatementCodeGenerator(private val codeGenerationPhase: CodeGenerati
         if (conditionType != DataType.PrimitiveType.Boolean) {
             throw IncompatibleTypeException(DataType.PrimitiveType.Boolean, conditionType, condition.getStart())
         }
-        codeGenerationPhase.currentFunction.body.instructions.add(Instruction._if)
+        codeGenerationPhase.emitInstruction(Instruction._if)
         thenbranch()
         if (elsebranch != null) {
-            codeGenerationPhase.currentFunction.body.instructions.add(Instruction._else)
+            codeGenerationPhase.emitInstruction(Instruction._else)
             elsebranch()
         }
-        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.end)
+        codeGenerationPhase.emitInstruction(Instruction.end)
     }
 }

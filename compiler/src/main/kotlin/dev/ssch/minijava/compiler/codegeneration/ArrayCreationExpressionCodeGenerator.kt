@@ -25,7 +25,7 @@ class ArrayCreationExpressionCodeGenerator(private val codeGenerationPhase: Code
             else -> TODO()
         }
 
-        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.call(address))
+        codeGenerationPhase.emitInstruction(Instruction.call(address))
 
         return DataType.Array(arrayType)
     }

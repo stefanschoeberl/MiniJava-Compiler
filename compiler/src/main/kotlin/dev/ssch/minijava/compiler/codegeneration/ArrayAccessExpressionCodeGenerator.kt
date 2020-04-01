@@ -31,7 +31,7 @@ class ArrayAccessExpressionCodeGenerator(private val codeGenerationPhase: CodeGe
             else -> TODO()
         }
 
-        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.call(address))
+        codeGenerationPhase.emitInstruction(Instruction.call(address))
         return elementType
     }
 }

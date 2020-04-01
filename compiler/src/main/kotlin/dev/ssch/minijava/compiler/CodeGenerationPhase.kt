@@ -13,13 +13,13 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
 
     private lateinit var module: Module
     lateinit var currentClass: String
-    lateinit var currentFunction: Function
+    private lateinit var currentFunction: Function
 
     lateinit var localsVariableSymbolTable: LocalVariableSymbolTable
     lateinit var methodSymbolTable: MethodSymbolTable
 
-    lateinit var functions: MutableMap<Pair<String, MethodSymbolTable.MethodSignature>, Function>
-    lateinit var initializers: MutableMap<Pair<String, InitializerSymbolTable.InitializerSignature>, Function>
+    private lateinit var functions: MutableMap<Pair<String, MethodSymbolTable.MethodSignature>, Function>
+    private lateinit var initializers: MutableMap<Pair<String, InitializerSymbolTable.InitializerSignature>, Function>
 
     val operatorTable = OperatorTable()
 
@@ -50,6 +50,43 @@ class CodeGenerationPhase(val classSymbolTable: ClassSymbolTable) {
     val variableAssignmentStatementCodeGenerator = VariableAssignmentStatementCodeGenerator(this)
     val expressionCodeGenerator = ExpressionCodeGenerator(this)
     val statementCodeGenerator = StatementCodeGenerator(this)
+
+    fun emitInstruction(instruction: Instruction) {
+        currentFunction.body.instructions.add(instruction)
+    }
+
+    fun emitInstruction(index: Int, instruction: Instruction) {
+        currentFunction.body.instructions.add(index, instruction)
+    }
+
+    fun emitInstructions(instruction: Collection<Instruction>) {
+        currentFunction.body.instructions.addAll(instruction)
+    }
+
+    fun deleteInstruction(index: Int) {
+        currentFunction.body.instructions.removeAt(index)
+    }
+
+    fun deleteInstructionsBeginningAt(n: Int) {
+        while (currentFunction.body.instructions.size > n) {
+            deleteInstruction(currentFunction.body.instructions.size - 1)
+        }
+    }
+
+    val nextInstructionAddress: Int
+        get() = currentFunction.body.instructions.size
+
+    fun beginMethodGeneration(methodSignature: MethodSymbolTable.MethodSignature) {
+        currentFunction = functions[Pair(currentClass, methodSignature)]!!
+    }
+
+    fun beginInitializerGeneration(initializerSignature: InitializerSymbolTable.InitializerSignature) {
+        currentFunction = initializers[Pair(currentClass, initializerSignature)]!!
+    }
+
+    fun generateLocalVariables() {
+        currentFunction.locals.addAll(localsVariableSymbolTable.allLocalVariables.map(DataType::toWebAssemblyType))
+    }
 
     fun generateModule(trees: List<MiniJavaParser.MinijavaContext>): Module {
         initModule()

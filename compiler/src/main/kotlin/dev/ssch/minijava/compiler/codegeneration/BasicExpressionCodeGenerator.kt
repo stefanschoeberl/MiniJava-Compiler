@@ -13,12 +13,11 @@ class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerati
     fun generateEvaluation(ctx: MiniJavaParser.IdExprContext): DataType {
         val name = ctx.IDENT().text
 
-        val instructions = codeGenerationPhase.currentFunction.body.instructions
         val localsVariableSymbolTable = codeGenerationPhase.localsVariableSymbolTable
 
         return when {
             localsVariableSymbolTable.isDeclared(name) -> {
-                instructions.add(Instruction.local_get(localsVariableSymbolTable.addressOf(name)))
+                codeGenerationPhase.emitInstruction(Instruction.local_get(localsVariableSymbolTable.addressOf(name)))
                 localsVariableSymbolTable.typeOf(name)
             }
             localsVariableSymbolTable.doesThisParameterExist() -> {
@@ -30,28 +29,28 @@ class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerati
 
     fun generateEvaluation(ctx: MiniJavaParser.IntExprContext): DataType {
         val value = ctx.INT().text.toInt()
-        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.i32_const(value))
+        codeGenerationPhase.emitInstruction(Instruction.i32_const(value))
         return DataType.PrimitiveType.Integer
     }
 
     fun generateEvaluation(ctx: MiniJavaParser.BoolExprContext): DataType {
         if (ctx.value.type == MiniJavaParser.TRUE) {
-            codeGenerationPhase.currentFunction.body.instructions.add(Instruction.i32_const(1))
+            codeGenerationPhase.emitInstruction(Instruction.i32_const(1))
         } else {
-            codeGenerationPhase.currentFunction.body.instructions.add(Instruction.i32_const(0))
+            codeGenerationPhase.emitInstruction(Instruction.i32_const(0))
         }
         return DataType.PrimitiveType.Boolean
     }
 
     fun generateEvaluation(ctx: MiniJavaParser.FloatExprContext): DataType {
         val value = ctx.FLOAT().text.toFloat()
-        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.f32_const(value))
+        codeGenerationPhase.emitInstruction(Instruction.f32_const(value))
         return DataType.PrimitiveType.Float
     }
 
     fun generateEvaluation(ctx: MiniJavaParser.CharExprContext): DataType {
         val char = ctx.CHAR().text[1]
-        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.i32_const(char.toInt()))
+        codeGenerationPhase.emitInstruction(Instruction.i32_const(char.toInt()))
         return DataType.PrimitiveType.Char
     }
 
@@ -60,14 +59,14 @@ class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerati
     }
 
     fun generateEvaluation(ctx: MiniJavaParser.MinusExprContext): DataType? {
-        val codePositionBeforeOperand = codeGenerationPhase.currentFunction.body.instructions.size
+        val codePositionBeforeOperand = codeGenerationPhase.nextInstructionAddress
         val type = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
 
         val unaryOperation = codeGenerationPhase.operatorTable.findUnaryMinusOperation(type)
             ?: throw InvalidUnaryOperationException(type, ctx.SUB().symbol)
 
-        codeGenerationPhase.currentFunction.body.instructions.add(codePositionBeforeOperand, unaryOperation.operationBeforeOperand)
-        codeGenerationPhase.currentFunction.body.instructions.add(unaryOperation.operationAfterOperand)
+        codeGenerationPhase.emitInstruction(codePositionBeforeOperand, unaryOperation.operationBeforeOperand)
+        codeGenerationPhase.emitInstruction(unaryOperation.operationAfterOperand)
 
         return type
     }
@@ -80,13 +79,13 @@ class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerati
         val castCode = exprType?.castTypeTo(type)
             ?: throw InconvertibleTypeException(exprType, type, ctx.start)
 
-        codeGenerationPhase.currentFunction.body.instructions.addAll(castCode)
+        codeGenerationPhase.emitInstructions(castCode)
 
         return type
     }
 
     fun generateNullEvaluation(): DataType {
-        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.i32_const(0))
+        codeGenerationPhase.emitInstruction(Instruction.i32_const(0))
         return DataType.NullType
     }
 
@@ -100,7 +99,7 @@ class BasicExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerati
 
     private fun generateThis(): DataType {
         val thisAddress = codeGenerationPhase.localsVariableSymbolTable.addressOfThis()
-        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.local_get(thisAddress))
+        codeGenerationPhase.emitInstruction(Instruction.local_get(thisAddress))
         return DataType.ReferenceType(codeGenerationPhase.currentClass)
     }
 }

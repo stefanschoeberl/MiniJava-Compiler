@@ -17,7 +17,7 @@ class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: 
             rightType?.assignTypeTo(it)
         } ?: throw IncompatibleAssignmentException(leftType, rightType, token)
 
-        codeGenerationPhase.currentFunction.body.instructions.addAll(conversionCode)
+        codeGenerationPhase.emitInstructions(conversionCode)
     }
 
     fun generateExecution(ctx: MiniJavaParser.VarassignStmtContext) {
@@ -25,18 +25,17 @@ class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: 
             is MiniJavaParser.IdExprContext -> {
                 val name = left.IDENT().text
 
-                val instructions = codeGenerationPhase.currentFunction.body.instructions
                 val localsVariableSymbolTable = codeGenerationPhase.localsVariableSymbolTable
 
                 when {
                     localsVariableSymbolTable.isDeclared(name) -> {
                         val rightType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
                         checkAndConvertAssigment(codeGenerationPhase.localsVariableSymbolTable.typeOf(name), rightType, ctx.left.start)
-                        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.local_set(codeGenerationPhase.localsVariableSymbolTable.addressOf(name)))
+                        codeGenerationPhase.emitInstruction(Instruction.local_set(codeGenerationPhase.localsVariableSymbolTable.addressOf(name)))
                     }
                     localsVariableSymbolTable.doesThisParameterExist() -> {
                         codeGenerationPhase.memberAccessExpressionCodeGenerator.generateWrite(name, ctx.right, ctx.left.start) {
-                            instructions.add(Instruction.local_get(localsVariableSymbolTable.addressOfThis()))
+                            codeGenerationPhase.emitInstruction(Instruction.local_get(localsVariableSymbolTable.addressOfThis()))
                             DataType.ReferenceType(codeGenerationPhase.currentClass)
                         }
                     }
@@ -59,7 +58,7 @@ class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: 
                     else -> TODO()
                 }
 
-                codeGenerationPhase.currentFunction.body.instructions.add(Instruction.call(address))
+                codeGenerationPhase.emitInstruction(Instruction.call(address))
             }
             is MiniJavaParser.MemberExprContext -> {
                 codeGenerationPhase.memberAccessExpressionCodeGenerator.generateWrite(left, ctx.right)

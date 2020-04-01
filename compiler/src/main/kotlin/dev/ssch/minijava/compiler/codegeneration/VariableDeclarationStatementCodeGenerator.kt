@@ -25,9 +25,9 @@ class VariableDeclarationStatementCodeGenerator(private val codeGenerationPhase:
         val conversionCode = exprType?.assignTypeTo(variableType)
             ?: throw IncompatibleAssignmentException(variableType, exprType, ctx.name)
 
-        codeGenerationPhase.currentFunction.body.instructions.addAll(conversionCode)
+        codeGenerationPhase.emitInstructions(conversionCode)
 
-        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.local_set(codeGenerationPhase.localsVariableSymbolTable.addressOf(variableName)))
+        codeGenerationPhase.emitInstruction(Instruction.local_set(codeGenerationPhase.localsVariableSymbolTable.addressOf(variableName)))
     }
 
     private fun declareVariable(nameToken: Token, typeContext: MiniJavaParser.TypeDefinitionContext): Pair<String, DataType> {

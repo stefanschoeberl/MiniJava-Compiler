@@ -6,7 +6,6 @@ import dev.ssch.minijava.compiler.getDataType
 import dev.ssch.minijava.compiler.symboltable.InitializerSymbolTable
 import dev.ssch.minijava.compiler.symboltable.LocalVariableSymbolTable
 import dev.ssch.minijava.compiler.symboltable.MethodSymbolTable
-import dev.ssch.minijava.compiler.toWebAssemblyType
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.wasm.ast.Instruction
 
@@ -23,16 +22,16 @@ class MethodCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) 
 
         declareParameters(!codeGenerationPhase.methodSymbolTable.isStatic(methodName, parameterTypes), parameters)
 
-        codeGenerationPhase.currentFunction = codeGenerationPhase.functions[Pair(codeGenerationPhase.currentClass, MethodSymbolTable.MethodSignature(methodName, parameterTypes))]!!
+        codeGenerationPhase.beginMethodGeneration(MethodSymbolTable.MethodSignature(methodName, parameterTypes))
 
         generateStatementExecution(ctx.statements)
 
         // "workaround" idea from https://github.com/WebAssembly/wabt/issues/1075
         if (codeGenerationPhase.methodSymbolTable.returnTypeOf(methodName, parameterTypes) != null) {
-            codeGenerationPhase.currentFunction.body.instructions.add(Instruction.unreachable)
+            codeGenerationPhase.emitInstruction(Instruction.unreachable)
         }
 
-        generateLocalVariables()
+        codeGenerationPhase.generateLocalVariables()
     }
 
     fun generate(ctx: MiniJavaParser.ConstructorContext) {
@@ -40,11 +39,11 @@ class MethodCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) 
         val parameterTypes = extractParameterTypes(parameters)
         declareParameters(true, parameters)
 
-        codeGenerationPhase.currentFunction = codeGenerationPhase.initializers[Pair(codeGenerationPhase.currentClass, InitializerSymbolTable.InitializerSignature(parameterTypes))]!!
+        codeGenerationPhase.beginInitializerGeneration(InitializerSymbolTable.InitializerSignature(parameterTypes))
 
         generateStatementExecution(ctx.statements)
-        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.local_get(codeGenerationPhase.localsVariableSymbolTable.addressOfThis()))
-        generateLocalVariables()
+        codeGenerationPhase.emitInstruction(Instruction.local_get(codeGenerationPhase.localsVariableSymbolTable.addressOfThis()))
+        codeGenerationPhase.generateLocalVariables()
     }
 
     private fun beginMethod(parameters: List<MiniJavaParser.FormalParameterContext>): List<Pair<String, DataType>> {
@@ -68,11 +67,5 @@ class MethodCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) 
 
     private fun generateStatementExecution(statements: List<MiniJavaParser.StatementContext>) {
         statements.forEach(codeGenerationPhase.statementCodeGenerator::generateExecution)
-    }
-
-    private fun generateLocalVariables() {
-        codeGenerationPhase.localsVariableSymbolTable.allLocalVariables.forEach {
-            codeGenerationPhase.currentFunction.locals.add(it.toWebAssemblyType())
-        }
     }
 }

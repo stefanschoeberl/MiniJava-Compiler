@@ -24,7 +24,7 @@ class MemberExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerat
             .getFieldSymbolTable(objType.name)
             .findFieldInfo(fieldName) ?: throw UndefinedVariableException(fieldName, token) // TODO: better exception like "UndefinedField"
 
-        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.call(field.getterAddress))
+        codeGenerationPhase.emitInstruction(Instruction.call(field.getterAddress))
         return field.type
     }
 
@@ -44,6 +44,6 @@ class MemberExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerat
 
         val rightType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(right)
         codeGenerationPhase.variableAssignmentStatementCodeGenerator.checkAndConvertAssigment(field.type, rightType, token)
-        codeGenerationPhase.currentFunction.body.instructions.add(Instruction.call(field.setterAddress))
+        codeGenerationPhase.emitInstruction(Instruction.call(field.setterAddress))
     }
 }
