@@ -168,4 +168,35 @@ class InstanceMethodsTest : CompilerTest() {
         assertThat(output.lines()).containsExactly("123","123", "")
     }
 
+    @Test
+    fun `native instance method`() {
+        val output = Source.withMiniJava("""
+            class Point {
+                int x;
+                int y;
+                
+                native float calc(int offset);
+            }
+            
+            class Main {
+                public static void main() {
+                    Point point = new Point();
+                    point.x = 3;
+                    point.y = 4;
+                    Console.println(point.calc(2));
+                }
+            }
+        """).andJavaScript("""
+            module.exports = function (runtime) {
+                return {
+                    "Point.calc#int": function(thisRef, offset) {
+                        const point = runtime.wasmDeref(thisRef);
+                        return point.x + point.y + offset;
+                    }
+                }
+            };
+        """).compileAndRun()
+        assertThat(output.lines()).containsExactly("9", "")
+    }
+
 }
