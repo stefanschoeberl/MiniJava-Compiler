@@ -1,26 +1,29 @@
 package dev.ssch.minijava.compiler.codegeneration
 
-import dev.ssch.minijava.compiler.CodeGenerationPhase
+import dev.ssch.minijava.compiler.CodeEmitter
 import dev.ssch.minijava.grammar.MiniJavaBaseVisitor
 import dev.ssch.minijava.grammar.MiniJavaParser
 
-class ClassCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
+class ClassCodeGenerator (
+    private val codeEmitter: CodeEmitter,
+    private val methodCodeGenerator: MethodCodeGenerator
+) {
 
     private val visitor = Visitor()
 
     private inner class Visitor : MiniJavaBaseVisitor<Unit>() {
         override fun visitMethod(ctx: MiniJavaParser.MethodContext) {
-            codeGenerationPhase.methodCodeGenerator.generate(ctx)
+            methodCodeGenerator.generate(ctx)
         }
 
         override fun visitConstructor(ctx: MiniJavaParser.ConstructorContext) {
-            codeGenerationPhase.methodCodeGenerator.generate(ctx)
+            methodCodeGenerator.generate(ctx)
         }
     }
 
     fun generate(ctx: MiniJavaParser.JavaclassContext) {
-        codeGenerationPhase.currentClass = ctx.name.text
-        codeGenerationPhase.methodSymbolTable = codeGenerationPhase.classSymbolTable.getMethodSymbolTable(codeGenerationPhase.currentClass)
+        codeEmitter.currentClass = ctx.name.text
+        codeEmitter.methodSymbolTable = codeEmitter.classSymbolTable.getMethodSymbolTable(codeEmitter.currentClass)
         visitor.visitChildren(ctx)
     }
 }

@@ -1,17 +1,21 @@
 package dev.ssch.minijava.compiler.codegeneration
 
-import dev.ssch.minijava.compiler.CodeGenerationPhase
+import dev.ssch.minijava.compiler.CodeEmitter
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.wasm.ast.Instruction
 
-class BasicStatementCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
+class BasicStatementCodeGenerator (
+    private val codeEmitter: CodeEmitter,
+    private val expressionCodeGenerator: ExpressionCodeGenerator,
+    private val statementCodeGenerator: StatementCodeGenerator
+) {
 
     fun generateExecution(ctx: MiniJavaParser.ExpressionStmtContext) {
         if (ctx.expr() is MiniJavaParser.CallExprContext) {
-            val exprType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.expr())
+            val exprType = expressionCodeGenerator.generateEvaluation(ctx.expr())
 
             if (exprType != null) {
-                codeGenerationPhase.emitInstruction(Instruction.drop)
+                codeEmitter.emitInstruction(Instruction.drop)
             }
         } else {
             TODO()
@@ -19,13 +23,13 @@ class BasicStatementCodeGenerator(private val codeGenerationPhase: CodeGeneratio
     }
 
     fun generateExecution(ctx: MiniJavaParser.ReturnStmtContext) {
-        codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.value)
-        codeGenerationPhase.emitInstruction(Instruction._return)
+        expressionCodeGenerator.generateEvaluation(ctx.value)
+        codeEmitter.emitInstruction(Instruction._return)
     }
 
     fun generateExecution(ctx: MiniJavaParser.BlockStmtContext) {
-        codeGenerationPhase.localsVariableSymbolTable.pushScope()
-        ctx.statements.forEach(codeGenerationPhase.statementCodeGenerator::generateExecution)
-        codeGenerationPhase.localsVariableSymbolTable.popScope()
+        codeEmitter.localsVariableSymbolTable.pushScope()
+        ctx.statements.forEach(statementCodeGenerator::generateExecution)
+        codeEmitter.localsVariableSymbolTable.popScope()
     }
 }

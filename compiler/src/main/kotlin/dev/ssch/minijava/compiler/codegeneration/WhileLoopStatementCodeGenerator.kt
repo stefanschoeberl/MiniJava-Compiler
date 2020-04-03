@@ -1,18 +1,22 @@
 package dev.ssch.minijava.compiler.codegeneration
 
-import dev.ssch.minijava.compiler.CodeGenerationPhase
+import dev.ssch.minijava.compiler.CodeEmitter
 import dev.ssch.minijava.compiler.DataType
 import dev.ssch.minijava.compiler.exception.IncompatibleTypeException
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.wasm.ast.Instruction
 
-class WhileLoopStatementCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
+class WhileLoopStatementCodeGenerator (
+    private val codeEmitter: CodeEmitter,
+    private val expressionCodeGenerator: ExpressionCodeGenerator,
+    private val statementCodeGenerator: StatementCodeGenerator
+) {
 
     fun generateExecution(ctx: MiniJavaParser.WhileLoopStmtContext) {
-        codeGenerationPhase.emitInstruction(Instruction.block)
-        codeGenerationPhase.emitInstruction(Instruction.loop)
+        codeEmitter.emitInstruction(Instruction.block)
+        codeEmitter.emitInstruction(Instruction.loop)
 
-        val conditionType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.condition)
+        val conditionType = expressionCodeGenerator.generateEvaluation(ctx.condition)
         if (conditionType != DataType.PrimitiveType.Boolean) {
             throw IncompatibleTypeException(
                 DataType.PrimitiveType.Boolean,
@@ -20,14 +24,14 @@ class WhileLoopStatementCodeGenerator(private val codeGenerationPhase: CodeGener
                 ctx.condition.getStart()
             )
         }
-        codeGenerationPhase.emitInstruction(Instruction.i32_eqz)
-        codeGenerationPhase.emitInstruction(Instruction.br_if(1))
+        codeEmitter.emitInstruction(Instruction.i32_eqz)
+        codeEmitter.emitInstruction(Instruction.br_if(1))
 
-        codeGenerationPhase.statementCodeGenerator.generateExecution(ctx.body)
+        statementCodeGenerator.generateExecution(ctx.body)
 
-        codeGenerationPhase.emitInstruction(Instruction.br(0))
+        codeEmitter.emitInstruction(Instruction.br(0))
 
-        codeGenerationPhase.emitInstruction(Instruction.end)
-        codeGenerationPhase.emitInstruction(Instruction.end)
+        codeEmitter.emitInstruction(Instruction.end)
+        codeEmitter.emitInstruction(Instruction.end)
     }
 }

@@ -1,17 +1,34 @@
 package dev.ssch.minijava.compiler.codegeneration
 
-import dev.ssch.minijava.compiler.CodeGenerationPhase
 import dev.ssch.minijava.compiler.DataType
 import dev.ssch.minijava.grammar.MiniJavaBaseVisitor
 import dev.ssch.minijava.grammar.MiniJavaParser
 
-class ExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
+class ExpressionCodeGenerator {
 
-    private val basicExpressionCodeGenerator = codeGenerationPhase.basicExpressionCodeGenerator
-    private val binaryExpressionCodeGenerator = BinaryExpressionCodeGenerator(codeGenerationPhase)
-    private val arrayCreationExpressionCodeGenerator = ArrayCreationExpressionCodeGenerator(codeGenerationPhase)
-    private val callExpressionCodeGenerator = CallExpressionCodeGeneration(codeGenerationPhase)
-    private val classInstanceCreationExpressionCodeGenerator = ClassInstanceCreationExpressionCodeGenerator(codeGenerationPhase)
+    fun init(basicExpressionCodeGenerator: BasicExpressionCodeGenerator,
+             binaryExpressionCodeGenerator: BinaryExpressionCodeGenerator,
+             arrayCreationExpressionCodeGenerator: ArrayCreationExpressionCodeGenerator,
+             arrayAccessExpressionCodeGeneration: ArrayAccessExpressionCodeGenerator,
+             callExpressionCodeGenerator: CallExpressionCodeGeneration,
+             classInstanceCreationExpressionCodeGenerator: ClassInstanceCreationExpressionCodeGenerator,
+             memberExpressionCodeGenerator: MemberExpressionCodeGenerator) {
+        this.basicExpressionCodeGenerator = basicExpressionCodeGenerator
+        this.binaryExpressionCodeGenerator = binaryExpressionCodeGenerator
+        this.arrayCreationExpressionCodeGenerator = arrayCreationExpressionCodeGenerator
+        this.arrayAccessExpressionCodeGeneration = arrayAccessExpressionCodeGeneration
+        this.callExpressionCodeGenerator = callExpressionCodeGenerator
+        this.classInstanceCreationExpressionCodeGenerator = classInstanceCreationExpressionCodeGenerator
+        this.memberExpressionCodeGenerator = memberExpressionCodeGenerator
+    }
+
+    private lateinit var basicExpressionCodeGenerator: BasicExpressionCodeGenerator
+    private lateinit var binaryExpressionCodeGenerator: BinaryExpressionCodeGenerator
+    private lateinit var arrayCreationExpressionCodeGenerator: ArrayCreationExpressionCodeGenerator
+    private lateinit var arrayAccessExpressionCodeGeneration: ArrayAccessExpressionCodeGenerator
+    private lateinit var callExpressionCodeGenerator: CallExpressionCodeGeneration
+    private lateinit var classInstanceCreationExpressionCodeGenerator: ClassInstanceCreationExpressionCodeGenerator
+    private lateinit var memberExpressionCodeGenerator: MemberExpressionCodeGenerator
 
     private val visitor = Visitor()
 
@@ -21,7 +38,7 @@ class ExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPha
 
     private inner class Visitor : MiniJavaBaseVisitor<DataType?>() {
         override fun visitArrayAccessExpr(ctx: MiniJavaParser.ArrayAccessExprContext): DataType? {
-            return codeGenerationPhase.arrayAccessExpressionCodeGeneration.generateEvaluation(ctx)
+            return arrayAccessExpressionCodeGeneration.generateEvaluation(ctx)
         }
 
         override fun visitMinusExpr(ctx: MiniJavaParser.MinusExprContext): DataType? {
@@ -33,7 +50,7 @@ class ExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPha
         }
 
         override fun visitMemberExpr(ctx: MiniJavaParser.MemberExprContext): DataType? {
-            return codeGenerationPhase.memberAccessExpressionCodeGenerator.generateEvaluation(ctx)
+            return memberExpressionCodeGenerator.generateEvaluation(ctx)
         }
 
         override fun visitIdExpr(ctx: MiniJavaParser.IdExprContext): DataType? {

@@ -1,16 +1,27 @@
 package dev.ssch.minijava.compiler.codegeneration
 
-import dev.ssch.minijava.compiler.CodeGenerationPhase
 import dev.ssch.minijava.grammar.MiniJavaBaseVisitor
 import dev.ssch.minijava.grammar.MiniJavaParser
 
-class StatementCodeGenerator(codeGenerationPhase: CodeGenerationPhase) {
+class StatementCodeGenerator {
 
-    val whileLoopCodeGenerator = WhileLoopStatementCodeGenerator(codeGenerationPhase)
-    val ifElseLoopCodeGenerator = IfElseStatementCodeGenerator(codeGenerationPhase)
-    val variableDeclarationStatementCodeGenerator = VariableDeclarationStatementCodeGenerator(codeGenerationPhase)
-    val variableAssignmentStatementCodeGenerator = codeGenerationPhase.variableAssignmentStatementCodeGenerator
-    val basicStatementCodeGenerator = BasicStatementCodeGenerator(codeGenerationPhase)
+    fun init(whileLoopCodeGenerator: WhileLoopStatementCodeGenerator,
+             ifElseLoopCodeGenerator: IfElseStatementCodeGenerator,
+             variableDeclarationStatementCodeGenerator: VariableDeclarationStatementCodeGenerator,
+             variableAssignmentStatementCodeGenerator: VariableAssignmentStatementCodeGenerator,
+             basicStatementCodeGenerator: BasicStatementCodeGenerator) {
+        this.whileLoopCodeGenerator = whileLoopCodeGenerator
+        this.ifElseLoopCodeGenerator = ifElseLoopCodeGenerator
+        this.variableDeclarationStatementCodeGenerator = variableDeclarationStatementCodeGenerator
+        this.variableAssignmentStatementCodeGenerator = variableAssignmentStatementCodeGenerator
+        this.basicStatementCodeGenerator = basicStatementCodeGenerator
+    }
+
+    private lateinit var whileLoopCodeGenerator: WhileLoopStatementCodeGenerator
+    private lateinit var ifElseLoopCodeGenerator: IfElseStatementCodeGenerator
+    private lateinit var variableDeclarationStatementCodeGenerator: VariableDeclarationStatementCodeGenerator
+    private lateinit var variableAssignmentStatementCodeGenerator: VariableAssignmentStatementCodeGenerator
+    private lateinit var basicStatementCodeGenerator: BasicStatementCodeGenerator
 
     private val visitor = Visitor()
 

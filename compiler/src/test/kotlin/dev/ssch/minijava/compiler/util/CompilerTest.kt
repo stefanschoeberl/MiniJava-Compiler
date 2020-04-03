@@ -1,7 +1,6 @@
 package dev.ssch.minijava.compiler.util
 
-import dev.ssch.minijava.compiler.BundleGenerator
-import dev.ssch.minijava.compiler.Compiler
+import dev.ssch.minijava.compiler.CompilationContext
 import dev.ssch.minijava.wasm.WebAssemblyRunner
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.within
@@ -60,7 +59,7 @@ abstract class CompilerTest {
     // ---
 
     fun Source.compileAndRun(withStandardLibrary: Boolean = true): String {
-        val compiler = Compiler()
+        val context = CompilationContext()
         val miniJavaSource = this.miniJava.trimIndent()
         val javaScriptSource = this.javaScript?.trimIndent()
 
@@ -85,10 +84,9 @@ abstract class CompilerTest {
                 .forEach { allSourceFiles.add(it) }
         }
 
-        val (module, classSymbolTable) = compiler.compile(allSourceFiles)
+        val (module, classSymbolTable) = context.compiler.compile(allSourceFiles)
 
-        val bundleGenerator = BundleGenerator()
-        bundleGenerator.generateBundle(module, allSourceFiles, wasmOutput, classSymbolTable)
+        context.bundleGenerator.generateBundle(module, allSourceFiles, wasmOutput, classSymbolTable)
 
         val runner = WebAssemblyRunner()
         return runner.run(wasmOutput.absolutePath)

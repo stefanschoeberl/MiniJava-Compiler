@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run Demo file" type="NodeJSConfigurationType" application-parameters="./wasm-output" path-to-js-file="run.js" working-dir="$PROJECT_DIR$">
     <method v="2">
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="dev.ssch.minijava.MainKt" run_configuration_type="JetRunConfigurationType" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="dev.ssch.minijava.compiler.MainKt" run_configuration_type="JetRunConfigurationType" />
     </method>
   </configuration>
 </component>

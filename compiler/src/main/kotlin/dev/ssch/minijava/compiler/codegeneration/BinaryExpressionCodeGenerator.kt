@@ -1,12 +1,17 @@
 package dev.ssch.minijava.compiler.codegeneration
 
-import dev.ssch.minijava.compiler.CodeGenerationPhase
+import dev.ssch.minijava.compiler.CodeEmitter
 import dev.ssch.minijava.compiler.DataType
+import dev.ssch.minijava.compiler.OperatorTable
 import dev.ssch.minijava.compiler.exception.InvalidBinaryOperationException
 import dev.ssch.minijava.grammar.MiniJavaParser
 import org.antlr.v4.runtime.Token
 
-class BinaryExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
+class BinaryExpressionCodeGenerator (
+    private val codeEmitter: CodeEmitter,
+    private val expressionCodeGenerator: ExpressionCodeGenerator,
+    private val operatorTable: OperatorTable
+) {
 
     fun generateEvaluation(ctx: MiniJavaParser.OrExprContext): DataType {
         return visitBinaryOperatorExpression(ctx.left, ctx.right, ctx.op)
@@ -33,17 +38,17 @@ class BinaryExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerat
     }
 
     private fun visitBinaryOperatorExpression(left: MiniJavaParser.ExprContext, right: MiniJavaParser.ExprContext, op: Token): DataType {
-        val leftType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(left)
-        val codePositionAfterLeftOperand = codeGenerationPhase.nextInstructionAddress
-        val rightType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(right)
+        val leftType = expressionCodeGenerator.generateEvaluation(left)
+        val codePositionAfterLeftOperand = codeEmitter.nextInstructionAddress
+        val rightType = expressionCodeGenerator.generateEvaluation(right)
 
-        val binaryOperation = codeGenerationPhase.operatorTable.findBinaryOperation(leftType, rightType, op)
+        val binaryOperation = operatorTable.findBinaryOperation(leftType, rightType, op)
             ?: throw InvalidBinaryOperationException(leftType, rightType, op)
 
-        binaryOperation.leftPromotion?.let { codeGenerationPhase.emitInstruction(codePositionAfterLeftOperand, it) }
-        binaryOperation.rightPromotion?.let { codeGenerationPhase.emitInstruction(it) }
+        binaryOperation.leftPromotion?.let { codeEmitter.emitInstruction(codePositionAfterLeftOperand, it) }
+        binaryOperation.rightPromotion?.let { codeEmitter.emitInstruction(it) }
 
-        codeGenerationPhase.emitInstruction(binaryOperation.operation)
+        codeEmitter.emitInstruction(binaryOperation.operation)
 
         return binaryOperation.resultingType
     }

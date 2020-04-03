@@ -13,10 +13,10 @@ fun main(args: Array<String>) {
     val inputFiles = cli.argList
     val outputFolder = cli.getOptionValue("o")
 
-    val files = inputFiles.map(::File)
-    val compiler = Compiler()
-    val (module, classSymbolTable) = compiler.compile(files)
+    val context = CompilationContext()
 
-    val bundleGenerator = BundleGenerator()
-    bundleGenerator.generateBundle(module, files, File(outputFolder), classSymbolTable)
+    val files = inputFiles.map(::File)
+    val (module, classSymbolTable) = context.compiler.compile(files)
+
+    context.bundleGenerator.generateBundle(module, files, File(outputFolder), classSymbolTable)
 }

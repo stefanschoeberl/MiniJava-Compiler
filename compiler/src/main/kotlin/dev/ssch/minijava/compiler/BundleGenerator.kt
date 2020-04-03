@@ -6,10 +6,10 @@ import dev.ssch.minijava.wasm.WebAssemblyModuleGenerator
 import dev.ssch.minijava.wasm.ast.Module
 import java.io.File
 
-class BundleGenerator {
-
-    private val moduleGenerator = WebAssemblyModuleGenerator()
-    private val assembler = WebAssemblyAssembler()
+class BundleGenerator (
+    private val moduleGenerator: WebAssemblyModuleGenerator,
+    private val assembler: WebAssemblyAssembler
+) {
 
     fun generateBundle(module: Module, src: List<File>, outputFolder: File, classSymbolTable: ClassSymbolTable) {
         outputFolder.mkdirs()

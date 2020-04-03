@@ -1,46 +1,50 @@
 package dev.ssch.minijava.compiler.codegeneration
 
-import dev.ssch.minijava.compiler.CodeGenerationPhase
+import dev.ssch.minijava.compiler.CodeEmitter
 import dev.ssch.minijava.compiler.DataType
 import dev.ssch.minijava.compiler.exception.IncompatibleTypeException
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.wasm.ast.Instruction
 
-class IfElseStatementCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
+class IfElseStatementCodeGenerator (
+    private val codeEmitter: CodeEmitter,
+    private val statementCodeGenerator: StatementCodeGenerator,
+    private val expressionCodeGenerator: ExpressionCodeGenerator
+) {
 
     fun generateExecution(ctx: MiniJavaParser.CompleteIfElseStmtContext) {
         generateIfElse(ctx.condition, {
-            codeGenerationPhase.statementCodeGenerator.generateExecution(ctx.thenbranch)
+            statementCodeGenerator.generateExecution(ctx.thenbranch)
         }, {
-            codeGenerationPhase.statementCodeGenerator.generateExecution(ctx.elsebranch)
+            statementCodeGenerator.generateExecution(ctx.elsebranch)
         })
     }
 
     fun generateExecution(ctx: MiniJavaParser.IncompleteIfStmtContext) {
         generateIfElse(ctx.condition, {
-            codeGenerationPhase.statementCodeGenerator.generateExecution(ctx.thenbranch)
+            statementCodeGenerator.generateExecution(ctx.thenbranch)
         })
     }
 
     fun generateExecution(ctx: MiniJavaParser.IncompleteIfElseStmtContext) {
         generateIfElse(ctx.condition, {
-            codeGenerationPhase.statementCodeGenerator.generateExecution(ctx.thenbranch)
+            statementCodeGenerator.generateExecution(ctx.thenbranch)
         }, {
-            codeGenerationPhase.statementCodeGenerator.generateExecution(ctx.elsebranch)
+            statementCodeGenerator.generateExecution(ctx.elsebranch)
         })
     }
 
     private fun generateIfElse(condition: MiniJavaParser.ExprContext, thenbranch: () -> Unit, elsebranch: (() -> Unit)? = null) {
-        val conditionType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(condition)
+        val conditionType = expressionCodeGenerator.generateEvaluation(condition)
         if (conditionType != DataType.PrimitiveType.Boolean) {
             throw IncompatibleTypeException(DataType.PrimitiveType.Boolean, conditionType, condition.getStart())
         }
-        codeGenerationPhase.emitInstruction(Instruction._if)
+        codeEmitter.emitInstruction(Instruction._if)
         thenbranch()
         if (elsebranch != null) {
-            codeGenerationPhase.emitInstruction(Instruction._else)
+            codeEmitter.emitInstruction(Instruction._else)
             elsebranch()
         }
-        codeGenerationPhase.emitInstruction(Instruction.end)
+        codeEmitter.emitInstruction(Instruction.end)
     }
 }

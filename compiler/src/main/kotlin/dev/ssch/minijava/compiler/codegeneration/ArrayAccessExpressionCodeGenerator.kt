@@ -1,19 +1,24 @@
 package dev.ssch.minijava.compiler.codegeneration
 
-import dev.ssch.minijava.compiler.CodeGenerationPhase
+import dev.ssch.minijava.compiler.BuiltinFunctions
+import dev.ssch.minijava.compiler.CodeEmitter
 import dev.ssch.minijava.compiler.DataType
 import dev.ssch.minijava.compiler.exception.ExpressionIsNotAnArrayException
 import dev.ssch.minijava.compiler.exception.IncompatibleTypeException
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.wasm.ast.Instruction
 
-class ArrayAccessExpressionCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
+class ArrayAccessExpressionCodeGenerator (
+    private val codeEmitter: CodeEmitter,
+    private val expressionCodeGenerator: ExpressionCodeGenerator,
+    private val builtinFunctions: BuiltinFunctions
+) {
 
     fun generateArrayAndIndexAddressesAndReturnElementType(ctx: MiniJavaParser.ArrayAccessExprContext): DataType {
-        val arrayType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.array)
+        val arrayType = expressionCodeGenerator.generateEvaluation(ctx.array)
                 as? DataType.Array ?: throw ExpressionIsNotAnArrayException(ctx.array.start)
 
-        val indexType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.index)
+        val indexType = expressionCodeGenerator.generateEvaluation(ctx.index)
         if (indexType != DataType.PrimitiveType.Integer) {
             throw IncompatibleTypeException(DataType.PrimitiveType.Integer, indexType, ctx.index.start)
         }
@@ -23,15 +28,15 @@ class ArrayAccessExpressionCodeGenerator(private val codeGenerationPhase: CodeGe
     fun generateEvaluation(ctx: MiniJavaParser.ArrayAccessExprContext): DataType {
         val elementType = generateArrayAndIndexAddressesAndReturnElementType(ctx)
         val address = when (elementType) {
-            DataType.PrimitiveType.Integer -> codeGenerationPhase.getArrayPrimitiveIntAddress
-            DataType.PrimitiveType.Float -> codeGenerationPhase.getArrayPrimitiveFloatAddress
-            DataType.PrimitiveType.Boolean -> codeGenerationPhase.getArrayPrimitiveBooleanAddress
-            DataType.PrimitiveType.Char -> codeGenerationPhase.getArrayPrimitiveCharAddress
-            is DataType.ReferenceType -> codeGenerationPhase.getArrayReferenceAddress
+            DataType.PrimitiveType.Integer -> builtinFunctions.getArrayPrimitiveIntAddress
+            DataType.PrimitiveType.Float -> builtinFunctions.getArrayPrimitiveFloatAddress
+            DataType.PrimitiveType.Boolean -> builtinFunctions.getArrayPrimitiveBooleanAddress
+            DataType.PrimitiveType.Char -> builtinFunctions.getArrayPrimitiveCharAddress
+            is DataType.ReferenceType -> builtinFunctions.getArrayReferenceAddress
             else -> TODO()
         }
 
-        codeGenerationPhase.emitInstruction(Instruction.call(address))
+        codeEmitter.emitInstruction(Instruction.call(address))
         return elementType
     }
 }

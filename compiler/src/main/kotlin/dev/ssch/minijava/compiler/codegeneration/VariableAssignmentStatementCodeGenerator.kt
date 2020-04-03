@@ -1,6 +1,7 @@
 package dev.ssch.minijava.compiler.codegeneration
 
-import dev.ssch.minijava.compiler.CodeGenerationPhase
+import dev.ssch.minijava.compiler.BuiltinFunctions
+import dev.ssch.minijava.compiler.CodeEmitter
 import dev.ssch.minijava.compiler.DataType
 import dev.ssch.minijava.compiler.assignTypeTo
 import dev.ssch.minijava.compiler.exception.IncompatibleAssignmentException
@@ -10,14 +11,19 @@ import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.wasm.ast.Instruction
 import org.antlr.v4.runtime.Token
 
-class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: CodeGenerationPhase) {
+class VariableAssignmentStatementCodeGenerator (
+    private val codeEmitter: CodeEmitter,
+    private val expressionCodeGenerator: ExpressionCodeGenerator,
+    private val arrayAccessExpressionCodeGenerator: ArrayAccessExpressionCodeGenerator,
+    private val builtinFunctions: BuiltinFunctions
+) {
 
-    fun checkAndConvertAssigment(leftType: DataType?, rightType: DataType?, token: Token) {
+    private fun checkAndConvertAssigment(leftType: DataType?, rightType: DataType?, token: Token) {
         val conversionCode = leftType?.let {
             rightType?.assignTypeTo(it)
         } ?: throw IncompatibleAssignmentException(leftType, rightType, token)
 
-        codeGenerationPhase.emitInstructions(conversionCode)
+        codeEmitter.emitInstructions(conversionCode)
     }
 
     fun generateExecution(ctx: MiniJavaParser.VarassignStmtContext) {
@@ -25,18 +31,18 @@ class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: 
             is MiniJavaParser.IdExprContext -> {
                 val name = left.IDENT().text
 
-                val localsVariableSymbolTable = codeGenerationPhase.localsVariableSymbolTable
+                val localsVariableSymbolTable = codeEmitter.localsVariableSymbolTable
 
                 when {
                     localsVariableSymbolTable.isDeclared(name) -> {
-                        val rightType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
-                        checkAndConvertAssigment(codeGenerationPhase.localsVariableSymbolTable.typeOf(name), rightType, ctx.left.start)
-                        codeGenerationPhase.emitInstruction(Instruction.local_set(codeGenerationPhase.localsVariableSymbolTable.addressOf(name)))
+                        val rightType = expressionCodeGenerator.generateEvaluation(ctx.right)
+                        checkAndConvertAssigment(codeEmitter.localsVariableSymbolTable.typeOf(name), rightType, ctx.left.start)
+                        codeEmitter.emitInstruction(Instruction.local_set(codeEmitter.localsVariableSymbolTable.addressOf(name)))
                     }
                     localsVariableSymbolTable.doesThisParameterExist() -> {
-                        codeGenerationPhase.memberAccessExpressionCodeGenerator.generateWrite(name, ctx.right, ctx.left.start) {
-                            codeGenerationPhase.emitInstruction(Instruction.local_get(localsVariableSymbolTable.addressOfThis()))
-                            DataType.ReferenceType(codeGenerationPhase.currentClass)
+                        generateWrite(name, ctx.right, ctx.left.start) {
+                            codeEmitter.emitInstruction(Instruction.local_get(localsVariableSymbolTable.addressOfThis()))
+                            DataType.ReferenceType(codeEmitter.currentClass)
                         }
                     }
                     else -> throw UndefinedVariableException(name, left.IDENT().symbol)
@@ -44,26 +50,45 @@ class VariableAssignmentStatementCodeGenerator(private val codeGenerationPhase: 
                 }
             }
             is MiniJavaParser.ArrayAccessExprContext -> {
-                val elementType = codeGenerationPhase.arrayAccessExpressionCodeGeneration.generateArrayAndIndexAddressesAndReturnElementType(left)
+                val elementType = arrayAccessExpressionCodeGenerator.generateArrayAndIndexAddressesAndReturnElementType(left)
 
-                val rightType = codeGenerationPhase.expressionCodeGenerator.generateEvaluation(ctx.right)
+                val rightType = expressionCodeGenerator.generateEvaluation(ctx.right)
                 checkAndConvertAssigment(elementType, rightType, ctx.left.start)
 
                 val address = when (elementType) {
-                    DataType.PrimitiveType.Integer -> codeGenerationPhase.setArrayPrimitiveIntAddress
-                    DataType.PrimitiveType.Float -> codeGenerationPhase.setArrayPrimitiveFloatAddress
-                    DataType.PrimitiveType.Boolean -> codeGenerationPhase.setArrayPrimitiveBooleanAddress
-                    DataType.PrimitiveType.Char -> codeGenerationPhase.setArrayPrimitiveCharAddress
-                    is DataType.ReferenceType -> codeGenerationPhase.setArrayReferenceAddress
+                    DataType.PrimitiveType.Integer -> builtinFunctions.setArrayPrimitiveIntAddress
+                    DataType.PrimitiveType.Float -> builtinFunctions.setArrayPrimitiveFloatAddress
+                    DataType.PrimitiveType.Boolean -> builtinFunctions.setArrayPrimitiveBooleanAddress
+                    DataType.PrimitiveType.Char -> builtinFunctions.setArrayPrimitiveCharAddress
+                    is DataType.ReferenceType -> builtinFunctions.setArrayReferenceAddress
                     else -> TODO()
                 }
 
-                codeGenerationPhase.emitInstruction(Instruction.call(address))
+                codeEmitter.emitInstruction(Instruction.call(address))
             }
             is MiniJavaParser.MemberExprContext -> {
-                codeGenerationPhase.memberAccessExpressionCodeGenerator.generateWrite(left, ctx.right)
+                generateWrite(left, ctx.right)
             }
             else -> throw InvalidAssignmentException(left.start)
         }
+    }
+
+    private fun generateWrite(ctx: MiniJavaParser.MemberExprContext, right: MiniJavaParser.ExprContext) {
+        val fieldName = ctx.right.text
+        generateWrite(fieldName, right, ctx.right) {
+            expressionCodeGenerator.generateEvaluation(ctx.left)
+        }
+    }
+
+    private fun generateWrite(fieldName: String, right: MiniJavaParser.ExprContext, token: Token, objectAddressCode: () -> DataType?) {
+        val objType = objectAddressCode() as? DataType.ReferenceType ?: TODO()
+
+        val field = codeEmitter.classSymbolTable
+            .getFieldSymbolTable(objType.name)
+            .findFieldInfo(fieldName) ?: TODO()
+
+        val rightType = expressionCodeGenerator.generateEvaluation(right)
+        checkAndConvertAssigment(field.type, rightType, token)
+        codeEmitter.emitInstruction(Instruction.call(field.setterAddress))
     }
 }
