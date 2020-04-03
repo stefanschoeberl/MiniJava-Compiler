@@ -8,9 +8,10 @@ class CompilationContext {
 
     val webAssemblyAssembler = WebAssemblyAssembler()
     val webAssemblyModuleGenerator = WebAssemblyModuleGenerator()
+    val externalFunctionNameProvider = ExternalFunctionNameProvider()
 
     val declarationPhase = DeclarationPhase()
-    val bundleGenerator = BundleGenerator(webAssemblyModuleGenerator, webAssemblyAssembler)
+    val bundleGenerator = BundleGenerator(webAssemblyModuleGenerator, webAssemblyAssembler, externalFunctionNameProvider)
 
     val builtinFunctions = BuiltinFunctions()
 
@@ -24,7 +25,8 @@ class CompilationContext {
     val codeGenerationPhase = ModuleCodeGenerator(
         classCodeGenerator,
         codeEmitter,
-        builtinFunctions
+        builtinFunctions,
+        externalFunctionNameProvider
     )
     val compiler = Compiler(declarationPhase, codeGenerationPhase)
 

@@ -1,7 +1,6 @@
 package dev.ssch.minijava.compiler
 
 import dev.ssch.minijava.compiler.symboltable.ClassSymbolTable
-import dev.ssch.minijava.compiler.symboltable.MethodSymbolTable
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.wasm.ast.Instruction
 import dev.ssch.minijava.wasm.ast.ValueType
@@ -83,20 +82,4 @@ fun DataType.castTypeTo(other: DataType): List<Instruction>? {
     } else {
         dataTypeCastingConversions[Pair(this, other)]
     }
-}
-
-fun MethodSymbolTable.MethodSignature.externalName(): String {
-    return this.name + this.parameterTypes.joinToString("") { "#$it" }
-}
-
-fun externalConstructorName(className: String): String {
-    return "new_$className"
-}
-
-fun externalGetterName(className: String, fieldName: String): String {
-    return "get_$className.$fieldName"
-}
-
-fun externalSetterName(className: String, fieldName: String): String {
-    return "set_$className.$fieldName"
 }

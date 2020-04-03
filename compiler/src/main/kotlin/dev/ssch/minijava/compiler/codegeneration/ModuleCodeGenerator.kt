@@ -1,9 +1,12 @@
 package dev.ssch.minijava.compiler.codegeneration
 
-import dev.ssch.minijava.compiler.*
+import dev.ssch.minijava.compiler.BuiltinFunctions
+import dev.ssch.minijava.compiler.CodeEmitter
+import dev.ssch.minijava.compiler.ExternalFunctionNameProvider
 import dev.ssch.minijava.compiler.symboltable.ClassSymbolTable
 import dev.ssch.minijava.compiler.symboltable.InitializerSymbolTable
 import dev.ssch.minijava.compiler.symboltable.MethodSymbolTable
+import dev.ssch.minijava.compiler.toWebAssemblyType
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.wasm.ast.FuncType
 import dev.ssch.minijava.wasm.ast.Module
@@ -12,7 +15,8 @@ import dev.ssch.minijava.wasm.ast.ValueType
 class ModuleCodeGenerator (
     private val classCodeGenerator: ClassCodeGenerator,
     private val codeEmitter: CodeEmitter,
-    private val builtinFunctions: BuiltinFunctions
+    private val builtinFunctions: BuiltinFunctions,
+    private val externalFunctionNameProvider: ExternalFunctionNameProvider
 ) {
 
     fun generateModule(classSymbolTable: ClassSymbolTable, trees: List<MiniJavaParser.MinijavaContext>): Module {
@@ -66,7 +70,7 @@ class ModuleCodeGenerator (
 
             codeEmitter.importFunction(
                 "imports",
-                "$className.${methodSignature.externalName()}",
+                "$className.${externalFunctionNameProvider.externalNameForMethod(methodSignature)}",
                 createFunctionType(methodSignature, methodInfo)
             )
         }
@@ -79,7 +83,7 @@ class ModuleCodeGenerator (
                 val className = it.key
                 codeEmitter.importFunction(
                     "imports",
-                    externalConstructorName(className),
+                    externalFunctionNameProvider.externalNameForConstructor(className),
                     FuncType(mutableListOf(), mutableListOf(ValueType.I32))
                 )
             }
@@ -97,13 +101,13 @@ class ModuleCodeGenerator (
 
             codeEmitter.importFunction(
                 "imports",
-                externalGetterName(className, fieldName),
+                externalFunctionNameProvider.externalNameForGetter(className, fieldName),
                 FuncType(mutableListOf(ValueType.I32), mutableListOf(fieldType))
             )
 
             codeEmitter.importFunction(
                 "imports",
-                externalSetterName(className, fieldName),
+                externalFunctionNameProvider.externalNameForSetter(className, fieldName),
                 FuncType(mutableListOf(ValueType.I32, fieldType), mutableListOf())
             )
         }
@@ -126,8 +130,8 @@ class ModuleCodeGenerator (
                 codeEmitter.mapMethodToFunction(className, methodSignature, function)
 
                 if (methodInfo.isPublic) {
-                    codeEmitter.exportFunction("$className.${methodSignature.externalName()}", methodInfo.address)
-
+                    val externalName = externalFunctionNameProvider.externalNameForMethod(methodSignature)
+                    codeEmitter.exportFunction("$className.$externalName", methodInfo.address)
                 }
             }
     }

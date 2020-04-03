@@ -8,7 +8,8 @@ import java.io.File
 
 class BundleGenerator (
     private val moduleGenerator: WebAssemblyModuleGenerator,
-    private val assembler: WebAssemblyAssembler
+    private val assembler: WebAssemblyAssembler,
+    private val externalFunctionNameProvider: ExternalFunctionNameProvider
 ) {
 
     fun generateBundle(module: Module, src: List<File>, outputFolder: File, classSymbolTable: ClassSymbolTable) {
@@ -54,11 +55,11 @@ class BundleGenerator (
                 "\"${field.key}\":$initValue"
             }
 
-            val constructor = externalConstructorName(className)
+            val constructor = externalFunctionNameProvider.externalNameForConstructor(className)
             functions.add("\"$constructor\": function() { return runtime.wasmRef({$initObject}); }")
             fields.forEach { field ->
-                val getter = externalGetterName(className, field.key)
-                val setter = externalSetterName(className, field.key)
+                val getter = externalFunctionNameProvider.externalNameForGetter(className, field.key)
+                val setter = externalFunctionNameProvider.externalNameForSetter(className, field.key)
                 val type = field.value.type
 
                 if (type is DataType.PrimitiveType.Boolean) {
