@@ -4,7 +4,6 @@ import dev.ssch.minijava.compiler.CodeEmitter
 import dev.ssch.minijava.compiler.DataType
 import dev.ssch.minijava.compiler.getDataType
 import dev.ssch.minijava.compiler.symboltable.InitializerSymbolTable
-import dev.ssch.minijava.compiler.symboltable.LocalVariableSymbolTable
 import dev.ssch.minijava.compiler.symboltable.MethodSymbolTable
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.wasm.ast.Instruction
@@ -16,16 +15,15 @@ class MethodCodeGenerator (
     fun generate(ctx: MiniJavaParser.MethodContext) {
         val methodName = ctx.name.text
 
-        val parameters = beginMethod(ctx.parameters)
+        val parameters = processFormalParameters(ctx.parameters)
         val parameterTypes = extractParameterTypes(parameters)
 
         if (codeEmitter.methodSymbolTable.isNative(methodName, parameterTypes)) {
             return
         }
 
+        codeEmitter.switchToMethod(MethodSymbolTable.MethodSignature(methodName, parameterTypes))
         declareParameters(!codeEmitter.methodSymbolTable.isStatic(methodName, parameterTypes), parameters)
-
-        codeEmitter.beginMethodGeneration(MethodSymbolTable.MethodSignature(methodName, parameterTypes))
 
         generateStatementExecution(ctx.statements)
 
@@ -38,20 +36,18 @@ class MethodCodeGenerator (
     }
 
     fun generate(ctx: MiniJavaParser.ConstructorContext) {
-        val parameters = beginMethod(ctx.parameters)
+        val parameters = processFormalParameters(ctx.parameters)
         val parameterTypes = extractParameterTypes(parameters)
-        declareParameters(true, parameters)
 
-        codeEmitter.beginInitializerGeneration(InitializerSymbolTable.InitializerSignature(parameterTypes))
+        codeEmitter.switchToInitializer(InitializerSymbolTable.InitializerSignature(parameterTypes))
+        declareParameters(true, parameters)
 
         generateStatementExecution(ctx.statements)
         codeEmitter.emitInstruction(Instruction.local_get(codeEmitter.localsVariableSymbolTable.addressOfThis()))
         codeEmitter.generateLocalVariables()
     }
 
-    private fun beginMethod(parameters: List<MiniJavaParser.FormalParameterContext>): List<Pair<String, DataType>> {
-        // reset scope
-        codeEmitter.localsVariableSymbolTable = LocalVariableSymbolTable()
+    private fun processFormalParameters(parameters: List<MiniJavaParser.FormalParameterContext>): List<Pair<String, DataType>> {
         return parameters.map { Pair(it.name.text, it.type.getDataType(codeEmitter.classSymbolTable)!!) }
     }
 

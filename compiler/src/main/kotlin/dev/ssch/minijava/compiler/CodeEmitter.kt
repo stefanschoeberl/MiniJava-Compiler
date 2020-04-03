@@ -10,11 +10,15 @@ import dev.ssch.minijava.wasm.ast.Function
 class CodeEmitter {
 
     lateinit var classSymbolTable: ClassSymbolTable
+        private set
     lateinit var methodSymbolTable: MethodSymbolTable
+        private set
     lateinit var localsVariableSymbolTable: LocalVariableSymbolTable
+        private set
 
     private lateinit var module: Module
     lateinit var currentClass: String
+        private set
     private lateinit var currentFunction: Function
 
     private lateinit var functions: MutableMap<Pair<String, MethodSymbolTable.MethodSignature>, Function>
@@ -44,14 +48,6 @@ class CodeEmitter {
 
     val nextInstructionAddress: Int
         get() = currentFunction.body.instructions.size
-
-    fun beginMethodGeneration(methodSignature: MethodSymbolTable.MethodSignature) {
-        currentFunction = functions[Pair(currentClass, methodSignature)]!!
-    }
-
-    fun beginInitializerGeneration(initializerSignature: InitializerSymbolTable.InitializerSignature) {
-        currentFunction = initializers[Pair(currentClass, initializerSignature)]!!
-    }
 
     fun generateLocalVariables() {
         currentFunction.locals.addAll(localsVariableSymbolTable.allLocalVariables.map(DataType::toWebAssemblyType))
@@ -97,5 +93,24 @@ class CodeEmitter {
 
     fun buildModule(): Module {
         return module
+    }
+
+    fun switchToClass(className: String) {
+        currentClass = className
+        methodSymbolTable = classSymbolTable.getMethodSymbolTable(currentClass)
+    }
+
+    fun switchToMethod(methodSignature: MethodSymbolTable.MethodSignature) {
+        resetScope()
+        currentFunction = functions[Pair(currentClass, methodSignature)]!!
+    }
+
+    fun switchToInitializer(initializerSignature: InitializerSymbolTable.InitializerSignature) {
+        resetScope()
+        currentFunction = initializers[Pair(currentClass, initializerSignature)]!!
+    }
+
+    private fun resetScope() {
+        localsVariableSymbolTable = LocalVariableSymbolTable()
     }
 }

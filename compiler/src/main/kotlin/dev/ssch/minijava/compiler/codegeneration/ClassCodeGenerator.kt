@@ -22,8 +22,7 @@ class ClassCodeGenerator (
     }
 
     fun generate(ctx: MiniJavaParser.JavaclassContext) {
-        codeEmitter.currentClass = ctx.name.text
-        codeEmitter.methodSymbolTable = codeEmitter.classSymbolTable.getMethodSymbolTable(codeEmitter.currentClass)
+        codeEmitter.switchToClass(ctx.name.text)
         visitor.visitChildren(ctx)
     }
 }
