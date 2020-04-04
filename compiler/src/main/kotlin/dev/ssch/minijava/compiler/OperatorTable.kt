@@ -77,9 +77,29 @@ class OperatorTable (
         MiniJavaParser.NEQ to Pair(Instruction.i32_ne, DataType.PrimitiveType.Boolean)
     )
 
+    private val stringOperations = hashMapOf(
+        Pair(DataType.ReferenceType.StringType, DataType.ReferenceType.StringType) to { builtinFunctions.concatStringStringAddress },
+        Pair(DataType.ReferenceType.StringType, DataType.PrimitiveType.Integer) to { builtinFunctions.concatStringIntAddress },
+        Pair(DataType.PrimitiveType.Integer, DataType.ReferenceType.StringType) to { builtinFunctions.concatIntStringAddress },
+        Pair(DataType.ReferenceType.StringType, DataType.PrimitiveType.Float) to { builtinFunctions.concatStringFloatAddress },
+        Pair(DataType.PrimitiveType.Float, DataType.ReferenceType.StringType) to { builtinFunctions.concatFloatStringAddress },
+        Pair(DataType.ReferenceType.StringType, DataType.PrimitiveType.Boolean) to { builtinFunctions.concatStringBooleanAddress },
+        Pair(DataType.PrimitiveType.Boolean, DataType.ReferenceType.StringType) to { builtinFunctions.concatBooleanStringAddress },
+        Pair(DataType.ReferenceType.StringType, DataType.PrimitiveType.Char) to { builtinFunctions.concatStringCharAddress },
+        Pair(DataType.PrimitiveType.Char, DataType.ReferenceType.StringType) to { builtinFunctions.concatCharStringAddress },
+        Pair(DataType.ReferenceType.StringType, DataType.NullType) to { builtinFunctions.concatStringReferenceAddress },
+        Pair(DataType.NullType, DataType.ReferenceType.StringType) to { builtinFunctions.concatReferenceStringAddress }
+    )
+
     fun findBinaryOperation(left: DataType?, right: DataType?, op: Token): BinaryOperation? {
-        return if (left == DataType.ReferenceType.StringType && right == DataType.ReferenceType.StringType) {
-            return BinaryOperation(null, null, Instruction.call(builtinFunctions.concatStringStringAddress), DataType.ReferenceType.StringType)
+        return if (left == DataType.ReferenceType.StringType || right == DataType.ReferenceType.StringType) {
+            val predefinedOperationAddress = stringOperations[Pair(left, right)]
+            val instructionAddress = when {
+                predefinedOperationAddress != null -> predefinedOperationAddress()
+                left != DataType.ReferenceType.StringType -> builtinFunctions.concatReferenceStringAddress
+                else -> builtinFunctions.concatStringReferenceAddress
+            }
+            BinaryOperation(null, null, Instruction.call(instructionAddress), DataType.ReferenceType.StringType)
         } else if (numericTypes.contains(left) && numericTypes.contains(right)) {
             if (left == DataType.PrimitiveType.Float || right == DataType.PrimitiveType.Float) {
                 floatOperations[op.type]?.let {

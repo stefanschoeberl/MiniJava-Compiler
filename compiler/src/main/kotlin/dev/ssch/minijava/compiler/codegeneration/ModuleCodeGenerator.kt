@@ -59,6 +59,16 @@ class ModuleCodeGenerator (
         builtinFunctions.setArrayReferenceAddress = importInternal("set_array_reference", mutableListOf(ValueType.I32, ValueType.I32, ValueType.I32), mutableListOf())
 
         builtinFunctions.concatStringStringAddress = importInternal("+_String_String", mutableListOf(ValueType.I32, ValueType.I32), mutableListOf(ValueType.I32))
+        builtinFunctions.concatStringIntAddress = importInternal("+_String_numeric", mutableListOf(ValueType.I32, ValueType.I32), mutableListOf(ValueType.I32))
+        builtinFunctions.concatIntStringAddress = importInternal("+_numeric_String", mutableListOf(ValueType.I32, ValueType.I32), mutableListOf(ValueType.I32))
+        builtinFunctions.concatStringFloatAddress = importInternal("+_String_numeric", mutableListOf(ValueType.I32, ValueType.F32), mutableListOf(ValueType.I32))
+        builtinFunctions.concatFloatStringAddress = importInternal("+_numeric_String", mutableListOf(ValueType.F32, ValueType.I32), mutableListOf(ValueType.I32))
+        builtinFunctions.concatStringBooleanAddress = importInternal("+_String_boolean", mutableListOf(ValueType.I32, ValueType.I32), mutableListOf(ValueType.I32))
+        builtinFunctions.concatBooleanStringAddress = importInternal("+_boolean_String", mutableListOf(ValueType.I32, ValueType.I32), mutableListOf(ValueType.I32))
+        builtinFunctions.concatStringCharAddress = importInternal("+_String_char", mutableListOf(ValueType.I32, ValueType.I32), mutableListOf(ValueType.I32))
+        builtinFunctions.concatCharStringAddress = importInternal("+_char_String", mutableListOf(ValueType.I32, ValueType.I32), mutableListOf(ValueType.I32))
+        builtinFunctions.concatStringReferenceAddress = importInternal("+_String_reference", mutableListOf(ValueType.I32, ValueType.I32), mutableListOf(ValueType.I32))
+        builtinFunctions.concatReferenceStringAddress = importInternal("+_reference_String", mutableListOf(ValueType.I32, ValueType.I32), mutableListOf(ValueType.I32))
     }
 
     private fun importNativeMethods() {

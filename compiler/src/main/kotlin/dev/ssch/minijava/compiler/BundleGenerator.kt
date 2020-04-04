@@ -39,7 +39,6 @@ class BundleGenerator (
         exports.add(generateObjectHelper(classSymbolTable))
         exports.add(0, generateStringLiterals(stringLiteralSymbolTable))
         val content = "module.exports = [${exports.joinToString()}];"
-        println(content)
         val moduleJS = File(outputFolder, "module.js")
         moduleJS.writeText(content)
     }

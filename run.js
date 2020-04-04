@@ -105,6 +105,44 @@ async function runModule(folder) {
                 const s2 = runtime.wasmDeref(stringRef2);
                 return runtime.wasmRef(s1.concat(s2));
             },
+            "+_String_numeric": (stringRef, value) => {
+                const s = runtime.wasmDeref(stringRef);
+                return runtime.wasmRef(s.concat(value.toString()));
+            },
+            "+_numeric_String": (value, stringRef) => {
+                const s = runtime.wasmDeref(stringRef);
+                return runtime.wasmRef(value.toString().concat(s));
+            },
+            "+_String_boolean": (stringRef, value) => {
+                const s = runtime.wasmDeref(stringRef);
+                const v = runtime.wasmBoolean(value);
+                return runtime.wasmRef(s.concat(v.toString()));
+            },
+            "+_boolean_String": (value, stringRef) => {
+                const s = runtime.wasmDeref(stringRef);
+                const v = runtime.wasmBoolean(value);
+                return runtime.wasmRef(v.toString().concat(s));
+            },
+            "+_String_char": (stringRef, value) => {
+                const s = runtime.wasmDeref(stringRef);
+                const v = runtime.wasmToChar(value);
+                return runtime.wasmRef(s.concat(v));
+            },
+            "+_char_String": (value, stringRef) => {
+                const s = runtime.wasmDeref(stringRef);
+                const v = runtime.wasmToChar(value);
+                return runtime.wasmRef(v.concat(s));
+            },
+            "+_String_reference": (stringRef, ref) => {
+                const s = runtime.wasmDeref(stringRef);
+                const o = runtime.wasmDeref(ref);
+                return runtime.wasmRef(s.concat(o == null ? "null" : "Object@" + ref));
+            },
+            "+_reference_String": (ref, stringRef) => {
+                const s = runtime.wasmDeref(stringRef);
+                const o = runtime.wasmDeref(ref);
+                return runtime.wasmRef((o == null ? "null" : "Object@" + ref).concat(s));
+            },
         },
         imports: nativeMethods
     };
