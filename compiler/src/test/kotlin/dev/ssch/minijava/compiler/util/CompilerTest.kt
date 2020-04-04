@@ -84,9 +84,9 @@ abstract class CompilerTest {
                 .forEach { allSourceFiles.add(it) }
         }
 
-        val (module, classSymbolTable, stringLiteralSymbolTable) = context.compiler.compile(allSourceFiles)
+        val bundle = context.compiler.compile(allSourceFiles)
 
-        context.bundleGenerator.generateBundle(module, allSourceFiles, wasmOutput, classSymbolTable, stringLiteralSymbolTable)
+        context.bundleGenerator.generateBundle(bundle, allSourceFiles, wasmOutput)
 
         val runner = WebAssemblyRunner()
         return runner.run(wasmOutput.absolutePath)

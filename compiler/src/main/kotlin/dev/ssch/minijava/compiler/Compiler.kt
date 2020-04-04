@@ -1,11 +1,8 @@
 package dev.ssch.minijava.compiler
 
 import dev.ssch.minijava.compiler.codegeneration.ModuleCodeGenerator
-import dev.ssch.minijava.compiler.symboltable.ClassSymbolTable
-import dev.ssch.minijava.compiler.symboltable.StringLiteralSymbolTable
 import dev.ssch.minijava.grammar.MiniJavaLexer
 import dev.ssch.minijava.grammar.MiniJavaParser
-import dev.ssch.minijava.wasm.ast.Module
 import org.antlr.v4.runtime.BailErrorStrategy
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
@@ -16,7 +13,7 @@ class Compiler (
     private val moduleCodeGenerator: ModuleCodeGenerator
 ) {
 
-    fun compile(src: List<File>): Triple<Module, ClassSymbolTable, StringLiteralSymbolTable> {
+    fun compile(src: List<File>): Bundle {
 
         val trees = src.map { file ->
             val input = CharStreams.fromStream(file.inputStream())
@@ -29,7 +26,7 @@ class Compiler (
 
         val classSymbolTable = declarationPhase.generateClassSymbolTable(trees)
         val (module, stringLiteralSymbolTable) = moduleCodeGenerator.generateModule(classSymbolTable, trees)
-        return Triple(module, classSymbolTable, stringLiteralSymbolTable)
+        return Bundle(module, classSymbolTable, stringLiteralSymbolTable)
     }
 
 }

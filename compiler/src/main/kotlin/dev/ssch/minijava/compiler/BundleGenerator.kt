@@ -4,7 +4,6 @@ import dev.ssch.minijava.compiler.symboltable.ClassSymbolTable
 import dev.ssch.minijava.compiler.symboltable.StringLiteralSymbolTable
 import dev.ssch.minijava.wasm.WebAssemblyAssembler
 import dev.ssch.minijava.wasm.WebAssemblyModuleGenerator
-import dev.ssch.minijava.wasm.ast.Module
 import java.io.File
 
 class BundleGenerator (
@@ -13,10 +12,10 @@ class BundleGenerator (
     private val externalFunctionNameProvider: ExternalFunctionNameProvider
 ) {
 
-    fun generateBundle(module: Module, src: List<File>, outputFolder: File, classSymbolTable: ClassSymbolTable, stringLiteralSymbolTable: StringLiteralSymbolTable) {
+    fun generateBundle(bundle: Bundle, src: List<File>, outputFolder: File) {
         outputFolder.mkdirs()
         val wat = File(outputFolder, "module.wat")
-        val watText = moduleGenerator.toSExpr(module)
+        val watText = moduleGenerator.toSExpr(bundle.module)
         wat.writeText(watText)
 
         val wasm = File(outputFolder, "module.wasm")
@@ -26,7 +25,7 @@ class BundleGenerator (
         nativeFolder.mkdir()
 
         val scriptFiles = copyScriptFiles(src, nativeFolder)
-        generateModuleJS(outputFolder, nativeFolder, scriptFiles, classSymbolTable, stringLiteralSymbolTable)
+        generateModuleJS(outputFolder, nativeFolder, scriptFiles, bundle.classSymbolTable, bundle.stringLiteralSymbolTable)
     }
 
     private fun generateModuleJS(

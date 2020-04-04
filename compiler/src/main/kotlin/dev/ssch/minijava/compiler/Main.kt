@@ -16,7 +16,7 @@ fun main(args: Array<String>) {
     val context = CompilationContext()
 
     val files = inputFiles.map(::File)
-    val (module, classSymbolTable, stringLiteralSymbolTable) = context.compiler.compile(files)
+    val bundle = context.compiler.compile(files)
 
-    context.bundleGenerator.generateBundle(module, files, File(outputFolder), classSymbolTable, stringLiteralSymbolTable)
+    context.bundleGenerator.generateBundle(bundle, files, File(outputFolder))
 }
