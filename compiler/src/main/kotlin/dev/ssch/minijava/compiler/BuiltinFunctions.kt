@@ -17,4 +17,6 @@ class BuiltinFunctions {
     var setArrayPrimitiveBooleanAddress: Int = -1
     var setArrayPrimitiveCharAddress: Int = -1
     var setArrayReferenceAddress: Int = -1
+
+    var concatStringStringAddress: Int = -1
 }

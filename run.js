@@ -100,6 +100,11 @@ async function runModule(folder) {
                 const a = runtime.wasmDeref(arrayAddress);
                 a[index] = runtime.wasmDeref(valueAddress);
             },
+            "+_String_String": (stringRef1, stringRef2) => {
+                const s1 = runtime.wasmDeref(stringRef1);
+                const s2 = runtime.wasmDeref(stringRef2);
+                return runtime.wasmRef(s1.concat(s2));
+            },
         },
         imports: nativeMethods
     };

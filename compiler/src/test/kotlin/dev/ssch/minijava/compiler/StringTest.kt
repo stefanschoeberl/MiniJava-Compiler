@@ -33,4 +33,22 @@ class StringTest : CompilerTest() {
         """.compileAndRunInMainFunction()
         assertThat(output.lines()).containsExactly("Hello", "world", "")
     }
+
+    @Test
+    fun `concat Strings 1`() {
+        val output = """
+            Console.println("Hello" + " " + "world");
+        """.compileAndRunInMainFunction()
+        assertThat(output.lines()).containsExactly("Hello world", "")
+    }
+
+    @Test
+    fun `concat Strings 2`() {
+        val output = """
+            String hello = "Hello";
+            String world = "world";
+            Console.println(hello + " " + world);
+        """.compileAndRunInMainFunction()
+        assertThat(output.lines()).containsExactly("Hello world", "")
+    }
 }

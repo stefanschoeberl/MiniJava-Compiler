@@ -30,7 +30,7 @@ class CompilationContext {
     )
     val compiler = Compiler(declarationPhase, codeGenerationPhase)
 
-    val operatorTable = OperatorTable()
+    val operatorTable = OperatorTable(builtinFunctions)
 
     val arrayAccessExpressionCodeGeneration = ArrayAccessExpressionCodeGenerator(codeEmitter, expressionCodeGenerator, builtinFunctions)
     val arrayCreationExpressionCodeGenerator = ArrayCreationExpressionCodeGenerator(codeEmitter, expressionCodeGenerator, builtinFunctions)

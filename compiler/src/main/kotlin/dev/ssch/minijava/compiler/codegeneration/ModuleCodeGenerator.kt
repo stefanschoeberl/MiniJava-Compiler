@@ -57,6 +57,8 @@ class ModuleCodeGenerator (
         builtinFunctions.setArrayPrimitiveBooleanAddress = importInternal("set_array_boolean", mutableListOf(ValueType.I32, ValueType.I32, ValueType.I32), mutableListOf())
         builtinFunctions.setArrayPrimitiveCharAddress = importInternal("set_array_char", mutableListOf(ValueType.I32, ValueType.I32, ValueType.I32), mutableListOf())
         builtinFunctions.setArrayReferenceAddress = importInternal("set_array_reference", mutableListOf(ValueType.I32, ValueType.I32, ValueType.I32), mutableListOf())
+
+        builtinFunctions.concatStringStringAddress = importInternal("+_String_String", mutableListOf(ValueType.I32, ValueType.I32), mutableListOf(ValueType.I32))
     }
 
     private fun importNativeMethods() {

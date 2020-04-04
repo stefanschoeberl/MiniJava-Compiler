@@ -4,7 +4,9 @@ import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.wasm.ast.Instruction
 import org.antlr.v4.runtime.Token
 
-class OperatorTable {
+class OperatorTable (
+    private val builtinFunctions: BuiltinFunctions
+) {
 
     data class BinaryOperation (
         val leftPromotion: Instruction?,
@@ -76,7 +78,9 @@ class OperatorTable {
     )
 
     fun findBinaryOperation(left: DataType?, right: DataType?, op: Token): BinaryOperation? {
-        return if (numericTypes.contains(left) && numericTypes.contains(right)) {
+        return if (left == DataType.ReferenceType.StringType && right == DataType.ReferenceType.StringType) {
+            return BinaryOperation(null, null, Instruction.call(builtinFunctions.concatStringStringAddress), DataType.ReferenceType.StringType)
+        } else if (numericTypes.contains(left) && numericTypes.contains(right)) {
             if (left == DataType.PrimitiveType.Float || right == DataType.PrimitiveType.Float) {
                 floatOperations[op.type]?.let {
                     BinaryOperation(floatPromotions[left], floatPromotions[right], it.first, it.second)
