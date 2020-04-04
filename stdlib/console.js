@@ -25,6 +25,9 @@ module.exports = function (runtime) {
         "Console.println#char": function(arg) {
             console.log(runtime.wasmToChar(arg))
         },
+        "Console.println#String": function(arg) {
+            console.log(runtime.wasmDeref(arg));
+        },
         "Console.println#int[]": writeArray,
         "Console.println#boolean[]": writeArray,
         "Console.println#float[]": writeArray,

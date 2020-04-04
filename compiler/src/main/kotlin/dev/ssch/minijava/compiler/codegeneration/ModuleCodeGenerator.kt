@@ -6,6 +6,7 @@ import dev.ssch.minijava.compiler.ExternalFunctionNameProvider
 import dev.ssch.minijava.compiler.symboltable.ClassSymbolTable
 import dev.ssch.minijava.compiler.symboltable.InitializerSymbolTable
 import dev.ssch.minijava.compiler.symboltable.MethodSymbolTable
+import dev.ssch.minijava.compiler.symboltable.StringLiteralSymbolTable
 import dev.ssch.minijava.compiler.toWebAssemblyType
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.wasm.ast.FuncType
@@ -19,7 +20,7 @@ class ModuleCodeGenerator (
     private val externalFunctionNameProvider: ExternalFunctionNameProvider
 ) {
 
-    fun generateModule(classSymbolTable: ClassSymbolTable, trees: List<MiniJavaParser.MinijavaContext>): Module {
+    fun generateModule(classSymbolTable: ClassSymbolTable, trees: List<MiniJavaParser.MinijavaContext>): Pair<Module, StringLiteralSymbolTable> {
         codeEmitter.initModule(classSymbolTable)
         buildModuleBaseStructure()
         trees.flatMap {it.javaclass()}.forEach(classCodeGenerator::generate)

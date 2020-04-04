@@ -61,6 +61,7 @@ expr: array=expr '[' index=expr ']'                                             
     | NULL                                                                          # NullExpr
     | THIS                                                                          # ThisExpr
     | CHAR                                                                          # CharExpr
+    | STRING                                                                        # StringExpr
     | value=(TRUE|FALSE)                                                            # BoolExpr
     | '(' expr ')'                                                                  # ParensExpr
     | 'new' type=typeDefinition '(' (parameters+=expr (',' parameters+=expr)*)? ')' # ClassInstanceCreationExpr
@@ -89,6 +90,7 @@ IDENT: [_a-zA-Z][_a-zA-Z0-9]*;
 FLOAT: [0-9]+ ('.' [0-9]*)? 'f';
 INT: [0-9]+;
 CHAR: '\'' . '\'';
+STRING: '"' .*? '"';
 WS: [ \t\r\n]+ -> skip;
 SINGLE_LINE_COMMENT: '//' .*? [\r\n]+ -> skip;
 MULTI_LINE_COMMENT: '/*' .*? '*/' -> skip;

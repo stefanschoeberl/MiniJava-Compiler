@@ -1,9 +1,6 @@
 package dev.ssch.minijava.compiler
 
-import dev.ssch.minijava.compiler.symboltable.ClassSymbolTable
-import dev.ssch.minijava.compiler.symboltable.InitializerSymbolTable
-import dev.ssch.minijava.compiler.symboltable.LocalVariableSymbolTable
-import dev.ssch.minijava.compiler.symboltable.MethodSymbolTable
+import dev.ssch.minijava.compiler.symboltable.*
 import dev.ssch.minijava.wasm.ast.*
 import dev.ssch.minijava.wasm.ast.Function
 
@@ -14,6 +11,8 @@ class CodeEmitter {
     lateinit var methodSymbolTable: MethodSymbolTable
         private set
     lateinit var localsVariableSymbolTable: LocalVariableSymbolTable
+        private set
+    lateinit var stringLiteralSymbolTable: StringLiteralSymbolTable
         private set
 
     private lateinit var module: Module
@@ -88,11 +87,12 @@ class CodeEmitter {
         module = Module()
         functions = mutableMapOf()
         initializers = mutableMapOf()
+        stringLiteralSymbolTable = StringLiteralSymbolTable()
         this.classSymbolTable = classSymbolTable
     }
 
-    fun buildModule(): Module {
-        return module
+    fun buildModule(): Pair<Module, StringLiteralSymbolTable> {
+        return Pair(module, stringLiteralSymbolTable)
     }
 
     fun switchToClass(className: String) {

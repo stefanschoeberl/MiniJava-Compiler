@@ -2,6 +2,7 @@ package dev.ssch.minijava.compiler
 
 import dev.ssch.minijava.compiler.codegeneration.ModuleCodeGenerator
 import dev.ssch.minijava.compiler.symboltable.ClassSymbolTable
+import dev.ssch.minijava.compiler.symboltable.StringLiteralSymbolTable
 import dev.ssch.minijava.grammar.MiniJavaLexer
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.wasm.ast.Module
@@ -15,7 +16,7 @@ class Compiler (
     private val moduleCodeGenerator: ModuleCodeGenerator
 ) {
 
-    fun compile(src: List<File>): Pair<Module, ClassSymbolTable> {
+    fun compile(src: List<File>): Triple<Module, ClassSymbolTable, StringLiteralSymbolTable> {
 
         val trees = src.map { file ->
             val input = CharStreams.fromStream(file.inputStream())
@@ -27,7 +28,8 @@ class Compiler (
         }
 
         val classSymbolTable = declarationPhase.generateClassSymbolTable(trees)
-        return Pair(moduleCodeGenerator.generateModule(classSymbolTable, trees), classSymbolTable)
+        val (module, stringLiteralSymbolTable) = moduleCodeGenerator.generateModule(classSymbolTable, trees)
+        return Triple(module, classSymbolTable, stringLiteralSymbolTable)
     }
 
 }

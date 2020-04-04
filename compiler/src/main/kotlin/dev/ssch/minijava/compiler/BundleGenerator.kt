@@ -1,6 +1,7 @@
 package dev.ssch.minijava.compiler
 
 import dev.ssch.minijava.compiler.symboltable.ClassSymbolTable
+import dev.ssch.minijava.compiler.symboltable.StringLiteralSymbolTable
 import dev.ssch.minijava.wasm.WebAssemblyAssembler
 import dev.ssch.minijava.wasm.WebAssemblyModuleGenerator
 import dev.ssch.minijava.wasm.ast.Module
@@ -12,7 +13,7 @@ class BundleGenerator (
     private val externalFunctionNameProvider: ExternalFunctionNameProvider
 ) {
 
-    fun generateBundle(module: Module, src: List<File>, outputFolder: File, classSymbolTable: ClassSymbolTable) {
+    fun generateBundle(module: Module, src: List<File>, outputFolder: File, classSymbolTable: ClassSymbolTable, stringLiteralSymbolTable: StringLiteralSymbolTable) {
         outputFolder.mkdirs()
         val wat = File(outputFolder, "module.wat")
         val watText = moduleGenerator.toSExpr(module)
@@ -25,13 +26,21 @@ class BundleGenerator (
         nativeFolder.mkdir()
 
         val scriptFiles = copyScriptFiles(src, nativeFolder)
-        generateModuleJS(outputFolder, nativeFolder, scriptFiles, classSymbolTable)
+        generateModuleJS(outputFolder, nativeFolder, scriptFiles, classSymbolTable, stringLiteralSymbolTable)
     }
 
-    private fun generateModuleJS(outputFolder: File, nativeFolder: File, scriptFiles: List<File>, classSymbolTable: ClassSymbolTable) {
+    private fun generateModuleJS(
+        outputFolder: File,
+        nativeFolder: File,
+        scriptFiles: List<File>,
+        classSymbolTable: ClassSymbolTable,
+        stringLiteralSymbolTable: StringLiteralSymbolTable
+    ) {
         val exports = scriptFiles.map { "require('./${nativeFolder.name}/${it.name}')" }.toMutableList()
         exports.add(generateObjectHelper(classSymbolTable))
+        exports.add(0, generateStringLiterals(stringLiteralSymbolTable))
         val content = "module.exports = [${exports.joinToString()}];"
+        println(content)
         val moduleJS = File(outputFolder, "module.js")
         moduleJS.writeText(content)
     }
@@ -82,7 +91,21 @@ class BundleGenerator (
             function (runtime) {
                 return {
 $classCode
-                }
+                };
+            }
+        """.trimIndent()
+    }
+
+    private fun generateStringLiterals(stringLiteralSymbolTable: StringLiteralSymbolTable): String {
+        val stringsCode = stringLiteralSymbolTable.allStringsByAddress
+            .sortedBy { it.first }
+            .map { """runtime.wasmRef("${it.second}");""" }
+            .joinToString("\n") { it.prependIndent("                ")}
+
+        return """
+            function (runtime) {
+$stringsCode
+                return {};
             }
         """.trimIndent()
     }

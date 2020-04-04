@@ -104,4 +104,11 @@ class BasicExpressionCodeGenerator (
         codeEmitter.emitInstruction(Instruction.local_get(thisAddress))
         return DataType.ReferenceType(codeEmitter.currentClass)
     }
+
+    fun generateEvaluation(ctx: MiniJavaParser.StringExprContext): DataType {
+        val stringContent = ctx.text.substring(1, ctx.text.length - 1)
+        val address = codeEmitter.stringLiteralSymbolTable.addressOfString(stringContent)
+        codeEmitter.emitInstruction(Instruction.i32_const(address))
+        return DataType.ReferenceType.StringType
+    }
 }

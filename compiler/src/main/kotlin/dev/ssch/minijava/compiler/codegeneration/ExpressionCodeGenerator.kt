@@ -73,6 +73,10 @@ class ExpressionCodeGenerator {
             return basicExpressionCodeGenerator.generateEvaluation(ctx)
         }
 
+        override fun visitStringExpr(ctx: MiniJavaParser.StringExprContext): DataType? {
+            return basicExpressionCodeGenerator.generateEvaluation(ctx)
+        }
+
         override fun visitNullExpr(ctx: MiniJavaParser.NullExprContext): DataType? {
             return basicExpressionCodeGenerator.generateNullEvaluation()
         }
