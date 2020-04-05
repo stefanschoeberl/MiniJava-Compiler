@@ -11,9 +11,6 @@ import dev.ssch.minijava.grammar.MiniJavaParser
 class DeclarationPhase {
 
     private lateinit var classSymbolTable: ClassSymbolTable
-    private lateinit var methodSymbolTable: MethodSymbolTable
-    private lateinit var fieldSymbolTable: FieldSymbolTable
-    private lateinit var initializerSymbolTable: InitializerSymbolTable
 
     private var currentNativeMethodAddress = 25 // builtin functions
     private var currentMethodAddress = 0
@@ -74,6 +71,9 @@ class DeclarationPhase {
 
     private inner class Visitor : MiniJavaBaseVisitor<Unit>() {
         private lateinit var currentClassName: String
+        private lateinit var methodSymbolTable: MethodSymbolTable
+        private lateinit var fieldSymbolTable: FieldSymbolTable
+        private lateinit var initializerSymbolTable: InitializerSymbolTable
 
         override fun visitJavaclass(ctx: MiniJavaParser.JavaclassContext) {
             val className = ctx.name.text
