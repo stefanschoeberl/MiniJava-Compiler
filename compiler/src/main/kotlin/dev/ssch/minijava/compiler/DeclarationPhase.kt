@@ -73,6 +73,8 @@ class DeclarationPhase {
     }
 
     private inner class Visitor : MiniJavaBaseVisitor<Unit>() {
+        private lateinit var currentClassName: String
+
         override fun visitJavaclass(ctx: MiniJavaParser.JavaclassContext) {
             val className = ctx.name.text
             if (declareOnly) {
@@ -85,15 +87,16 @@ class DeclarationPhase {
                 methodSymbolTable = classSymbolTable.getMethodSymbolTable(className)
                 fieldSymbolTable = classSymbolTable.getFieldSymbolTable(className)
                 initializerSymbolTable = classSymbolTable.getInitializerSymbolTable(className)
+                currentClassName = className
                 visitChildren(ctx)
             }
         }
 
         override fun visitField(ctx: MiniJavaParser.FieldContext) {
-            val type = ctx.type.getDataType(classSymbolTable) ?: TODO()
+            val type = ctx.type.getDataType(classSymbolTable) ?: throw UnknownTypeException(ctx.type.text, ctx.type.start)
             val name = ctx.name.text
             if (fieldSymbolTable.isDeclared(name)) {
-                TODO()
+                throw RedefinedFieldException(name, ctx.name)
             }
             val getterAddress = currentGetterSetterAddress++
             val setterAddress = currentGetterSetterAddress++
@@ -150,12 +153,15 @@ class DeclarationPhase {
         }
 
         override fun visitConstructor(ctx: MiniJavaParser.ConstructorContext) {
+            if (ctx.name.text != currentClassName) {
+                throw InvalidConstructorNameException(ctx.name.text, currentClassName, ctx.name)
+            }
             val parameters = ctx.parameters.map {
                 it.type.getDataType(classSymbolTable) ?: throw UnknownTypeException(it.type.text, it.type.start)
             }
 
             if (initializerSymbolTable.isDeclared(parameters)) {
-                TODO()
+                throw RedefinedConstructorException(parameters, ctx.name)
             }
 
             initializerSymbolTable.declareInitializer(currentInitializerAddress++, parameters)

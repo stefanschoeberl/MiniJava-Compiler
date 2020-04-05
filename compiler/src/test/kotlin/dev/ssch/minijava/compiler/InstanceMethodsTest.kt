@@ -1,7 +1,9 @@
 package dev.ssch.minijava.compiler
 
+import dev.ssch.minijava.compiler.exception.NotAReferenceTypeException
 import dev.ssch.minijava.compiler.util.CompilerTest
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 class InstanceMethodsTest : CompilerTest() {
@@ -197,6 +199,53 @@ class InstanceMethodsTest : CompilerTest() {
             };
         """).compileAndRun()
         assertThat(output.lines()).containsExactly("9", "")
+    }
+
+    @Test
+    fun `call method on non-reference typed variable (int)`() {
+        assertThatThrownBy {
+        """
+            int a;
+            a.println();
+        """.compileAndRunInMainFunction()
+        }.isInstanceOf(NotAReferenceTypeException::class.java)
+    }
+
+    @Test
+    fun `call method on non-reference typed expression (int)`() {
+        assertThatThrownBy {
+        """
+            static int a() {
+                return 123;
+            }
+            public static void main() {
+                a().println();
+            }
+        """.compileAndRunInMainClass()
+        }.isInstanceOf(NotAReferenceTypeException::class.java)
+    }
+
+    @Test
+    fun `call method on non-reference typed expression (void)`() {
+        assertThatThrownBy {
+        """
+            static void a() {
+                return 123;
+            }
+            public static void main() {
+                a().println();
+            }
+        """.compileAndRunInMainClass()
+        }.isInstanceOf(NotAReferenceTypeException::class.java)
+    }
+
+    @Test
+    fun `call method on non-reference typed expression (null)`() {
+        assertThatThrownBy {
+        """
+            null.println();
+        """.compileAndRunInMainFunction()
+        }.isInstanceOf(NotAReferenceTypeException::class.java)
     }
 
 }

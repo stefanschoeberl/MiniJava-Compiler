@@ -1,7 +1,10 @@
 package dev.ssch.minijava.compiler
 
+import dev.ssch.minijava.compiler.exception.NotACallableExpressionException
+import dev.ssch.minijava.compiler.exception.UndefinedClassException
 import dev.ssch.minijava.compiler.util.CompilerTest
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 class MethodsTest : CompilerTest() {
@@ -269,5 +272,32 @@ class MethodsTest : CompilerTest() {
             }
         """).compileAndRunInMainClass()
         output.lines().matches(v(123), v(true), v(123.123f, 0.0001f), v(""))
+    }
+
+    @Test
+    fun `call method on non-existent class`() {
+        assertThatThrownBy {
+        """
+            Output.println();
+        """.compileAndRunInMainFunction()
+        }.isInstanceOf(UndefinedClassException::class.java)
+    }
+
+    @Test
+    fun `call arithmetic expression as method`() {
+        assertThatThrownBy {
+        """
+            (1+2)();
+        """.compileAndRunInMainFunction()
+        }.isInstanceOf(NotACallableExpressionException::class.java)
+    }
+
+    @Test
+    fun `call object after new expression as method`() {
+        assertThatThrownBy {
+        """
+            (new Main())();
+        """.compileAndRunInMainFunction()
+        }.isInstanceOf(NotACallableExpressionException::class.java)
     }
 }

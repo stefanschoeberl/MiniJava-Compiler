@@ -4,9 +4,7 @@ import dev.ssch.minijava.compiler.BuiltinFunctions
 import dev.ssch.minijava.compiler.CodeEmitter
 import dev.ssch.minijava.compiler.DataType
 import dev.ssch.minijava.compiler.assignTypeTo
-import dev.ssch.minijava.compiler.exception.IncompatibleAssignmentException
-import dev.ssch.minijava.compiler.exception.InvalidAssignmentException
-import dev.ssch.minijava.compiler.exception.UndefinedVariableException
+import dev.ssch.minijava.compiler.exception.*
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.wasm.ast.Instruction
 import org.antlr.v4.runtime.Token
@@ -61,7 +59,7 @@ class VariableAssignmentStatementCodeGenerator (
                     DataType.PrimitiveType.Boolean -> builtinFunctions.setArrayPrimitiveBooleanAddress
                     DataType.PrimitiveType.Char -> builtinFunctions.setArrayPrimitiveCharAddress
                     is DataType.ReferenceType -> builtinFunctions.setArrayReferenceAddress
-                    else -> TODO()
+                    else -> throw IllegalStateException("Address for array storage of type $elementType does not exist")
                 }
 
                 codeEmitter.emitInstruction(Instruction.call(address))
@@ -81,11 +79,13 @@ class VariableAssignmentStatementCodeGenerator (
     }
 
     private fun generateWrite(fieldName: String, right: MiniJavaParser.ExprContext, token: Token, objectAddressCode: () -> DataType?) {
-        val objType = objectAddressCode() as? DataType.ReferenceType ?: TODO()
+        val objRawType = objectAddressCode()
+        val objType = objRawType as? DataType.ReferenceType
+            ?: throw NotAReferenceTypeException(objRawType, token)
 
         val field = codeEmitter.classSymbolTable
             .getFieldSymbolTable(objType.name)
-            .findFieldInfo(fieldName) ?: TODO()
+            .findFieldInfo(fieldName) ?: throw UndefinedFieldException("${objType.name}.$fieldName", token)
 
         val rightType = expressionCodeGenerator.generateEvaluation(right)
         checkAndConvertAssigment(field.type, rightType, token)

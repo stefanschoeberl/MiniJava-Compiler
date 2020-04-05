@@ -1,5 +1,6 @@
 package dev.ssch.minijava.compiler
 
+import dev.ssch.minijava.compiler.exception.*
 import dev.ssch.minijava.compiler.util.CompilerTest
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -32,7 +33,7 @@ class ClassTest : CompilerTest() {
             class A {}
             class A {}
         """.compileAndRun()
-        } // TODO
+        }.isInstanceOf(RedefinedClassException::class.java)
     }
 
     @Test
@@ -300,5 +301,76 @@ class ClassTest : CompilerTest() {
             }
         """).compileAndRun()
         assertThat(output.lines()).containsExactly("123", "")
+    }
+
+    @Test
+    fun `create instance of unknown type`() {
+        assertThatThrownBy {
+        """
+            Console.println(new Type());
+        """.compileAndRunInMainFunction()
+        }.isInstanceOf(UnknownTypeException::class.java)
+    }
+
+    @Test
+    fun `create instance of a primitive type`() {
+        assertThatThrownBy {
+        """
+            Console.println(new int());
+        """.compileAndRunInMainFunction()
+        }.isInstanceOf(NotAReferenceTypeException::class.java)
+    }
+
+    @Test
+    fun `define field of unknown type`() {
+        assertThatThrownBy {
+        """
+            Type a;
+            public static void main() {}
+        """.compileAndRunInMainClass()
+        }.isInstanceOf(UnknownTypeException::class.java)
+    }
+
+    @Test
+    fun `redefine field (same type)`() {
+        assertThatThrownBy {
+        """
+            int a;
+            int a;
+            public static void main() {}
+        """.compileAndRunInMainClass()
+        }.isInstanceOf(RedefinedFieldException::class.java)
+    }
+
+    @Test
+    fun `redefine field (different type)`() {
+        assertThatThrownBy {
+        """
+            int a;
+            float a;
+            public static void main() {}
+        """.compileAndRunInMainClass()
+        }.isInstanceOf(RedefinedFieldException::class.java)
+    }
+
+    @Test
+    fun `redefine constructor`() {
+        assertThatThrownBy {
+        """
+            Main(int x) {}
+            Main(int y) {}
+            public static void main() {}
+        """.compileAndRunInMainClass()
+        }.isInstanceOf(RedefinedConstructorException::class.java)
+    }
+
+    @Test
+    fun `define constructor with wrong type name`() {
+        assertThatThrownBy {
+        """
+            Abc(int x) {}
+            public static void main() {}
+        """.compileAndRunInMainClass()
+        }.isInstanceOf(InvalidConstructorNameException::class.java)
     }
 }

@@ -21,11 +21,11 @@ fun DataType.toWebAssemblyType(): ValueType {
         DataType.PrimitiveType.Char -> ValueType.I32
         is DataType.Array -> ValueType.I32
         is DataType.ReferenceType -> ValueType.I32
-        DataType.NullType -> TODO()
+        DataType.NullType -> throw IllegalStateException("Equivalent WebAssembly type for DataType.NullType does not exist")
     }
 }
 
-fun MiniJavaParser.TypeDefinitionContext.getDataType(classSymbolTable: ClassSymbolTable): DataType? {
+fun String.getDataType(classSymbolTable: ClassSymbolTable): DataType? {
     fun asReferenceType(name: String): DataType? {
         return if (classSymbolTable.classes.containsKey(name)) {
             DataType.ReferenceType(name)
@@ -34,18 +34,16 @@ fun MiniJavaParser.TypeDefinitionContext.getDataType(classSymbolTable: ClassSymb
         }
     }
 
+    val primitiveType = DataType.PrimitiveType.fromString(this)
+    return primitiveType ?: asReferenceType(this)
+}
+
+fun MiniJavaParser.TypeDefinitionContext.getDataType(classSymbolTable: ClassSymbolTable): DataType? {
     return when (val ctx = this) {
-        is MiniJavaParser.SimpleTypeContext -> {
-            val primitiveType = DataType.PrimitiveType.fromString(ctx.IDENT().text)
-            primitiveType ?: asReferenceType(ctx.IDENT().text)
-        }
+        is MiniJavaParser.SimpleTypeContext -> ctx.IDENT().text.getDataType(classSymbolTable)
         is MiniJavaParser.ArrayTypeContext -> {
-            val primitiveType = DataType.PrimitiveType.fromString(ctx.IDENT().text)
-            if (primitiveType != null) {
-                DataType.Array(primitiveType)
-            } else {
-                asReferenceType(ctx.IDENT().text)?.let { DataType.Array(it) }
-            }
+            val type = ctx.IDENT().text.getDataType(classSymbolTable)
+            type?.let { DataType.Array(type) }
         }
         else -> null
     }

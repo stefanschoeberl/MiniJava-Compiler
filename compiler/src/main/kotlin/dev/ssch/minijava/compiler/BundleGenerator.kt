@@ -57,7 +57,7 @@ class BundleGenerator (
                     DataType.PrimitiveType.Char -> "'\\0'"
                     is DataType.ReferenceType -> "null"
                     is DataType.Array -> "null"
-                    DataType.NullType -> TODO()
+                    DataType.NullType -> throw IllegalStateException("Cannot generate code for field of type DataType.NullType")
                 }
                 "\"${field.key}\":$initValue"
             }

@@ -33,7 +33,7 @@ class ArrayAccessExpressionCodeGenerator (
             DataType.PrimitiveType.Boolean -> builtinFunctions.getArrayPrimitiveBooleanAddress
             DataType.PrimitiveType.Char -> builtinFunctions.getArrayPrimitiveCharAddress
             is DataType.ReferenceType -> builtinFunctions.getArrayReferenceAddress
-            else -> TODO()
+            else -> throw IllegalStateException("Address for array access of type $elementType does not exist")
         }
 
         codeEmitter.emitInstruction(Instruction.call(address))

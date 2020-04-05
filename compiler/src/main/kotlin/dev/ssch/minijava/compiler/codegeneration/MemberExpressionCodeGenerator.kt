@@ -2,7 +2,8 @@ package dev.ssch.minijava.compiler.codegeneration
 
 import dev.ssch.minijava.compiler.CodeEmitter
 import dev.ssch.minijava.compiler.DataType
-import dev.ssch.minijava.compiler.exception.UndefinedVariableException
+import dev.ssch.minijava.compiler.exception.NotAReferenceTypeException
+import dev.ssch.minijava.compiler.exception.UndefinedFieldException
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.wasm.ast.Instruction
 import org.antlr.v4.runtime.Token
@@ -20,12 +21,13 @@ class MemberExpressionCodeGenerator (
     }
 
     fun generateEvaluation(fieldName: String, token: Token, objectAddressCode: () -> DataType?): DataType {
-        val objType = objectAddressCode() as? DataType.ReferenceType ?: TODO()
-
+        val objRawType = objectAddressCode()
+        val objType = objRawType as? DataType.ReferenceType
+            ?: throw NotAReferenceTypeException(objRawType, token)
 
         val field = codeEmitter.classSymbolTable
             .getFieldSymbolTable(objType.name)
-            .findFieldInfo(fieldName) ?: throw UndefinedVariableException(fieldName, token) // TODO: better exception like "UndefinedField"
+            .findFieldInfo(fieldName) ?: throw UndefinedFieldException(fieldName, token)
 
         codeEmitter.emitInstruction(Instruction.call(field.getterAddress))
         return field.type

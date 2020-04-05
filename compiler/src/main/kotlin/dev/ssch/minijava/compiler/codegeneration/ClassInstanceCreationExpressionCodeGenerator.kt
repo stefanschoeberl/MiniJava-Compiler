@@ -2,6 +2,9 @@ package dev.ssch.minijava.compiler.codegeneration
 
 import dev.ssch.minijava.compiler.CodeEmitter
 import dev.ssch.minijava.compiler.DataType
+import dev.ssch.minijava.compiler.exception.NotAReferenceTypeException
+import dev.ssch.minijava.compiler.exception.UndefinedConstructorException
+import dev.ssch.minijava.compiler.exception.UnknownTypeException
 import dev.ssch.minijava.compiler.exception.VoidParameterException
 import dev.ssch.minijava.compiler.getDataType
 import dev.ssch.minijava.grammar.MiniJavaParser
@@ -13,9 +16,11 @@ class ClassInstanceCreationExpressionCodeGenerator (
 ) {
 
     fun generate(ctx: MiniJavaParser.ClassInstanceCreationExprContext): DataType {
-        val type = (ctx.type as? MiniJavaParser.SimpleTypeContext)?.getDataType(codeEmitter.classSymbolTable)
-                as? DataType.ReferenceType // TODO
-            ?: TODO()
+        val rawType = ctx.type.text.getDataType(codeEmitter.classSymbolTable)
+            ?: throw UnknownTypeException(ctx.type.text, ctx.type)
+
+        val type = rawType as? DataType.ReferenceType
+            ?: throw NotAReferenceTypeException(rawType, ctx.type)
 
         val constructorAddress = codeEmitter.classSymbolTable.getConstructorAddress(type.name)
         codeEmitter.emitInstruction(Instruction.call(constructorAddress))
@@ -32,7 +37,7 @@ class ClassInstanceCreationExpressionCodeGenerator (
             val initializerAddress = initializers.addressOf(parameters)
             codeEmitter.emitInstruction(Instruction.call(initializerAddress))
         } else if (parameters.isNotEmpty()) {
-            TODO("undeclared initializer")
+            throw UndefinedConstructorException(parameters, ctx.type)
         }
 
         return type

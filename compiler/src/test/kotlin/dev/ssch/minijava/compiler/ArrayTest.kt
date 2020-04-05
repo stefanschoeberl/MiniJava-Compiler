@@ -2,6 +2,7 @@ package dev.ssch.minijava.compiler
 
 import dev.ssch.minijava.compiler.exception.ExpressionIsNotAnArrayException
 import dev.ssch.minijava.compiler.exception.IncompatibleTypeException
+import dev.ssch.minijava.compiler.exception.UnknownTypeException
 import dev.ssch.minijava.compiler.util.CompilerTest
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -369,5 +370,14 @@ class ArrayTest : CompilerTest() {
             }
         """).compileAndRun()
         assertThat(output.lines()).containsExactly("1", "2", "3", "4", "")
+    }
+
+    @Test
+    fun `create array of unknown type`() {
+        assertThatThrownBy {
+        """
+            Console.println(new Type[123]);
+        """.compileAndRunInMainFunction()
+        }.isInstanceOf(UnknownTypeException::class.java)
     }
 }

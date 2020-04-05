@@ -2,9 +2,7 @@ package dev.ssch.minijava.compiler.codegeneration
 
 import dev.ssch.minijava.compiler.CodeEmitter
 import dev.ssch.minijava.compiler.DataType
-import dev.ssch.minijava.compiler.exception.UndefinedMethodException
-import dev.ssch.minijava.compiler.exception.UndefinedVariableException
-import dev.ssch.minijava.compiler.exception.VoidParameterException
+import dev.ssch.minijava.compiler.exception.*
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.wasm.ast.Instruction
 
@@ -49,28 +47,44 @@ class CallExpressionCodeGeneration (
         val startCodePosition = codeEmitter.nextInstructionAddress
         if (target is MiniJavaParser.MemberExprContext) {
             return when (val left = target.left) {
-                is MiniJavaParser.IdExprContext -> try {
-                    // try to evaluate identifier as variable
-                    Pair((basicExpressionCodeGenerator.generateEvaluation(left) as? DataType.ReferenceType)?.name
-                        ?: TODO("call not on object"), true)
-                } catch (e: UndefinedVariableException) {
-                    // if evaluation fails, try to interpret identifier as class name
+                is MiniJavaParser.IdExprContext -> {
+                    fun tryToInterpretIdentiferAsClassName(): Pair<String, Boolean> {
+                        codeEmitter.deleteInstructionsBeginningAt(startCodePosition) // remove previous evaluation
+                        val className = left.IDENT().text
+                        if (codeEmitter.classSymbolTable.isDeclared(className)) {
+                            return Pair(className, false)
+                        } else {
+                            throw UndefinedClassException(className, left.start)
+                        }
+                    }
 
-                    codeEmitter.deleteInstructionsBeginningAt(startCodePosition) // remove previous evaluation
-                    val className = left.IDENT().text
-                    if (codeEmitter.classSymbolTable.isDeclared(className)) {
-                        Pair(className, false)
-                    } else {
-                        TODO("not a class")
+                    try {
+                        // try to evaluate identifier as variable
+                        val leftRawType = basicExpressionCodeGenerator.generateEvaluation(left)
+                        val leftType = leftRawType as? DataType.ReferenceType
+                            ?: throw NotAReferenceTypeException(leftRawType, left.start)
+
+                        Pair(leftType.name, true)
+                    } catch (e: UndefinedVariableException) {
+                        // if evaluation fails, try to interpret identifier as class name
+                        tryToInterpretIdentiferAsClassName()
+                    } catch (e: UndefinedFieldException) {
+                        // if evaluation fails, try to interpret identifier as class name
+                        tryToInterpretIdentiferAsClassName()
                     }
                 }
-                else -> Pair((expressionCodeGenerator.generateEvaluation(target.left) as? DataType.ReferenceType)?.name
-                    ?: TODO("call not on object"), true)
+                else -> {
+                    val leftRawType = expressionCodeGenerator.generateEvaluation(target.left)
+                    val leftType = leftRawType as? DataType.ReferenceType
+                        ?: throw NotAReferenceTypeException(leftRawType, left.start)
+
+                    Pair(leftType.name, true)
+                }
             }
         } else if (target is MiniJavaParser.IdExprContext) {
             return Pair(codeEmitter.currentClass, false)
         } else {
-            TODO("call on unsupported expression")
+            throw NotACallableExpressionException(ctx.target.text, ctx.target.start)
         }
     }
 
@@ -78,7 +92,7 @@ class CallExpressionCodeGeneration (
         return when (val target = ctx.target) {
             is MiniJavaParser.IdExprContext -> target.IDENT().text
             is MiniJavaParser.MemberExprContext -> target.right.text
-            else -> TODO("call on unsupported expression")
+            else -> throw NotACallableExpressionException(ctx.target.text, ctx.target.start)
         }
     }
 

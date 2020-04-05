@@ -1,7 +1,9 @@
 package dev.ssch.minijava.compiler
 
+import dev.ssch.minijava.compiler.exception.UndefinedConstructorException
 import dev.ssch.minijava.compiler.util.CompilerTest
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 class ConstructorTest : CompilerTest() {
@@ -124,5 +126,14 @@ class ConstructorTest : CompilerTest() {
             }
         """.compileAndRun()
         assertThat(output.lines()).containsExactly("123", "456", "456", "123", "123", "456", "123", "456", "")
+    }
+
+    @Test
+    fun `call undefined constructor`() {
+        assertThatThrownBy {
+        """
+            Main m = new Main(123, 456);
+        """.compileAndRunInMainFunction()
+        }.isInstanceOf(UndefinedConstructorException::class.java)
     }
 }

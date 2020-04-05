@@ -1,6 +1,7 @@
 package dev.ssch.minijava.compiler.codegeneration
 
 import dev.ssch.minijava.compiler.CodeEmitter
+import dev.ssch.minijava.compiler.exception.NotAStatementException
 import dev.ssch.minijava.grammar.MiniJavaParser
 import dev.ssch.minijava.wasm.ast.Instruction
 
@@ -18,7 +19,7 @@ class BasicStatementCodeGenerator (
                 codeEmitter.emitInstruction(Instruction.drop)
             }
         } else {
-            TODO()
+            throw NotAStatementException(ctx.expr().text, ctx.expr().start)
         }
     }
 
