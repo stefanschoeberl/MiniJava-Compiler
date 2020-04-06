@@ -1,6 +1,6 @@
-module.exports = function (runtime) {
+module.exports = runtime => {
     function writeArrayMap(f) {
-        return function(ref) {
+        return ref => {
             const array = runtime.wasmDeref(ref);
             if (array != null) {
                 console.log('[' + array.map(f).join(', ') + ']');
@@ -10,22 +10,22 @@ module.exports = function (runtime) {
         }
     }
 
-    var writeArray = writeArrayMap(function (x) {return x;});
+    const writeArray = writeArrayMap(x => x);
 
     return {
-        "Console.println#int": function(arg) {
-            console.log(arg)
+        "Console.println#int": arg => {
+            console.log(arg);
         },
-        "Console.println#float": function(arg) {
-            console.log(arg)
+        "Console.println#float": arg => {
+            console.log(arg);
         },
-        "Console.println#boolean": function(arg) {
-            console.log(runtime.wasmBoolean(arg))
+        "Console.println#boolean": arg => {
+            console.log(runtime.wasmBoolean(arg));
         },
-        "Console.println#char": function(arg) {
-            console.log(runtime.wasmToChar(arg))
+        "Console.println#char": arg => {
+            console.log(runtime.wasmToChar(arg));
         },
-        "Console.println#String": function(arg) {
+        "Console.println#String": arg => {
             console.log(runtime.wasmDeref(arg));
         },
         "Console.println#int[]": writeArray,

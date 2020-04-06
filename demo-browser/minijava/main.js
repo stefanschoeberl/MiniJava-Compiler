@@ -1,6 +1,6 @@
-module.exports = function(runtime) {
+module.exports = runtime => {
     return {
-        "Main.alert#String": (stringRef) => {
+        "Main.alert#String": stringRef => {
             alert(runtime.wasmDeref(stringRef));
         }
     }

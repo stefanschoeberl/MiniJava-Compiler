@@ -1,12 +1,12 @@
-module.exports = function (runtime) {
+module.exports = runtime => {
     return {
-        "String.length": function (thisRef) {
+        "String.length": thisRef => {
             return runtime.wasmDeref(thisRef).length;
         },
-        "String.charAt#int": function (thisRef, index) {
+        "String.charAt#int": (thisRef, index) => {
             return runtime.charToWasm(runtime.wasmDeref(thisRef)[index]);
         },
-        "String.equals#String": function (thisRef, other) {
+        "String.equals#String": (thisRef, other) => {
             return runtime.wasmDeref(thisRef) === runtime.wasmDeref(other);
         }
     };

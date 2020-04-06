@@ -1,6 +1,6 @@
-module.exports = function(runtime) {
+module.exports = runtime => {
     return {
-        "Calculations.plus#int": function(a) {
+        "Calculations.plus#int": a => {
             return a + 1000;
         }
     }

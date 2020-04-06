@@ -1,16 +1,16 @@
-module.exports = function(runtime) {
+module.exports = runtime => {
     return {
         "new_array_numeric": size => {
-            return runtime.wasmRef(Array(size).fill(0))
+            return runtime.wasmRef(Array(size).fill(0));
         },
         "new_array_boolean": size => {
-            return runtime.wasmRef(Array(size).fill(false))
+            return runtime.wasmRef(Array(size).fill(false));
         },
         "new_array_char": size => {
-            return runtime.wasmRef(Array(size).fill('\0'))
+            return runtime.wasmRef(Array(size).fill('\0'));
         },
         "new_array_reference": size => {
-            return runtime.wasmRef(Array(size).fill(null))
+            return runtime.wasmRef(Array(size).fill(null));
         },
         "get_array_numeric": (arrayAddress, index) => {
             const a = runtime.wasmDeref(arrayAddress);
