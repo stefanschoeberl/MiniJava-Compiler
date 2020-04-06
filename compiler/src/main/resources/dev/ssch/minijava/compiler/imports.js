@@ -1,5 +1,5 @@
 const internals = require('./internal');
-const scripts = require('./module');
+const scripts = require('./module.js');
 
 module.exports = function (runtime) {
     const nativeMethods = {};

@@ -1,0 +1,15 @@
+import dev.ssch.minijava.plugin.MiniJavaCompilationTask
+
+plugins {
+    id 'base'
+    id 'dev.ssch.minijava'
+}
+
+dependencies {
+    minijava project(':compiler')
+}
+
+task compileMiniJava(type: MiniJavaCompilationTask) {
+    inputFiles = ["../stdlib", "minijava"]
+    outputDir = "build/wasm-module"
+}

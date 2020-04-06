@@ -1,0 +1,25 @@
+class Main {
+    public static void main() {
+        Console.println("Hello world!");
+        alert("Hello from WebAssembly!");
+        fibRecursive();
+    }
+
+    native static void alert(String text);
+
+    static void fibRecursive() {
+        int i = 0;
+        while (i < 20) {
+            Console.println("fib(" + i + ") = " + fib(i));
+            i = i + 1;
+        }
+    }
+
+    static int fib(int n) {
+        if (n == 0 || n == 1) {
+            return n;
+        } else {
+            return fib(n - 1) + fib(n - 2);
+        }
+    }
+}
