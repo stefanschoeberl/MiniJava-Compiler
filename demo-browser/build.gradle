@@ -3,6 +3,7 @@ import dev.ssch.minijava.plugin.MiniJavaCompilationTask
 plugins {
     id 'base'
     id 'dev.ssch.minijava'
+    id 'com.github.node-gradle.node' version '2.2.3'
 }
 
 dependencies {
@@ -13,3 +14,20 @@ task compileMiniJava(type: MiniJavaCompilationTask) {
     inputFiles = ["../stdlib", "minijava"]
     outputDir = "build/wasm-module"
 }
+
+node {
+    download = true
+    version = "12.13.0"
+    npmVersion = "6.14.2"
+}
+
+task buildWebApp(type: NpmTask) {
+    dependsOn(npmInstall, compileMiniJava)
+    npmCommand = ['run', 'build']
+    inputs.dir('minijava')
+    inputs.dir('src')
+    inputs.dir(fileTree("node_modules").exclude(".cache"))
+    outputs.files('build/dist')
+}
+
+build.dependsOn buildWebApp
