@@ -1,0 +1,3 @@
+class Calculations {
+    native static int plus(int a);
+}

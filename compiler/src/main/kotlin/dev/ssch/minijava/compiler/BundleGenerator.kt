@@ -4,6 +4,7 @@ import dev.ssch.minijava.compiler.symboltable.ClassSymbolTable
 import dev.ssch.minijava.compiler.symboltable.StringLiteralSymbolTable
 import dev.ssch.minijava.wasm.WebAssemblyAssembler
 import dev.ssch.minijava.wasm.WebAssemblyModuleGenerator
+import org.apache.commons.io.FileUtils
 import java.io.File
 
 class BundleGenerator (
@@ -26,6 +27,9 @@ class BundleGenerator (
 
         val scriptFiles = copyScriptFiles(src, nativeFolder)
         generateModuleJS(outputFolder, nativeFolder, scriptFiles, bundle.classSymbolTable, bundle.stringLiteralSymbolTable)
+        copyFile("runtime.js", outputFolder)
+        copyFile("internal.js", outputFolder)
+        copyFile("imports.js", outputFolder)
     }
 
     private fun generateModuleJS(
@@ -122,5 +126,12 @@ $stringsCode
         }
 
         return copyFromTo.map { it.second }
+    }
+
+    private fun copyFile(file: String, folder: File) {
+        FileUtils.copyURLToFile(
+            BundleGenerator::class.java.getResource("/dev/ssch/minijava/compiler/$file"),
+            File(folder, file)
+            )
     }
 }

@@ -1,5 +1,56 @@
 class Main {
     public static void main() {
-        Console.println("Hello world!");
+        Console.println("----- fibArray -----");
+        fibArray();
+        Console.println("----- fibRecursive -----");
+        fibRecursive();
+        Console.println("----- fibRange -----");
+        fibRange(new Range(20, 100));
+        Console.println("----- Calculations -----");
+        Console.println(Calculations.plus(23));
+    }
+
+    static void fibRange(Range range) {
+        int a = 0;
+        int b = 1;
+        while (a < range.from) {
+            int c = a + b;
+            a = b;
+            b = c;
+        }
+        while (a < range.to) {
+            Console.println(a);
+            int c = a + b;
+            a = b;
+            b = c;
+        }
+    }
+
+    static void fibArray() {
+        int[] numbers = new int[20];
+        numbers[0] = 0;
+        numbers[1] = 1;
+        int i = 2;
+        while (i < 20) {
+            numbers[i] = numbers[i-1] + numbers[i-2];
+            i = i + 1;
+        }
+        Console.println(numbers);
+    }
+
+    static void fibRecursive() {
+        int i = 0;
+        while (i < 20) {
+            Console.println(fib(i));
+            i = i + 1;
+        }
+    }
+
+    static int fib(int n) {
+        if (n == 0 || n == 1) {
+            return n;
+        } else {
+            return fib(n - 1) + fib(n - 2);
+        }
     }
 }
