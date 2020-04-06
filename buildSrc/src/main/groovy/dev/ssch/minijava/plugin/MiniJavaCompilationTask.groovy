@@ -6,7 +6,8 @@ import org.gradle.api.tasks.JavaExec
 // https://stackoverflow.com/questions/7111362/pulling-a-gradle-dependency-jar-from-maven-and-then-running-it-directly
 
 class MiniJavaCompilationTask extends JavaExec {
-    private List<Object> inputFiles
+    private List<Object> inputFiles = []
+    private List<Object> inputDirs = []
     private Object outputDir
 
     List<Object> getInputFiles() {
@@ -17,6 +18,15 @@ class MiniJavaCompilationTask extends JavaExec {
         inputs.files(inputFiles)
         this.inputFiles = inputFiles
         updateArgs()
+    }
+
+    List<Object> getInputDirs() {
+        return inputDirs
+    }
+
+    void setInputDirs(List<Object> inputDirs) {
+        inputDirs.forEach { inputs.dir(it) }
+        this.inputDirs = inputDirs
     }
 
     Object getOutputDir() {
@@ -30,15 +40,18 @@ class MiniJavaCompilationTask extends JavaExec {
     }
 
     MiniJavaCompilationTask() {
-        main = "dev.ssch.minijava.compiler.MainKt"
+        group = 'MiniJava'
+        description = 'Compiles MiniJava source files and generates a WebAssembly module'
+        main = 'dev.ssch.minijava.compiler.MainKt'
         classpath project.configurations.minijava
         project.build.dependsOn this
     }
 
     private void updateArgs() {
-        def arguments = ["-o"]
+        def arguments = ['-o']
         arguments.add(outputDir.toString())
         arguments.addAll(inputFiles.collect { it.toString() })
+        arguments.addAll(inputDirs.collect { it.toString() })
         args = arguments
     }
 }
