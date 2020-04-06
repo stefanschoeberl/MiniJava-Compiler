@@ -75,14 +75,14 @@ abstract class CompilerTest {
 
         val wasmOutput = File(temporaryFolder, "wasm-output")
 
-        val allSourceFiles = mutableListOf(testSourceFile)
+        val allSourceDefinitions = mutableListOf(testSourceFile)
 
         if (withStandardLibrary) {
             val stdlib = File(File(System.getProperty("user.dir")).parentFile, "stdlib")
-            stdlib.listFiles()!!
-                .filter { it.isFile && it.name.endsWith(".minijava") }
-                .forEach { allSourceFiles.add(it) }
+            allSourceDefinitions.add(stdlib)
         }
+
+        val allSourceFiles = context.compiler.expandSourceDefinitions(allSourceDefinitions)
 
         val bundle = context.compiler.compile(allSourceFiles)
 

@@ -15,7 +15,8 @@ fun main(args: Array<String>) {
 
     val context = CompilationContext()
 
-    val files = inputFiles.map(::File)
+    val sourceDefinitions = inputFiles.map(::File)
+    val files = context.compiler.expandSourceDefinitions(sourceDefinitions)
     val bundle = context.compiler.compile(files)
 
     context.bundleGenerator.generateBundle(bundle, files, File(outputFolder))

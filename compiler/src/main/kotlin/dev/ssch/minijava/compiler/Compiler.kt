@@ -13,6 +13,18 @@ class Compiler (
     private val moduleCodeGenerator: ModuleCodeGenerator
 ) {
 
+    fun expandSourceDefinitions(src: List<File>): List<File> {
+        return src.flatMap { file ->
+            if (file.isDirectory) {
+                file.listFiles()!!.filter {
+                    it.isFile && it.name.endsWith(".minijava")
+                }
+            } else {
+                listOf(file)
+            }
+        }
+    }
+
     fun compile(src: List<File>): Bundle {
 
         val trees = src.map { file ->
