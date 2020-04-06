@@ -10,6 +10,6 @@ dependencies {
 }
 
 task compileMiniJava(type: MiniJavaCompilationTask) {
-    inputDirs = ["../stdlib", "minijava"]
-    outputDir = "build/wasm-module"
+    inputDirs = ['../stdlib', 'minijava']
+    outputDir = 'build/wasm-module'
 }

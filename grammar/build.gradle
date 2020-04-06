@@ -3,11 +3,11 @@ plugins {
 }
 
 dependencies {
-    antlr "org.antlr:antlr4:4.7.2"
+    antlr 'org.antlr:antlr4:4.7.2'
 }
 
 compileJava.dependsOn generateGrammarSource
 
 generateGrammarSource {
-    arguments << "-lib" << "src/main/antlr/dev/ssch/minijava/grammar" << "-visitor"
+    arguments << '-lib' << 'src/main/antlr/dev/ssch/minijava/grammar' << '-visitor'
 }

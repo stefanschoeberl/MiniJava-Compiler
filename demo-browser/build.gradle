@@ -11,14 +11,14 @@ dependencies {
 }
 
 task compileMiniJava(type: MiniJavaCompilationTask) {
-    inputDirs = ["../stdlib", "minijava"]
-    outputDir = "build/wasm-module"
+    inputDirs = ['../stdlib', 'minijava']
+    outputDir = 'build/wasm-module'
 }
 
 node {
     download = true
-    version = "12.13.0"
-    npmVersion = "6.14.2"
+    version = '12.13.0'
+    npmVersion = '6.14.2'
 }
 
 task buildWebApp(type: NpmTask) {
@@ -26,7 +26,7 @@ task buildWebApp(type: NpmTask) {
     npmCommand = ['run', 'build']
     inputs.dir('minijava')
     inputs.dir('src')
-    inputs.dir(fileTree("node_modules").exclude(".cache"))
+    inputs.dir(fileTree('node_modules').exclude('.cache'))
     outputs.files('build/dist')
 }
 
