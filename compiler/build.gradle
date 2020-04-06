@@ -13,3 +13,15 @@ dependencies {
     implementation project(':grammar')
     implementation project(':wasm')
 }
+
+// https://stackoverflow.com/questions/49278063/how-do-i-create-an-executable-fat-jar-with-gradle-with-implementation-dependenci
+task allInOneJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'dev.ssch.minijava.compiler.MainKt'
+    }
+    baseName = 'compiler-all-in-one'
+    from { configurations.runtimeClasspath
+            .filter{ it.exists() }
+            .collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
