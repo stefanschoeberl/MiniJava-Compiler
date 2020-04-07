@@ -380,4 +380,31 @@ class ArrayTest : CompilerTest() {
         """.compileAndRunInMainFunction()
         }.isInstanceOf(UnknownTypeException::class.java)
     }
+
+    @Test
+    fun `array length`() {
+        val output = """
+            int[] a = new int[3];
+            boolean[] b = new boolean[0];
+            float[] c = new float[17];
+            Console.println(a.length);
+            Console.println(b.length);
+            Console.println(c.length);
+        """.compileAndRunInMainFunction()
+        assertThat(output.lines()).containsExactly("3", "0", "17", "")
+    }
+
+    @Test
+    fun `array length with loop`() {
+        val output = """
+            int[] a = new int[5];
+            int i = 0;
+            while (i < a.length) {
+                a[i] = i + 1;
+                i = i + 1;
+            }
+            Console.println(a);
+        """.compileAndRunInMainFunction()
+        assertThat(output.lines()).containsExactly("[1, 2, 3, 4, 5]", "")
+    }
 }

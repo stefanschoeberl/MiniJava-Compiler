@@ -36,7 +36,7 @@ class CompilationContext {
     val arrayCreationExpressionCodeGenerator = ArrayCreationExpressionCodeGenerator(codeEmitter, expressionCodeGenerator, builtinFunctions)
     val binaryExpressionCodeGenerator = BinaryExpressionCodeGenerator(codeEmitter, expressionCodeGenerator, operatorTable)
     val classInstanceCreationExpressionCodeGenerator = ClassInstanceCreationExpressionCodeGenerator(codeEmitter, expressionCodeGenerator)
-    val memberExpressionCodeGenerator = MemberExpressionCodeGenerator(codeEmitter, expressionCodeGenerator)
+    val memberExpressionCodeGenerator = MemberExpressionCodeGenerator(codeEmitter, expressionCodeGenerator, builtinFunctions)
     val basicExpressionCodeGenerator = BasicExpressionCodeGenerator(codeEmitter, expressionCodeGenerator, memberExpressionCodeGenerator, operatorTable)
     val callExpressionCodeGenerator = CallExpressionCodeGeneration(codeEmitter, expressionCodeGenerator, basicExpressionCodeGenerator)
 

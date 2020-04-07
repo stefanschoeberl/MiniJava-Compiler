@@ -12,7 +12,7 @@ class DeclarationPhase {
 
     private lateinit var classSymbolTable: ClassSymbolTable
 
-    private var currentNativeMethodAddress = 25 // builtin functions
+    private var currentNativeMethodAddress = BuiltinFunctions.NUM_FUNCTIONS
     private var currentMethodAddress = 0
     private var currentInitializerAddress = 0
     private var currentConstructorAddress = 0

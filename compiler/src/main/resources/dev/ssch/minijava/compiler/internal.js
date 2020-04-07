@@ -12,6 +12,9 @@ module.exports = runtime => {
         "new_array_reference": size => {
             return runtime.wasmRef(Array(size).fill(null));
         },
+        "array_length": arrayAddress => {
+            return runtime.wasmDeref(arrayAddress).length
+        },
         "get_array_numeric": (arrayAddress, index) => {
             const a = runtime.wasmDeref(arrayAddress);
             return a[index];

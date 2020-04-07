@@ -1,5 +1,6 @@
 package dev.ssch.minijava.compiler.codegeneration
 
+import dev.ssch.minijava.compiler.BuiltinFunctions
 import dev.ssch.minijava.compiler.CodeEmitter
 import dev.ssch.minijava.compiler.DataType
 import dev.ssch.minijava.compiler.exception.NotAReferenceTypeException
@@ -10,7 +11,8 @@ import org.antlr.v4.runtime.Token
 
 class MemberExpressionCodeGenerator (
     private val codeEmitter: CodeEmitter,
-    private val expressionCodeGenerator: ExpressionCodeGenerator
+    private val expressionCodeGenerator: ExpressionCodeGenerator,
+    private val builtinFunctions: BuiltinFunctions
 ) {
 
     fun generateEvaluation(ctx: MiniJavaParser.MemberExprContext): DataType {
@@ -22,6 +24,14 @@ class MemberExpressionCodeGenerator (
 
     fun generateEvaluation(fieldName: String, token: Token, objectAddressCode: () -> DataType?): DataType {
         val objRawType = objectAddressCode()
+        if (fieldName == "length" && objRawType is DataType.Array) {
+            return evaluateArrayLength()
+        } else {
+            return evaluateField(fieldName, objRawType, token)
+        }
+    }
+
+    private fun evaluateField(fieldName: String, objRawType: DataType?, token: Token): DataType {
         val objType = objRawType as? DataType.ReferenceType
             ?: throw NotAReferenceTypeException(objRawType, token)
 
@@ -33,5 +43,8 @@ class MemberExpressionCodeGenerator (
         return field.type
     }
 
-
+    private fun evaluateArrayLength(): DataType {
+        codeEmitter.emitInstruction(Instruction.call(builtinFunctions.arrayLengthAddress))
+        return DataType.PrimitiveType.Integer
+    }
 }

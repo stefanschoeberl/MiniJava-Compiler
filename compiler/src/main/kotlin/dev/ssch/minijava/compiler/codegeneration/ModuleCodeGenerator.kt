@@ -46,6 +46,8 @@ class ModuleCodeGenerator (
         builtinFunctions.newArrayCharAddress = importInternal("new_array_char", mutableListOf(ValueType.I32), mutableListOf(ValueType.I32))
         builtinFunctions.newArrayReferenceAddress = importInternal("new_array_reference", mutableListOf(ValueType.I32), mutableListOf(ValueType.I32))
 
+        builtinFunctions.arrayLengthAddress = importInternal("array_length", mutableListOf(ValueType.I32), mutableListOf(ValueType.I32))
+
         builtinFunctions.getArrayPrimitiveIntAddress = importInternal("get_array_numeric", mutableListOf(ValueType.I32, ValueType.I32), mutableListOf(ValueType.I32))
         builtinFunctions.getArrayPrimitiveFloatAddress = importInternal("get_array_numeric", mutableListOf(ValueType.I32, ValueType.I32), mutableListOf(ValueType.F32))
         builtinFunctions.getArrayPrimitiveBooleanAddress = importInternal("get_array_boolean", mutableListOf(ValueType.I32, ValueType.I32), mutableListOf(ValueType.I32))

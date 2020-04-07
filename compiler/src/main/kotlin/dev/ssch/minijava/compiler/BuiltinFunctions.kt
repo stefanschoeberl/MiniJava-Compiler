@@ -1,10 +1,16 @@
 package dev.ssch.minijava.compiler
 
 class BuiltinFunctions {
+    companion object {
+        const val NUM_FUNCTIONS = 26
+    }
+
     var newArrayNumericAddress: Int = -1
     var newArrayBooleanAddress: Int = -1
     var newArrayCharAddress: Int = -1
     var newArrayReferenceAddress: Int = -1
+
+    var arrayLengthAddress: Int = -1
 
     var getArrayPrimitiveIntAddress: Int = -1
     var getArrayPrimitiveFloatAddress: Int = -1
