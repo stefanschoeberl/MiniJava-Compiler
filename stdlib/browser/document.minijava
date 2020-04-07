@@ -1,0 +1,4 @@
+class Document {
+    native static HTMLElement getElementById(String elementId);
+    native static HTMLElement createElement(String tagName);
+}

@@ -1,25 +1,75 @@
-class Main {
-    public static void main() {
-        Console.println("Hello world!");
-        //alert("Hello from WebAssembly!");
-        fibRecursive();
+class Range {
+    int from;
+    int to;
+
+    Range(int from, int to) {
+        this.from = from;
+        this.to = to;
     }
 
-    native static void alert(String text);
+    native void printToConsole();
+}
 
-    static void fibRecursive() {
-        int i = 0;
-        while (i < 20) {
-            Console.println("fib(" + i + ") = " + fib(i));
-            i = i + 1;
-        }
-    }
-
+class FibonacciCalculator {
     static int fib(int n) {
         if (n == 0 || n == 1) {
             return n;
         } else {
             return fib(n - 1) + fib(n - 2);
         }
+    }
+
+    static int[] fibNumbers(Range range) {
+        int[] numbers = new int[range.to - range.from + 1];
+        int i = 0;
+        while (i < range.to - range.from + 1) { // TODO: numbers.length
+            numbers[i] = fib(i + range.from);
+            i = i + 1;
+        }
+        return numbers;
+    }
+}
+
+class Main {
+    public static void main() {
+        HTMLElement txtFrom = Document.getElementById("txtFrom");
+        HTMLElement txtTo = Document.getElementById("txtTo");
+
+        Range range = new Range(
+            Integer.parseInt(txtFrom.value),
+            Integer.parseInt(txtTo.value)
+        );
+        range.printToConsole();
+
+        // TODO: eventhandler for button click
+
+        HTMLElement resultBox = Document.getElementById("resultBox");
+
+        HTMLElement table = Document.createElement("table");
+        resultBox.appendChild(table);
+        table.classList.add("table");
+
+        HTMLElement tbody = Document.createElement("tbody");
+        table.appendChild(tbody);
+
+        int[] numbers = FibonacciCalculator.fibNumbers(range);
+        int i = 0;
+        while (i < range.to - range.from + 1) { // TODO: numbers.length
+            HTMLElement row = Document.createElement("tr");
+            HTMLElement titleCol = Document.createElement("td");
+            HTMLElement valueCol = Document.createElement("td");
+
+            titleCol.innerText = "fib(" + (i + range.from) + ")";
+            valueCol.innerText = Integer.toString(numbers[i]);
+
+            row.appendChild(titleCol);
+            row.appendChild(valueCol);
+            tbody.appendChild(row);
+            i = i + 1;
+        }
+
+        HTMLElement infoBox = Document.getElementById("infoBox");
+        infoBox.classList.remove("invisible");
+        infoBox.innerText = "Generated fibonacci numbers fib(" + range.from + ") to fib(" + range.to +") in MiniJava!";
     }
 }

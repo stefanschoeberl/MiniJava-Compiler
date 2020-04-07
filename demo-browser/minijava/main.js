@@ -1,7 +1,7 @@
 module.exports = runtime => {
     return {
-        "Main.alert#String": stringRef => {
-            alert(runtime.wasmDeref(stringRef));
+        "Range.printToConsole": thisRef => {
+            console.log(runtime.wasmDeref(thisRef));
         }
     }
 };

@@ -1,0 +1,4 @@
+class DOMTokenList {
+    native void add(String token);
+    native void remove(String token);
+}

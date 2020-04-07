@@ -14,7 +14,7 @@ fun List<String>.runCommand(workingDir: File): String {
 
     val error = process.errorStream.bufferedReader().readText()
     if (error.isNotEmpty()) {
-        throw RuntimeException("WebAssembly Execution Error:\n$error")
+        throw RuntimeException("Execution Error:\n$error")
     }
 
     return process.inputStream.bufferedReader().readText()

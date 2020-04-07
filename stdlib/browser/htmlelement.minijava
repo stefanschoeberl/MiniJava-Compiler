@@ -1,0 +1,8 @@
+class HTMLElement {
+    String value;
+    String textContent;
+    String innerText;
+    DOMTokenList classList;
+
+    native void appendChild(HTMLElement newChild);
+}
