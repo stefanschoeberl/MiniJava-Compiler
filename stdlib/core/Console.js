@@ -28,6 +28,9 @@ module.exports = runtime => {
         "Console.println#String": arg => {
             console.log(runtime.wasmDeref(arg));
         },
+        "Console.println#Object": arg => {
+            console.log(runtime.wasmDeref(arg));
+        },
         "Console.println#int[]": writeArray,
         "Console.println#boolean[]": writeArray,
         "Console.println#float[]": writeArray,

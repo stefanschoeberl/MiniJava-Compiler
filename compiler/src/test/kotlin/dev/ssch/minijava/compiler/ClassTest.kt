@@ -373,4 +373,24 @@ class ClassTest : CompilerTest() {
         """.compileAndRunInMainClass()
         }.isInstanceOf(InvalidConstructorNameException::class.java)
     }
+
+    @Test
+    fun `write object to console`() {
+        val output = """
+            class Main {
+                public static void main() {
+                    Point p = new Point();
+                    p.x = 10;
+                    p.y = 20;
+                    Console.println(p);
+                }
+            }
+            
+            class Point {
+                int x;
+                int y;
+            }
+        """.compileAndRun()
+        assertThat(output.lines()).containsExactly("{ x: 10, y: 20 }", "")
+    }
 }
