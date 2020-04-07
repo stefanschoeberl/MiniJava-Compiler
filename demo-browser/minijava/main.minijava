@@ -1,7 +1,7 @@
 class Main {
     public static void main() {
         Console.println("Hello world!");
-        alert("Hello from WebAssembly!");
+        //alert("Hello from WebAssembly!");
         fibRecursive();
     }
 

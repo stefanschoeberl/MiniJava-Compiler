@@ -3,8 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <title>WebAssembly Demo</title>
+    <link rel="stylesheet" href="main.css" type="text/css">
 </head>
 <body>
+    <div class="container p-2">
+        <h1 class="text-center">MiniJava Demo</h1>
+        <div class="row">
+            <div class="col">
+                <button type="button" class="btn btn-primary w-100" id="btnRunJavaScript">JavaScript</button>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-primary w-100" id="btnRunMiniJava">MiniJava</button>
+            </div>
+        </div>
+        <hr>
+        <h2>Fibonacci Numbers</h2>
+        <div class="row mb-2">
+            <div class="col">
+                <input type="text" class="form-control" placeholder="From" id="txtFrom">
+            </div>
+            <div class="col">
+                <input type="text" class="form-control" placeholder="To" id="txtTo">
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-primary w-100" id="btnCalculate">Calculate</button>
+            </div>
+        </div>
+        <h3>Results</h3>
+        <div class="alert alert-success invisible" role="alert" id="infoBox"></div>
+        <div id="resultBox"></div>
+    </div>
     <script src="main.js"></script>
 </body>
 </html>
