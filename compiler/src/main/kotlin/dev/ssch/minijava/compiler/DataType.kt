@@ -26,6 +26,7 @@ sealed class DataType {
 
     open class ReferenceType(val name: String): DataType() {
         object StringType: ReferenceType("String")
+        object ObjectType: ReferenceType("Object")
 
         override fun toString(): String {
             return name

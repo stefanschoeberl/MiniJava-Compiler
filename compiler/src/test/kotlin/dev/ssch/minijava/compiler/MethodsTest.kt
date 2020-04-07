@@ -300,4 +300,28 @@ class MethodsTest : CompilerTest() {
         """.compileAndRunInMainFunction()
         }.isInstanceOf(NotACallableExpressionException::class.java)
     }
+
+    @Test
+    fun `native method with Object parameters`() {
+        val output = Source.withMiniJava("""
+            int x;
+            
+            public static void main() {
+                Main m = new Main();
+                m.x = 123;
+                call(m);
+            }
+            
+            native static void call(Object o);
+        """).andJavaScript("""
+            module.exports = runtime => {
+                return {
+                    "Main.call#Object": objRef => {
+                        console.log(runtime.wasmDeref(objRef).x);   
+                    }
+                };
+            };
+        """).compileAndRunInMainClass()
+        assertThat(output.lines()).containsExactly("123", "")
+    }
 }

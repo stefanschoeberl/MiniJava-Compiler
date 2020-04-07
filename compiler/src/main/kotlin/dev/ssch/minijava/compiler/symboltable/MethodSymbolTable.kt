@@ -25,6 +25,10 @@ class MethodSymbolTable {
         return nativeMethods.contains(signature) || methods.contains(signature)
     }
 
+    fun isCallable(name: String, parameters: List<DataType>): Boolean {
+        return findMethodInformation(name, parameters) != null
+    }
+
     fun isNative(name: String, parameters: List<DataType>): Boolean {
         return nativeMethods.contains(MethodSignature(name, parameters))
     }
@@ -59,16 +63,61 @@ class MethodSymbolTable {
         return methodInformation
     }
 
-    private fun findMethodInformation(name: String, parameters: List<DataType>): MethodInformation? {
+    private fun findMethodInformationWithoutObjectReplacement(name: String, parameters: List<DataType>): MethodInformation? {
         val signature =
             MethodSignature(name, parameters)
         val nativeMethod = nativeMethods[signature]
         if (nativeMethod != null) {
             return nativeMethod
         }
-
         return methods[signature]
     }
+
+    private fun findMethodInformation(name: String, parameters: List<DataType>): MethodInformation? {
+        val methodInfo = findMethodInformationWithoutObjectReplacement(name, parameters)
+        if (methodInfo != null) {
+            return methodInfo
+        }
+
+        // try all combinations of ReferenceType/Object
+        val referenceTypeIndices = parameters
+            .map { it != DataType.ReferenceType.ObjectType && it is DataType.ReferenceType }
+            .mapIndexed { index, b -> Pair(index, b) }
+            .filter { it.second }
+            .map { it.first }
+
+        if (referenceTypeIndices.isEmpty()) {
+            return null
+        }
+
+        val parameterCombination = parameters.toMutableList()
+        fun isLastParameterCombination(): Boolean {
+            return referenceTypeIndices
+                .map { parameterCombination[it] == DataType.ReferenceType.ObjectType }
+                .all { it }
+        }
+        fun nextCombination(index: Int = 0) {
+            if (index < referenceTypeIndices.size) {
+                val indexInParameters = referenceTypeIndices[index]
+                if (parameterCombination[indexInParameters] != DataType.ReferenceType.ObjectType) {
+                    parameterCombination[indexInParameters] = DataType.ReferenceType.ObjectType
+                } else {
+                    parameterCombination[indexInParameters] = parameters[indexInParameters]
+                    nextCombination(index + 1)
+                }
+            }
+        }
+
+        do {
+            nextCombination()
+            val currentMethodInfo = findMethodInformationWithoutObjectReplacement(name, parameterCombination)
+            if (currentMethodInfo != null) {
+                return currentMethodInfo
+            }
+        } while (!isLastParameterCombination())
+        return null
+    }
+
     fun addressOf(name: String, parameters: List<DataType>): Int = findMethodInformation(name, parameters)!!.address
     fun returnTypeOf(name: String, parameters: List<DataType>): DataType? = findMethodInformation(name, parameters)!!.returnType
 

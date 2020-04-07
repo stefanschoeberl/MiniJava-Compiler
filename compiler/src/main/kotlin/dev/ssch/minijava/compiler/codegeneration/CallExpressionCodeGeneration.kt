@@ -26,7 +26,7 @@ class CallExpressionCodeGeneration (
 
         val methodSymbolTableOfTargetClass = codeEmitter.classSymbolTable.getMethodSymbolTable(className)
 
-        if (!methodSymbolTableOfTargetClass.isDeclared(methodName, parameterTypes)) {
+        if (!methodSymbolTableOfTargetClass.isCallable(methodName, parameterTypes)) {
             throw UndefinedMethodException("$className.$methodName", ctx.target.start)
         }
 
