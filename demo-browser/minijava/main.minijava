@@ -22,7 +22,7 @@ class FibonacciCalculator {
     static int[] fibNumbers(Range range) {
         int[] numbers = new int[range.to - range.from + 1];
         int i = 0;
-        while (i < range.to - range.from + 1) { // TODO: numbers.length
+        while (i < numbers.length) {
             numbers[i] = fib(i + range.from);
             i = i + 1;
         }
@@ -54,7 +54,7 @@ class Main {
 
         int[] numbers = FibonacciCalculator.fibNumbers(range);
         int i = 0;
-        while (i < range.to - range.from + 1) { // TODO: numbers.length
+        while (i < numbers.length) {
             HTMLElement row = Document.createElement("tr");
             HTMLElement titleCol = Document.createElement("td");
             HTMLElement valueCol = Document.createElement("td");
