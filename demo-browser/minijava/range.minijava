@@ -1,0 +1,11 @@
+class Range {
+    int from;
+    int to;
+
+    Range(int from, int to) {
+        this.from = from;
+        this.to = to;
+    }
+
+    native void printToConsole();
+}
