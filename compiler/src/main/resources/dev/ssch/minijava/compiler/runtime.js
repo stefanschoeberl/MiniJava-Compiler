@@ -6,6 +6,11 @@ class Runtime {
         this.references = new Map();
         this.objects.set(null, 0);
         this.references.set(0, null);
+        this.instance = null;
+    }
+
+    setWasmModuleInstance(instance) {
+        this.instance = instance
     }
 
     wasmRef(obj) {
@@ -33,6 +38,11 @@ class Runtime {
 
     charToWasm(value) {
         return value.codePointAt(0);
+    }
+
+    staticMethod(className, methodName, ...argumentTypes) {
+        const argumentTypeString = argumentTypes.map(s => "#" + s).join("");
+        return this.instance.exports[className + "." + methodName + argumentTypeString];
     }
 }
 

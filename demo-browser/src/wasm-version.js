@@ -11,7 +11,9 @@ async function runModule() {
         const arrayBuffer = await response.arrayBuffer();
         const module = await WebAssembly.compile(arrayBuffer);
         const instance = await WebAssembly.instantiate(module, imports(runtime));
-        instance.exports["Main.main"]();
+
+        runtime.setWasmModuleInstance(instance);
+        runtime.staticMethod("Main", "main")();
     }
 }
 
