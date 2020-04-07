@@ -67,7 +67,7 @@ class BundleGenerator (
             }
 
             val constructor = externalFunctionNameProvider.externalNameForConstructor(className)
-            functions.add("\"$constructor\": function() { return runtime.wasmRef({$initObject}); }")
+            functions.add("\"$constructor\": function() { return runtime.wasmRefType({$initObject}, \"$className\"); }")
             fields.forEach { field ->
                 val getter = externalFunctionNameProvider.externalNameForGetter(className, field.key)
                 val setter = externalFunctionNameProvider.externalNameForSetter(className, field.key)
@@ -76,7 +76,10 @@ class BundleGenerator (
                 if (type is DataType.PrimitiveType.Boolean) {
                     functions.add("\"$getter\": function (ref) { return runtime.wasmDeref(ref)[\"${field.key}\"]; }")
                     functions.add("\"$setter\": function (ref, val) { runtime.wasmDeref(ref)[\"${field.key}\"] = runtime.wasmBoolean(val); }")
-                } else if (type is DataType.ReferenceType || type is DataType.Array) {
+                } else if (type is DataType.ReferenceType) {
+                    functions.add("\"$getter\": function (ref) { return runtime.wasmRefType(runtime.wasmDeref(ref)[\"${field.key}\"], \"${type.name}\"); }")
+                    functions.add("\"$setter\": function (ref, val) { runtime.wasmDeref(ref)[\"${field.key}\"] = runtime.wasmDeref(val); }")
+                } else if (type is DataType.Array) {
                     functions.add("\"$getter\": function (ref) { return runtime.wasmRef(runtime.wasmDeref(ref)[\"${field.key}\"]); }")
                     functions.add("\"$setter\": function (ref, val) { runtime.wasmDeref(ref)[\"${field.key}\"] = runtime.wasmDeref(val); }")
                 } else {
@@ -101,7 +104,7 @@ $classCode
     private fun generateStringLiterals(stringLiteralSymbolTable: StringLiteralSymbolTable): String {
         val stringsCode = stringLiteralSymbolTable.allStringsByAddress
             .sortedBy { it.first }
-            .map { """runtime.wasmRef("${it.second}");""" }
+            .map { """runtime.wasmRefType("${it.second}", "String");""" }
             .joinToString("\n") { it.prependIndent("                ")}
 
         return """

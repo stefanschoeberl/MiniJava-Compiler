@@ -4,6 +4,7 @@ class Runtime {
         this.nextFreeReference = 1;
         this.objects = new Map();
         this.references = new Map();
+        this.types = new Map();
         this.objects.set(null, 0);
         this.references.set(0, null);
         this.instance = null;
@@ -24,6 +25,11 @@ class Runtime {
         }
     }
 
+    wasmRefType(obj, type) {
+        this.types.set(obj, type);
+        return this.wasmRef(obj);
+    }
+
     wasmDeref(address) {
         return this.references.get(address);
     }
@@ -41,6 +47,16 @@ class Runtime {
     }
 
     staticMethod(className, methodName, ...argumentTypes) {
+        return this.findMethod(className, methodName, ...argumentTypes);
+    }
+
+    instanceMethod(obj, methodName, ...argumentTypes) {
+        const className = this.types.get(obj);
+        const rawFunction = this.findMethod(className, methodName, ...argumentTypes);
+        return (...args) => rawFunction(this.wasmRef(obj), ...args);
+    }
+
+    findMethod(className, methodName, ...argumentTypes) {
         const argumentTypeString = argumentTypes.map(s => "#" + s).join("");
         return this.instance.exports[className + "." + methodName + argumentTypeString];
     }

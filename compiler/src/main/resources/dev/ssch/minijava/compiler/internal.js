@@ -50,45 +50,45 @@ module.exports = runtime => {
         "+_String_String": (stringRef1, stringRef2) => {
             const s1 = runtime.wasmDeref(stringRef1);
             const s2 = runtime.wasmDeref(stringRef2);
-            return runtime.wasmRef(s1.concat(s2));
+            return runtime.wasmRefType(s1.concat(s2), "String");
         },
         "+_String_numeric": (stringRef, value) => {
             const s = runtime.wasmDeref(stringRef);
-            return runtime.wasmRef(s.concat(value.toString()));
+            return runtime.wasmRefType(s.concat(value.toString()), "String");
         },
         "+_numeric_String": (value, stringRef) => {
             const s = runtime.wasmDeref(stringRef);
-            return runtime.wasmRef(value.toString().concat(s));
+            return runtime.wasmRefType(value.toString().concat(s), "String");
         },
         "+_String_boolean": (stringRef, value) => {
             const s = runtime.wasmDeref(stringRef);
             const v = runtime.wasmBoolean(value);
-            return runtime.wasmRef(s.concat(v.toString()));
+            return runtime.wasmRefType(s.concat(v.toString()), "String");
         },
         "+_boolean_String": (value, stringRef) => {
             const s = runtime.wasmDeref(stringRef);
             const v = runtime.wasmBoolean(value);
-            return runtime.wasmRef(v.toString().concat(s));
+            return runtime.wasmRefType(v.toString().concat(s), "String");
         },
         "+_String_char": (stringRef, value) => {
             const s = runtime.wasmDeref(stringRef);
             const v = runtime.wasmToChar(value);
-            return runtime.wasmRef(s.concat(v));
+            return runtime.wasmRefType(s.concat(v), "String");
         },
         "+_char_String": (value, stringRef) => {
             const s = runtime.wasmDeref(stringRef);
             const v = runtime.wasmToChar(value);
-            return runtime.wasmRef(v.concat(s));
+            return runtime.wasmRefType(v.concat(s), "String");
         },
         "+_String_reference": (stringRef, ref) => {
             const s = runtime.wasmDeref(stringRef);
             const o = runtime.wasmDeref(ref);
-            return runtime.wasmRef(s.concat(o == null ? "null" : "Object@" + ref));
+            return runtime.wasmRefType(s.concat(o == null ? "null" : "Object@" + ref), "String");
         },
         "+_reference_String": (ref, stringRef) => {
             const s = runtime.wasmDeref(stringRef);
             const o = runtime.wasmDeref(ref);
-            return runtime.wasmRef((o == null ? "null" : "Object@" + ref).concat(s));
+            return runtime.wasmRefType((o == null ? "null" : "Object@" + ref).concat(s), "String");
         },
     }
 };
