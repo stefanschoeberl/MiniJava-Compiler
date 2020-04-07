@@ -1,20 +1,27 @@
-class Main {
-    public static void main() {
-        HTMLElement txtFrom = Document.getElementById("txtFrom");
-        HTMLElement txtTo = Document.getElementById("txtTo");
+class Elements {
+    HTMLElement txtFrom;
+    HTMLElement txtTo;
+    HTMLElement resultBox;
+    HTMLElement infoBox;
+}
 
+class ClickEventListener {
+    Elements elements;
+
+    ClickEventListener(Elements elements) {
+        this.elements = elements;
+    }
+
+    public void handleEvent(MouseEvent event) {
         Range range = new Range(
-            Integer.parseInt(txtFrom.value),
-            Integer.parseInt(txtTo.value)
+            Integer.parseInt(elements.txtFrom.value),
+            Integer.parseInt(elements.txtTo.value)
         );
-        range.printToConsole();
 
-        // TODO: eventhandler for button click
-
-        HTMLElement resultBox = Document.getElementById("resultBox");
+        elements.resultBox.textContent = "";
 
         HTMLElement table = Document.createElement("table");
-        resultBox.appendChild(table);
+        elements.resultBox.appendChild(table);
         table.classList.add("table");
 
         HTMLElement tbody = Document.createElement("tbody");
@@ -36,8 +43,22 @@ class Main {
             i = i + 1;
         }
 
-        HTMLElement infoBox = Document.getElementById("infoBox");
-        infoBox.classList.remove("invisible");
-        infoBox.innerText = "Generated fibonacci numbers fib(" + range.from + ") to fib(" + range.to +") in MiniJava!";
+        elements.infoBox.classList.remove("invisible");
+        elements.infoBox.innerText = "Generated fibonacci numbers fib(" + range.from + ") to fib(" + range.to +") in MiniJava!";
+    }
+}
+
+class Main {
+    public static void main() {
+        Elements elements = new Elements();
+        elements.txtFrom = Document.getElementById("txtFrom");
+        elements.txtTo = Document.getElementById("txtTo");
+        elements.resultBox = Document.getElementById("resultBox");
+        elements.infoBox = Document.getElementById("infoBox");
+
+        HTMLElement btnCalculate = Document.getElementById("btnCalculate");
+
+        ClickEventListener listener = new ClickEventListener(elements);
+        btnCalculate.addClickEventListener(listener);
     }
 }

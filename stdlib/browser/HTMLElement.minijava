@@ -5,4 +5,5 @@ class HTMLElement {
     DOMTokenList classList;
 
     native void appendChild(HTMLElement newChild);
+    native void addClickEventListener(Object handler);
 }
