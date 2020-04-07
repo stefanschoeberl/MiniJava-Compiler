@@ -78,7 +78,7 @@ abstract class CompilerTest {
         val allSourceDefinitions = mutableListOf(testSourceFile)
 
         if (withStandardLibrary) {
-            val stdlib = File(File(System.getProperty("user.dir")).parentFile, "stdlib")
+            val stdlib = File(File(File(System.getProperty("user.dir")).parentFile, "stdlib"), "core")
             allSourceDefinitions.add(stdlib)
         }
 
