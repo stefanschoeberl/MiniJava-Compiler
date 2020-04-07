@@ -15,10 +15,10 @@ function fibNumbers(from, to) {
 }
 
 module.exports = () => {
-    const txtFrom = document.getElementById("txtFrom");
-    const txtTo = document.getElementById("txtTo");
-    const btnCalculate = document.getElementById("btnCalculate");
-    const resultBox = document.getElementById("resultBox");
+    const txtFrom = document.getElementById('txtFrom');
+    const txtTo = document.getElementById('txtTo');
+    const btnCalculate = document.getElementById('btnCalculate');
+    const resultBox = document.getElementById('resultBox');
     const infoBox = document.getElementById('infoBox');
 
     btnCalculate.addEventListener('click', () => {

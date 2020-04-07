@@ -63,28 +63,28 @@ class BundleGenerator (
                     is DataType.Array -> "null"
                     DataType.NullType -> throw IllegalStateException("Cannot generate code for field of type DataType.NullType")
                 }
-                "\"${field.key}\":$initValue"
+                "'${field.key}':$initValue"
             }
 
             val constructor = externalFunctionNameProvider.externalNameForConstructor(className)
-            functions.add("\"$constructor\": function() { return runtime.wasmRefType({$initObject}, \"$className\"); }")
+            functions.add("'$constructor': function() { return runtime.wasmRefType({$initObject}, '$className'); }")
             fields.forEach { field ->
                 val getter = externalFunctionNameProvider.externalNameForGetter(className, field.key)
                 val setter = externalFunctionNameProvider.externalNameForSetter(className, field.key)
                 val type = field.value.type
 
                 if (type is DataType.PrimitiveType.Boolean) {
-                    functions.add("\"$getter\": function (ref) { return runtime.wasmDeref(ref)[\"${field.key}\"]; }")
-                    functions.add("\"$setter\": function (ref, val) { runtime.wasmDeref(ref)[\"${field.key}\"] = runtime.wasmBoolean(val); }")
+                    functions.add("'$getter': function (ref) { return runtime.wasmDeref(ref)['${field.key}']; }")
+                    functions.add("'$setter': function (ref, val) { runtime.wasmDeref(ref)['${field.key}'] = runtime.wasmBoolean(val); }")
                 } else if (type is DataType.ReferenceType) {
-                    functions.add("\"$getter\": function (ref) { return runtime.wasmRefType(runtime.wasmDeref(ref)[\"${field.key}\"], \"${type.name}\"); }")
-                    functions.add("\"$setter\": function (ref, val) { runtime.wasmDeref(ref)[\"${field.key}\"] = runtime.wasmDeref(val); }")
+                    functions.add("'$getter': function (ref) { return runtime.wasmRefType(runtime.wasmDeref(ref)['${field.key}'], '${type.name}'); }")
+                    functions.add("'$setter': function (ref, val) { runtime.wasmDeref(ref)['${field.key}'] = runtime.wasmDeref(val); }")
                 } else if (type is DataType.Array) {
-                    functions.add("\"$getter\": function (ref) { return runtime.wasmRef(runtime.wasmDeref(ref)[\"${field.key}\"]); }")
-                    functions.add("\"$setter\": function (ref, val) { runtime.wasmDeref(ref)[\"${field.key}\"] = runtime.wasmDeref(val); }")
+                    functions.add("'$getter': function (ref) { return runtime.wasmRef(runtime.wasmDeref(ref)['${field.key}']); }")
+                    functions.add("'$setter': function (ref, val) { runtime.wasmDeref(ref)['${field.key}'] = runtime.wasmDeref(val); }")
                 } else {
-                    functions.add("\"$getter\": function (ref) { return runtime.wasmDeref(ref)[\"${field.key}\"]; }")
-                    functions.add("\"$setter\": function (ref, val) { runtime.wasmDeref(ref)[\"${field.key}\"] = val; }")
+                    functions.add("'$getter': function (ref) { return runtime.wasmDeref(ref)['${field.key}']; }")
+                    functions.add("'$setter': function (ref, val) { runtime.wasmDeref(ref)['${field.key}'] = val; }")
                 }
             }
         }
@@ -104,7 +104,7 @@ $classCode
     private fun generateStringLiterals(stringLiteralSymbolTable: StringLiteralSymbolTable): String {
         val stringsCode = stringLiteralSymbolTable.allStringsByAddress
             .sortedBy { it.first }
-            .map { """runtime.wasmRefType("${it.second}", "String");""" }
+            .map { """runtime.wasmRefType("${it.second}", 'String');""" }
             .joinToString("\n") { it.prependIndent("                ")}
 
         return """

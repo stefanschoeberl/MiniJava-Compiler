@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { promisify } = require("util");
+const { promisify } = require('util');
 const readFile = promisify(fs.readFile);
 
 const Runtime = require('./build/wasm-module/runtime');
@@ -13,7 +13,7 @@ async function runModule() {
     const instance = new WebAssembly.Instance(module, imports(runtime));
 
     runtime.setWasmModuleInstance(instance);
-    runtime.staticMethod("Main", "main")();
+    runtime.staticMethod('Main', 'main')();
 }
 
 runModule();

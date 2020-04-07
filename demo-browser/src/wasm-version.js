@@ -16,7 +16,7 @@ async function runModule() {
     }
 
     runtime.setWasmModuleInstance(instance);
-    runtime.staticMethod("Main", "main")();
+    runtime.staticMethod('Main', 'main')();
 }
 
 module.exports = runModule;
