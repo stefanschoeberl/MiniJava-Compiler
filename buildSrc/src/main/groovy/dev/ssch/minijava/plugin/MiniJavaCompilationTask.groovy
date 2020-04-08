@@ -6,35 +6,23 @@ import org.gradle.api.tasks.JavaExec
 // https://stackoverflow.com/questions/7111362/pulling-a-gradle-dependency-jar-from-maven-and-then-running-it-directly
 
 class MiniJavaCompilationTask extends JavaExec {
-    private List<Object> inputFiles = []
-    private List<Object> inputDirs = []
+    private List<Object> inputParameters = []
     private Object outputDir
 
-    List<Object> getInputFiles() {
-        return inputFiles
-    }
-
-    void setInputFiles(List<Object> inputFiles) {
+    void inputFiles(List<Object> inputFiles) {
         inputs.files(inputFiles)
-        this.inputFiles = inputFiles
+        this.inputParameters.addAll(inputFiles)
         updateArgs()
     }
 
-    List<Object> getInputDirs() {
-        return inputDirs
+    void inputDirs(Object... inputDirs) {
+        Arrays.stream(inputDirs).forEach { inputs.dir(it) }
+        this.inputParameters.addAll(inputDirs)
+        updateArgs()
     }
 
-    void setInputDirs(List<Object> inputDirs) {
-        inputDirs.forEach { inputs.dir(it) }
-        this.inputDirs = inputDirs
-    }
-
-    Object getOutputDir() {
-        return outputDir
-    }
-
-    void setOutputDir(Object outputDir) {
-        outputs.files(outputDir)
+    void outputDir(Object outputDir) {
+        outputs.dir(outputDir)
         this.outputDir = outputDir
         updateArgs()
     }
@@ -50,8 +38,7 @@ class MiniJavaCompilationTask extends JavaExec {
     private void updateArgs() {
         def arguments = ['-o']
         arguments.add(outputDir.toString())
-        arguments.addAll(inputFiles.collect { it.toString() })
-        arguments.addAll(inputDirs.collect { it.toString() })
+        arguments.addAll(inputParameters.collect { it.toString() })
         args = arguments
     }
 }

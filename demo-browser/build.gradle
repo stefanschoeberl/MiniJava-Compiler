@@ -11,8 +11,8 @@ dependencies {
 }
 
 task compileMiniJava(type: MiniJavaCompilationTask) {
-    inputDirs = ['../stdlib/core', '../stdlib/browser', 'minijava']
-    outputDir = 'build/wasm-module'
+    inputDirs('../stdlib/core', '../stdlib/browser', 'minijava')
+    outputDir 'build/wasm-module'
 }
 
 node {
@@ -28,7 +28,7 @@ task buildWebApp(type: NpmTask) {
     inputs.dir('src')
     inputs.dir('build/wasm-module')
     inputs.dir(fileTree('node_modules').exclude('.cache'))
-    outputs.files('build/dist')
+    outputs.dir('build/dist')
 }
 
 assemble.dependsOn buildWebApp
