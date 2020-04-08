@@ -44,7 +44,7 @@ class MiniJavaCompilationTask extends JavaExec {
         description = 'Compiles MiniJava source files and generates a WebAssembly module'
         main = 'dev.ssch.minijava.compiler.MainKt'
         classpath project.configurations.minijava
-        project.build.dependsOn this
+        project.assemble.dependsOn this
     }
 
     private void updateArgs() {

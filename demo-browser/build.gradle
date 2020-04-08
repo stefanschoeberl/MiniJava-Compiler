@@ -31,4 +31,4 @@ task buildWebApp(type: NpmTask) {
     outputs.files('build/dist')
 }
 
-build.dependsOn buildWebApp
+assemble.dependsOn buildWebApp

@@ -26,3 +26,4 @@ task allInOneJar(type: Jar) {
             .collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
+assemble.dependsOn(allInOneJar)
