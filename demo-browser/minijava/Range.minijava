@@ -6,6 +6,4 @@ class Range {
         this.from = from;
         this.to = to;
     }
-
-    native void printToConsole();
 }
