@@ -13,6 +13,7 @@ class ClickEventListener {
     }
 
     public void handleEvent(MouseEvent event) {
+        int start = Stopwatch.now();
         Range range = new Range(
             Integer.parseInt(elements.txtFrom.value),
             Integer.parseInt(elements.txtTo.value)
@@ -42,9 +43,10 @@ class ClickEventListener {
             tbody.appendChild(row);
             i = i + 1;
         }
+        int end = Stopwatch.now();
 
         elements.infoBox.classList.remove("invisible");
-        elements.infoBox.innerText = "Generated fibonacci numbers fib(" + range.from + ") to fib(" + range.to +") in MiniJava!";
+        elements.infoBox.innerText = "Generated Fibonacci Numbers fib(" + range.from + ") to fib(" + range.to +") in MiniJava! Time: " + (end - start) + "ms";
     }
 }
 

@@ -1,0 +1,3 @@
+class Stopwatch {
+    native static int now();
+}

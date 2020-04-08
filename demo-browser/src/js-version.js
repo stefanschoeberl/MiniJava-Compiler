@@ -22,6 +22,7 @@ module.exports = () => {
     const infoBox = document.getElementById('infoBox');
 
     btnCalculate.addEventListener('click', () => {
+        const start = new Date().getMilliseconds();
         const from = parseInt(txtFrom.value);
         const to = parseInt(txtTo.value);
         const numbers = fibNumbers(from, to);
@@ -46,8 +47,9 @@ module.exports = () => {
             row.appendChild(valueCol);
             tbody.appendChild(row);
         }
+        const end = new Date().getMilliseconds();
 
         infoBox.classList.remove('invisible');
-        infoBox.innerText = 'Generated fibonacci numbers fib(' + from + ') to fib(' + to + ') in JavaScript!';
+        infoBox.innerText = 'Generated Fibonacci Numbers fib(' + from + ') to fib(' + to + ') in JavaScript! Time: ' + (end - start) + 'ms';
     });
 };
