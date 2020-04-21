@@ -14,6 +14,6 @@ module.exports = runtime => {
 
     return {
         internal: internals(runtime),
-        imports: nativeMethods
+        native: nativeMethods
     }
 };

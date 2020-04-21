@@ -84,7 +84,7 @@ class ModuleCodeGenerator (
             val methodInfo = it.second.value
 
             codeEmitter.importFunction(
-                "imports",
+                "native",
                 "$className.${externalFunctionNameProvider.externalNameForMethod(methodSignature)}",
                 createFunctionType(methodSignature, methodInfo)
             )
@@ -97,7 +97,7 @@ class ModuleCodeGenerator (
             .forEach {
                 val className = it.key
                 codeEmitter.importFunction(
-                    "imports",
+                    "native",
                     externalFunctionNameProvider.externalNameForConstructor(className),
                     FuncType(mutableListOf(), mutableListOf(ValueType.I32))
                 )
@@ -115,13 +115,13 @@ class ModuleCodeGenerator (
             val fieldType = it.second.value.type.toWebAssemblyType()
 
             codeEmitter.importFunction(
-                "imports",
+                "native",
                 externalFunctionNameProvider.externalNameForGetter(className, fieldName),
                 FuncType(mutableListOf(ValueType.I32), mutableListOf(fieldType))
             )
 
             codeEmitter.importFunction(
-                "imports",
+                "native",
                 externalFunctionNameProvider.externalNameForSetter(className, fieldName),
                 FuncType(mutableListOf(ValueType.I32, fieldType), mutableListOf())
             )
