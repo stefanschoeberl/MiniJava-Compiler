@@ -26,7 +26,9 @@ class Runtime {
     }
 
     wasmRefType(obj, type) {
-        this.types.set(obj, type);
+        if (obj !== null) {
+            this.types.set(obj, type);
+        }
         return this.wasmRef(obj);
     }
 
