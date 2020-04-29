@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  httpd:
+    build:
+      context: ./server
+    ports:
+    - 127.0.0.1:8080:80
+    volumes:
+    - ./build/dist:/usr/local/apache2/htdocs:ro
