@@ -1,0 +1,7 @@
+.*
+gradle/
+out/
+build/
+*/build/
+*/node_modules/
+fibminijava.Dockerfile
