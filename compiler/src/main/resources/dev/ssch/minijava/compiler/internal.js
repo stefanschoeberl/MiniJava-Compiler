@@ -12,40 +12,40 @@ module.exports = runtime => {
         'new_array_reference': size => {
             return runtime.wasmRef(Array(size).fill(null));
         },
-        'array_length': arrayAddress => {
-            return runtime.wasmDeref(arrayAddress).length
+        'array_length': arrayRef => {
+            return runtime.wasmDeref(arrayRef).length
         },
-        'get_array_numeric': (arrayAddress, index) => {
-            const a = runtime.wasmDeref(arrayAddress);
+        'get_array_numeric': (arrayRef, index) => {
+            const a = runtime.wasmDeref(arrayRef);
             return a[index];
         },
-        'get_array_boolean': (arrayAddress, index) => {
-            const a = runtime.wasmDeref(arrayAddress);
+        'get_array_boolean': (arrayRef, index) => {
+            const a = runtime.wasmDeref(arrayRef);
             return a[index] ? 1 : 0;
         },
-        'get_array_char': (arrayAddress, index) => {
-            const a = runtime.wasmDeref(arrayAddress);
+        'get_array_char': (arrayRef, index) => {
+            const a = runtime.wasmDeref(arrayRef);
             return runtime.charToWasm(a[index]);
         },
-        'get_array_reference': (arrayAddress, index) => {
-            const a = runtime.wasmDeref(arrayAddress);
+        'get_array_reference': (arrayRef, index) => {
+            const a = runtime.wasmDeref(arrayRef);
             return runtime.wasmRef(a[index]);
         },
-        'set_array_numeric': (arrayAddress, index, value) => {
-            const a = runtime.wasmDeref(arrayAddress);
+        'set_array_numeric': (arrayRef, index, value) => {
+            const a = runtime.wasmDeref(arrayRef);
             a[index] = value;
         },
-        'set_array_boolean': (arrayAddress, index, value) => {
-            const a = runtime.wasmDeref(arrayAddress);
+        'set_array_boolean': (arrayRef, index, value) => {
+            const a = runtime.wasmDeref(arrayRef);
             a[index] = value > 0;
         },
-        'set_array_char': (arrayAddress, index, value) => {
-            const a = runtime.wasmDeref(arrayAddress);
+        'set_array_char': (arrayRef, index, value) => {
+            const a = runtime.wasmDeref(arrayRef);
             a[index] = runtime.wasmToChar(value);
         },
-        'set_array_reference': (arrayAddress, index, valueAddress) => {
-            const a = runtime.wasmDeref(arrayAddress);
-            a[index] = runtime.wasmDeref(valueAddress);
+        'set_array_reference': (arrayRef, index, valueRef) => {
+            const a = runtime.wasmDeref(arrayRef);
+            a[index] = runtime.wasmDeref(valueRef);
         },
         '+_String_String': (stringRef1, stringRef2) => {
             const s1 = runtime.wasmDeref(stringRef1);
