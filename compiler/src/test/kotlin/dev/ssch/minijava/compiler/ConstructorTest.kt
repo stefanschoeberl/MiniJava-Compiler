@@ -136,4 +136,18 @@ class ConstructorTest : CompilerTest() {
         """.compileAndRunInMainFunction()
         }.isInstanceOf(UndefinedConstructorException::class.java)
     }
+
+    @Test
+    fun `call noarg-constructor and some arg-constructor exists`() {
+        assertThatThrownBy {
+        """
+            Main(int a) {}
+            
+            public static void main() {
+                Main a = new Main();
+            }
+             
+        """.compileAndRunInMainClass()
+        }.isInstanceOf(UndefinedConstructorException::class.java)
+    }
 }

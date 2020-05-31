@@ -36,7 +36,7 @@ class ClassInstanceCreationExpressionCodeGenerator (
         if (initializers.isDeclared(parameters)) {
             val initializerAddress = initializers.addressOf(parameters)
             codeEmitter.emitInstruction(Instruction.call(initializerAddress))
-        } else if (parameters.isNotEmpty()) {
+        } else if (parameters.isNotEmpty() || initializers.isNotEmpty()) {
             throw UndefinedConstructorException(parameters, ctx.type)
         }
 

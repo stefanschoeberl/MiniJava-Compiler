@@ -25,6 +25,10 @@ class InitializerSymbolTable {
         return initializers.contains(InitializerSignature(parameters))
     }
 
+    fun isNotEmpty(): Boolean {
+        return initializers.isNotEmpty()
+    }
+
     private fun findInitializerInformation(parameters: List<DataType>): InitializerInformation? {
         return initializers[InitializerSignature(parameters)]
     }
