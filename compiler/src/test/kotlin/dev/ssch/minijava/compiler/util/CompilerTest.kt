@@ -85,6 +85,7 @@ abstract class CompilerTest {
         val allSourceFiles = context.compiler.expandSourceDefinitions(allSourceDefinitions)
 
         val bundle = context.compiler.compile(allSourceFiles)
+        println(context.webAssemblyModuleGenerator.toSExpr(bundle.module))
 
         context.bundleGenerator.generateBundle(bundle, allSourceFiles, wasmOutput)
 

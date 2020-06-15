@@ -1,5 +1,6 @@
 package dev.ssch.minijava.compiler
 
+import dev.ssch.minijava.compiler.exception.InstanceMethodCallFromStaticMethodException
 import dev.ssch.minijava.compiler.exception.NotACallableExpressionException
 import dev.ssch.minijava.compiler.exception.UndefinedClassException
 import dev.ssch.minijava.compiler.util.CompilerTest
@@ -323,5 +324,48 @@ class MethodsTest : CompilerTest() {
             };
         """).compileAndRunInMainClass()
         assertThat(output.lines()).containsExactly("123", "")
+    }
+
+    @Test
+    fun `call instance method from other instance method`() {
+        val output = Source.withMiniJava("""
+            int x;
+            
+            void methodA() {
+                methodB();
+            }
+            
+            void methodB() {
+                Console.println(x);
+            }
+            
+            public static void main() {
+                Main m = new Main();
+                m.x = 123;
+                m.methodA();
+            }
+        """).compileAndRunInMainClass()
+        assertThat(output.lines()).containsExactly("123", "")
+    }
+
+    @Test
+    fun `call instance method from static method`() {
+        assertThatThrownBy {
+            Source.withMiniJava("""
+                int x;
+                
+                static void methodA() {
+                    methodB();
+                }
+                
+                void methodB() {
+                    
+                }
+                
+                public static void main() {
+                    Main.methodA();
+                }
+            """).compileAndRunInMainClass()
+        }.isInstanceOf(InstanceMethodCallFromStaticMethodException::class.java)
     }
 }

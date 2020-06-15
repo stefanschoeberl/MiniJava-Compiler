@@ -37,6 +37,15 @@ class CallExpressionCodeGeneration (
             codeEmitter.emitInstruction(codePositionBeforeParameters, Instruction.drop)
         }
 
+        if (!methodSymbolTableOfTargetClass.isStatic(methodName, parameterTypes) && !generatedTargetReferenceOnStack) {
+            if (!codeEmitter.localsVariableSymbolTable.doesThisParameterExist()) {
+                throw InstanceMethodCallFromStaticMethodException(className, methodName, ctx.target.stop)
+            } else {
+                val thisAddress = codeEmitter.localsVariableSymbolTable.addressOfThis()
+                codeEmitter.emitInstruction(codePositionBeforeParameters, Instruction.local_get(thisAddress))
+            }
+        }
+
         codeEmitter.emitInstruction(Instruction.call(address))
 
         return methodSymbolTableOfTargetClass.returnTypeOf(methodName, parameterTypes)
