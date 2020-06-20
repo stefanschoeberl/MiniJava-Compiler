@@ -67,7 +67,9 @@ class BasicExpressionCodeGenerator (
         val unaryOperation = operatorTable.findUnaryMinusOperation(type)
             ?: throw InvalidUnaryOperationException(type, ctx.SUB().symbol)
 
-        codeEmitter.emitInstruction(codePositionBeforeOperand, unaryOperation.operationBeforeOperand)
+        unaryOperation.operationBeforeOperand?.let {
+            codeEmitter.emitInstruction(codePositionBeforeOperand, it)
+        }
         codeEmitter.emitInstruction(unaryOperation.operationAfterOperand)
 
         return type

@@ -15,8 +15,8 @@ class OperatorTable (
         val resultingType: DataType
     )
 
-    data class UnaryOperation (
-        val operationBeforeOperand: Instruction,
+    data class UnaryOperation(
+        val operationBeforeOperand: Instruction?,
         val operationAfterOperand: Instruction
     )
 
@@ -134,7 +134,7 @@ class OperatorTable (
     fun findUnaryMinusOperation(type: DataType?): UnaryOperation? {
         return when (type) {
             DataType.PrimitiveType.Integer -> UnaryOperation(Instruction.i32_const(0), Instruction.i32_sub)
-            DataType.PrimitiveType.Float -> UnaryOperation(Instruction.f32_const(0f), Instruction.f32_sub)
+            DataType.PrimitiveType.Float -> UnaryOperation(null, Instruction.f32_neg)
             else -> null
         }
     }

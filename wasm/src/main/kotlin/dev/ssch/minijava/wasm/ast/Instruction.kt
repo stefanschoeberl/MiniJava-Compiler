@@ -64,6 +64,8 @@ sealed class Instruction {
     object i32_and : Instruction()
     object i32_or : Instruction()
 
+    object f32_neg : Instruction()
+
     object _if : Instruction()
     object _else: Instruction()
     object end: Instruction()

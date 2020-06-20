@@ -93,6 +93,7 @@ class WebAssemblyModuleGenerator {
             Instruction.end -> "end"
             Instruction.i32_and -> "i32.and"
             Instruction.i32_or -> "i32.or"
+            Instruction.f32_neg -> "f32.neg"
             is Instruction.br -> "br ${instruction.label}"
             is Instruction.br_if -> "br_if ${instruction.label}"
             Instruction.i32_eqz -> "i32.eqz"
