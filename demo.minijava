@@ -1,0 +1,10 @@
+class Utils {
+    static native int add(int a, int b);
+}
+
+class Main {
+    public static void main() {
+        Console.println("Hello World!");
+        Console.println("3 + 4 = " + Utils.add(3, 4));
+    }
+}

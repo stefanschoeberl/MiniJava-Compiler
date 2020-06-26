@@ -7,5 +7,6 @@
 *.ipr
 out/
 build/
+wasm-output/
 
 .gradle
