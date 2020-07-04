@@ -327,6 +327,45 @@ class MethodsTest : CompilerTest() {
     }
 
     @Test
+    fun `call method with Object parameter with array`() {
+        val output = Source.withMiniJava("""
+            int x;
+            
+            public static void main() {
+                Main[] a1 = new Main[2];
+                a1[0] = new Main();
+                a1[0].x = 111;
+                a1[1] = new Main();
+                a1[1].x = 222;
+                
+                int[] a2 = new int[2];
+                a2[0] = 333;
+                a2[1] = 444;
+                
+                call1(a1);
+                call2(a2);
+            }
+            
+            native static void call1(Object o);
+            native static void call2(Object o);
+        """).andJavaScript("""
+            module.exports = runtime => {
+                return {
+                    "Main.call1#Object": arrayRef => {
+                        console.log(runtime.wasmDeref(arrayRef)[0].x);
+                        console.log(runtime.wasmDeref(arrayRef)[1].x);
+                    },
+                    "Main.call2#Object": arrayRef => {
+                        console.log(runtime.wasmDeref(arrayRef)[0]);
+                        console.log(runtime.wasmDeref(arrayRef)[1]);
+                    }
+                };
+            };
+        """).compileAndRunInMainClass()
+        assertThat(output.lines()).containsExactly("111", "222", "333", "444", "")
+    }
+
+    @Test
     fun `call instance method from other instance method`() {
         val output = Source.withMiniJava("""
             int x;

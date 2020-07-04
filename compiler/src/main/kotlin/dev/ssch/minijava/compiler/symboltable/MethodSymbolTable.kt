@@ -81,7 +81,7 @@ class MethodSymbolTable {
 
         // try all combinations of ReferenceType/Object
         val referenceTypeIndices = parameters
-            .map { it != DataType.ReferenceType.ObjectType && it is DataType.ReferenceType }
+            .map { it != DataType.ReferenceType.ObjectType && (it is DataType.ReferenceType || it is DataType.Array) }
             .mapIndexed { index, b -> Pair(index, b) }
             .filter { it.second }
             .map { it.first }
