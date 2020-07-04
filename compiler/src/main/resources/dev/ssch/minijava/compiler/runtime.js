@@ -7,11 +7,11 @@ class Runtime {
         this.types = new Map();
         this.objects.set(null, 0);
         this.references.set(0, null);
-        this.instance = null;
+        this.wasmModuleInstance = null;
     }
 
     setWasmModuleInstance(instance) {
-        this.instance = instance
+        this.wasmModuleInstance = instance
     }
 
     wasmRef(obj) {
@@ -60,7 +60,7 @@ class Runtime {
 
     findMethod(className, methodName, ...argumentTypes) {
         const argumentTypeString = argumentTypes.map(s => '#' + s).join('');
-        return this.instance.exports[className + '.' + methodName + argumentTypeString];
+        return this.wasmModuleInstance.exports[className + '.' + methodName + argumentTypeString];
     }
 }
 
