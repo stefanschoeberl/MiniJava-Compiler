@@ -11,7 +11,7 @@ class Runtime {
     }
 
     setWasmModuleInstance(instance) {
-        this.wasmModuleInstance = instance
+        this.wasmModuleInstance = instance;
     }
 
     wasmRef(obj) {
@@ -37,7 +37,7 @@ class Runtime {
     }
 
     wasmBoolean(value) {
-        return value !== 0
+        return value !== 0;
     }
 
     wasmToChar(value) {

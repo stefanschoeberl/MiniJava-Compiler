@@ -13,7 +13,7 @@ module.exports = runtime => {
             return runtime.wasmRef(Array(size).fill(null));
         },
         'array_length': arrayRef => {
-            return runtime.wasmDeref(arrayRef).length
+            return runtime.wasmDeref(arrayRef).length;
         },
         'get_array_numeric': (arrayRef, index) => {
             const a = runtime.wasmDeref(arrayRef);
